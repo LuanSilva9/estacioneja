@@ -1,0 +1,67 @@
+.geral_hero {
+    height: auto;
+    padding: 30px;
+    background: #fff;
+}
+
+.geral_hero .geral_content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.geral_hero .geral_content .title {
+    text-align: center;
+    color: #182f42;
+}
+
+.geral_hero .geral_content .container_texts .texts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 35px;
+}
+
+.geral_hero .geral_content .container_texts .texts .text-single {
+    max-width: 750px;
+    width: 99%;
+    padding: 10px;
+    list-style: numeric ;
+    border-bottom: 1px solid #c0c0c0;
+}
+
+.geral_hero .geral_content .container_texts .texts .text-single h3 {
+    color: #182f42;
+}
+
+
+.geral_hero .geral_content .container_texts .texts .text-single p {
+    text-align: justify;
+    line-height: 200%;
+    font-size: 16px;
+}
+
+.container_texts .buttons_font {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.container_texts .buttons_font button {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #182f42;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #182f42;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.container_texts .buttons_font button:hover {
+    opacity: .5;
+}
