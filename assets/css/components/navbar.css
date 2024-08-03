@@ -1,0 +1,40 @@
+.navbar {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+    align-items: center;
+    background: #182f42;
+    height: auto;
+    padding: 20px;
+    gap: 20px;
+}
+
+.navbar .logo {
+    color: #ffffff;
+    font-size: 15px;
+    user-select: none;
+}
+
+.navbar .logo h2 {
+    font-weight: 400;
+}
+
+.navbar .navlist {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 15px;
+}
+
+.navbar .navlist li {
+    list-style-type: none;
+}
+
+.navbar .navlist li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar .navlist li a:hover {
+    opacity: 0.6;
+}
