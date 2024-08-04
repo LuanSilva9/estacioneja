@@ -51,8 +51,8 @@
 
 
 .container_texts .buttons_font button {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     border: 1px solid #182f42;
     border-radius: 50%;
     background: #ffffff;
@@ -60,8 +60,10 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
+    transition: .3s;
 }
 
 .container_texts .buttons_font button:hover {
-    opacity: .5;
+    color: #fff;
+    background: #182f42;
 }
