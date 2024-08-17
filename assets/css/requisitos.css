@@ -1,0 +1,39 @@
+.requisitos_hero {
+    height: auto;
+    padding: 30px;
+    background: #fff;
+}
+
+.requisitos_hero .requisitos_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.requisitos_hero .requisitos_content .title {
+    text-align: center;
+    color: #182f42;
+}
+
+.requisitos_hero .requisitos_content table {
+    max-width: 800px;
+    width: 97%;
+}
+
+.requisitos_hero .requisitos_content table td {
+    padding: 5px;
+    border: 1px solid #182f42;
+}
+
+.requisitos_hero .requisitos_content table .indice {
+    font-style: italic;
+}
+
+.requisitos_hero .requisitos_content table .requisito-titulo {
+    text-align: center;
+}
+
+.requisitos_hero .requisitos_content table .descricao {
+    text-align: justify;
+}

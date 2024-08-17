@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./assets/css/requisitos.css">
+    <link rel="stylesheet" href="./assets/css/global.css">
+
+    <!-- componentes fixos-->
+    <link rel="stylesheet" href="./assets/css/components/navbar.css">
+
+    <title>TheParkHub :: Modelagem & Estudo</title>
+
+</head>
+
+<body>
+    <main class="geral">
+        <header class="navbar">
+            <div class="logo">
+                <h2>TheParkHub ::</h2>
+            </div>
+
+            <ul class="navlist">
+                <li><a href="./">Principal</a></li>
+                <li><a href="./">Integrantes</a></li>
+                <li><a href="./">Curso</a></li>
+            </ul>
+        </header>
+          
+        <div class="requisitos_hero">
+            <div class="requisitos_content">
+                <div class="title">
+                    <h2>Requisitos Funcionais</h2>
+                </div>
+            
+                <table class="requisitos_funcionais_table">
+                    <tr>
+                        <td class="indice">RF.N</td>
+                        <td>Nome do Requisito</td>
+                        <td>Descrição</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.1</td>
+                        <td class="requisito-titulo">Cadastro de Estacionamentos</td>
+                        <td class="descricao">O sistema deve permitir o cadastro de diferentes estacionamentos, incluindo informações como localização, capacidade de vagas e horários de funcionamento.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.2</td>
+                        <td class="requisito-titulo">Visualização de Vagas Disponíveis</td>
+                        <td class="descricao">Os usuários devem poder visualizar em tempo real as vagas disponíveis em cada estacionamento cadastrado.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.3</td>
+                        <td class="requisito-titulo">Reservar Vaga</td>
+                        <td class="descricao">Os usuários devem ter a capacidade de reservar uma vaga de estacionamento com antecedência, quando disponível, através do aplicativo.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.4</td>
+                        <td class="requisito-titulo">Cancelar Reserva</td>
+                        <td class="descricao">Os Usuários devem ter uma maneira de cancelar suas vagas para caso de adversidades ou se mudarem de ideia, desse modo o sistema irá atualizar para que outra pessoa possa pegar essa vaga.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.5</td>
+                        <td class="requisito-titulo">Registrar Entradas e Saídas</td>
+                        <td class="descricao">Os usuários devem registrar quando entraram e quando saíram dos estacionamentos, para o sistema reconhecer que a vaga está sendo ocupada como deveria, já que, sem essa etapa, vagas poderão ser reservadas para o dia inteiro e não serão preenchidas, a maneira como esse check-in será feito está em debate.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.6</td>
+                        <td class="requisito-titulo">Indicação de Rotas</td>
+                        <td class="descricao">O aplicativo deve fornecer rotas otimizadas para chegar ao estacionamento selecionado, considerando o tráfego em tempo real.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.7</td>
+                        <td class="requisito-titulo">Notificação em Tempo Real</td>
+                        <td class="descricao">Os usuários devem receber notificações sobre o status de sua reserva, bem como alertas sobre vagas disponíveis ou eventos importantes, como mudanças nos horários de funcionamento.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.8</td>
+                        <td class="requisito-titulo">Feedback dos Usuários</td>
+                        <td class="descricao">Deve ser possível para os usuários fornecer feedback sobre a experiência de estacionamento, ajudando a melhorar o serviço.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.9</td>
+                        <td class="requisito-titulo">Manter Estacionamento</td>
+                        <td class="descricao">Os administradores devem ter acesso a um painel de controle onde possam gerenciar informações sobre os estacionamentos, verificar estatísticas de uso e responder a feedback dos usuários.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.10</td>
+                        <td class="requisito-titulo">Recomendação de Vagas</td>
+                        <td class="descricao">Deve existir um sistema de recomendação de vagas personalizado, baseado nas preferências e histórico de utilização de cada usuário.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.11</td>
+                        <td class="requisito-titulo">Disponibilidade de Vagas</td>
+                        <td class="descricao">Implementar um sistema de avaliação em tempo real da disponibilidade de vagas, considerando fatores como o tamanho do veículo e a acessibilidade da vaga.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.12</td>
+                        <td class="requisito-titulo">Gerenciamento de Conflitos</td>
+                        <td class="descricao">Desenvolver um mecanismo para resolver conflitos de reservas, como quando dois usuários reservam a mesma vaga no mesmo horário, priorizando critérios como fidelidade do usuário ou urgência da reserva.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">RF.13</td>
+                        <td class="requisito-titulo">Status de Vaga</td>
+                        <td class="descricao">As Vagas deverão ter uma tag de status que indicará o quão prioritária ela será, se a vaga for específica para PCD, ela não poderá ser reservada por um usuário sem tal permissão, se a vaga for prioridade para um convidado do campus ou da empresa, ela não poderá ser reservada por um usuário que não o convidado, além disso as vagas em sua maioria terão status livre, a não ser que estejam ocupadas ou reservadas.</td>
+                    </tr>
+                </table>
+
+                <div class="title">
+                    <h2>Requisitos não funcionais</h2>
+                </div>
+
+                <table class="requisitos_funcionais_table">
+                    <tr>
+                        <td class="indice">NF.N</td>
+                        <td>Nome do requisito</td>
+                        <td>Descrição</td>
+                    </tr>
+
+                    <tr>
+                        <td class="indice">NF.1</td>
+                        <td class="requisito-titulo">Desempenho</td>
+                        <td class="descricao">O sistema deve ser capaz de lidar com um grande volume de usuários simultâneos sem degradação significativa do desempenho.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">NF.2</td>
+                        <td class="requisito-titulo">Segurança</td>
+                        <td class="descricao">O aplicativo deve garantir a segurança dos dados dos usuários, utilizando medidas como criptografia de dados e autenticação de dois fatores.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">NF.3</td>
+                        <td class="requisito-titulo">Escalabilidade</td>
+                        <td class="descricao">A arquitetura do sistema deve ser projetada para permitir escalabilidade fácil, para que possa lidar com o crescimento do número de usuários e estacionamentos cadastrados.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">NF.4</td>
+                        <td class="requisito-titulo">Usabilidade</td>
+                        <td class="descricao">A interface do aplicativo deve ser intuitiva e fácil de usar, mesmo para usuários inexperientes.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">NF.5</td>
+                        <td class="requisito-titulo">Acessibilidade</td>
+                        <td class="descricao">O sistema deve ser compatível com tecnologias assistivas, como leitores de tela e dispositivos de entrada alternativos, garantindo que os usuários com deficiências visuais ou motoras tenham acesso completo e eficaz ao aplicativo.</td>
+                    </tr>
+                    <tr>
+                        <td class="indice">NF.6</td>
+                        <td class="requisito-titulo">Integração com Serviços Externos</td>
+                        <td class="descricao">O sistema deve ser capaz de se integrar facilmente com serviços externos, como sistemas de pagamento online e APIs de tráfego em tempo real.</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
