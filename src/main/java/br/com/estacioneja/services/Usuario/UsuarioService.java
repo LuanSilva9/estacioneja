@@ -1,7 +1,8 @@
 package br.com.estacioneja.services.Usuario;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
@@ -13,11 +14,13 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public HttpStatus createUsuario(UsuarioDTO dto) {
+    public Usuario createUsuario(UsuarioDTO dto) {
         Usuario newUsuario = new Usuario(dto);
 
-        this.usuarioRepository.save(newUsuario);
+        return this.usuarioRepository.save(newUsuario);
+    }
 
-        return HttpStatus.CREATED;
+    public List<Usuario> listUsers() {
+        return usuarioRepository.findAll();
     }
 }
