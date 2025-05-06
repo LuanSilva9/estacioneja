@@ -2,9 +2,11 @@ package br.com.estacioneja.domain.model.Vaga;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.dto.VagaDTO;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,15 +34,22 @@ public class Vaga {
 
     private TipoVaga tipoVaga;
 
-    private Long slug;
+    private String slug;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="estacionamentoId", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Estacionamento estacionamento;
 
     public Vaga(VagaDTO dto, Estacionamento estacionamento) {
         this.tipoVaga = dto.tipoVaga();
         this.slug = dto.slug();
         this.estacionamento = estacionamento;
+    }
+
+    public Vaga(Estacionamento estacionamento, String slug) {
+        this.estacionamento = estacionamento;
+        this.slug = slug;
+        this.tipoVaga = TipoVaga.ANY;
     }
 }

@@ -2,9 +2,11 @@ package br.com.estacioneja.domain.model.Estacionamento;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.dto.EstacionamentoDTO;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,15 +33,21 @@ public class Estacionamento {
     private UUID id;
 
     private Long capacidadeTotal;
+    private Long vagasDisponiveis;
     private StatusEstacionamento statusEstacionamento;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    private String prefixo;
+
+    @ManyToOne
     @JoinColumn(name="empresaId", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Empresa empresa;
 
     public Estacionamento(EstacionamentoDTO dto, Empresa empresa) {
         this.capacidadeTotal = dto.capacidade();
         this.statusEstacionamento = dto.statusEstacionamento();
+        this.prefixo = dto.prefixo();
+        this.vagasDisponiveis = capacidadeTotal;
         this.empresa = empresa;
     }
 }

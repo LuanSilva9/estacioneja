@@ -1,9 +1,9 @@
-package br.com.estacioneja.domain.model.Acesso;
+package br.com.estacioneja.domain.model.Vinculo;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import br.com.estacioneja.domain.model.Empresa.Empresa;
+import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,33 +19,29 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="acessos")
+@Table(name = "vinculos")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
-
-public class Acesso {
+public class Vinculo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private TipoAcesso tipoAcesso;
-
     @ManyToOne
-    @JoinColumn(name = "usuarioId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "usuarioId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "empresaId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Empresa empresa;
+    private Estacionamento estacionamento;
 
-    public Acesso(TipoAcesso tipoAcesso, Usuario usuario, Empresa empresa) {
-        this.tipoAcesso = tipoAcesso;
+    public Vinculo(Usuario usuario, Estacionamento estacionamento) {
         this.usuario = usuario;
-        this.empresa = empresa;
+        this.estacionamento = estacionamento;
     }
 }

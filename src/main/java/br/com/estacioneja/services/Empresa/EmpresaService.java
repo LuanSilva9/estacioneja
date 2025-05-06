@@ -10,6 +10,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.EmpresaDTO;
+import jakarta.transaction.Transactional;
 
 @Service
 public class EmpresaService {
@@ -19,6 +20,7 @@ public class EmpresaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Transactional
     public Empresa createCompany(EmpresaDTO dto) throws Exception{
         Usuario representante = usuarioRepository.findById(dto.representanteId()).orElseThrow(() -> new Exception("ID / Representante não encontrado!"));
 
@@ -27,6 +29,7 @@ public class EmpresaService {
         return empresaRepository.save(newEmpresa);
     }
 
+    @Transactional
     public List<Empresa> listCompany() {
         return empresaRepository.findAll();
     }
