@@ -1,18 +1,25 @@
 package br.com.estacioneja.domain.model.Vaga;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.dto.VagaDTO;
+import br.com.estacioneja.domain.model.Reserva.Reserva;
+import br.com.estacioneja.dto.i.VagaDTO;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -39,7 +46,14 @@ public class Vaga {
     @ManyToOne
     @JoinColumn(name="estacionamentoId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonManagedReference("relacao-vaga-estacionamento")
     private Estacionamento estacionamento;
+
+    @OneToMany(mappedBy = "vaga", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference("relacao-reserva-vaga")
+    private List<Reserva> reservaLogs;
+
+    private StatusVaga statusVaga;
 
     public Vaga(VagaDTO dto, Estacionamento estacionamento) {
         this.tipoVaga = dto.tipoVaga();
@@ -51,5 +65,6 @@ public class Vaga {
         this.estacionamento = estacionamento;
         this.slug = slug;
         this.tipoVaga = TipoVaga.ANY;
+        this.statusVaga = StatusVaga.LIVRE;
     }
 }

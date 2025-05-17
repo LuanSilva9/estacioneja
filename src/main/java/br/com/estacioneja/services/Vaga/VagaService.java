@@ -10,7 +10,7 @@ import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.domain.repository.Vaga.VagaRepository;
-import br.com.estacioneja.dto.VagaDTO;
+import br.com.estacioneja.dto.i.VagaDTO;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -35,6 +35,11 @@ public class VagaService {
         Estacionamento estacionamento = estacionamentoRepository.findById(dto.estacionamentoId()).orElseThrow(() -> new Exception("Estacionamento não encontrado"));
 
         Vaga newVaga = new Vaga(dto, estacionamento);
+
+        estacionamento.setCapacidadeTotal(estacionamento.getCapacidadeTotal() + 1);
+        estacionamento.setVagasDisponiveis(estacionamento.getVagasDisponiveis() + 1);
+        
+        estacionamentoRepository.save(estacionamento);
 
         return vagaRepository.save(newVaga);
     }

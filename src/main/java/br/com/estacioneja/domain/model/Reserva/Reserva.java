@@ -4,9 +4,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
-import br.com.estacioneja.dto.ReservaDTO;
+import br.com.estacioneja.dto.i.ReservaDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,10 +40,12 @@ public class Reserva {
     
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "usuarioId", referencedColumnName = "id")
+    @JsonManagedReference("relacao-reserva-usuario")
     private Usuario usuario;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "vagaId", referencedColumnName = "id")
+    @JsonManagedReference("relacao-reserva-vaga")
     private Vaga vaga;
 
     private ReservaStatus status;

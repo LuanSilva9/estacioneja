@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.dto.EstacionamentoDTO;
+import br.com.estacioneja.dto.i.EstacionamentoDTO;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@RequestMapping("estacionamento")
+@RequestMapping("api/estacionamento")
 public class EstacionamentoController {
     @Autowired private EstacionamentoService estacionamentoService;
 

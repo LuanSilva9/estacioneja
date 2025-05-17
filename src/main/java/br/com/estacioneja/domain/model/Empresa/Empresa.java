@@ -1,12 +1,19 @@
 package br.com.estacioneja.domain.model.Empresa;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.EmpresaDTO;
+import br.com.estacioneja.dto.i.EmpresaDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -35,7 +42,12 @@ public class Empresa {
 
     @OneToOne
     @JoinColumn(name="representanteId", referencedColumnName = "id")
+    @JsonIgnore
     private Usuario representante;
+
+    @OneToMany(mappedBy = "empresa")
+    @JsonBackReference("relacao-empresa-estacionamento")
+    private List<Estacionamento> estacionamentos;
 
     public Empresa(EmpresaDTO dto, Usuario representante) {
         this.nome = dto.nome();

@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.UsuarioDTO;
+import br.com.estacioneja.dto.i.UsuarioDTO;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
-@RequestMapping("usuario")
+@RequestMapping("api/usuario")
 public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
@@ -32,9 +34,16 @@ public class UsuarioController {
         }
     }
 
+    
+
     @GetMapping("listar")
     public ResponseEntity<List<Usuario>> listUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.listUsers());
+    }
+
+    @GetMapping("listar/{id}")
+    public ResponseEntity<Usuario> getUser(@PathVariable Long id) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(usuarioService.getUserById(id));
     }
     
 }

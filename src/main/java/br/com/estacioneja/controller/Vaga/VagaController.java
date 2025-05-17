@@ -1,7 +1,7 @@
 package br.com.estacioneja.controller.Vaga;
 
 import br.com.estacioneja.domain.model.Vaga.Vaga;
-import br.com.estacioneja.dto.VagaDTO;
+import br.com.estacioneja.dto.i.VagaDTO;
 import br.com.estacioneja.services.Vaga.VagaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

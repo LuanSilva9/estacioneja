@@ -9,20 +9,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.dto.EmpresaDTO;
+import br.com.estacioneja.dto.i.EmpresaDTO;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
-@RequestMapping("empresa")
+@RequestMapping("api/empresa")
 public class EmpresaController {
     @Autowired
     private EmpresaService empresaService;
 
     @PostMapping("criar")
-    public ResponseEntity<String> postMethodName(@RequestBody EmpresaDTO dto) {
+    public ResponseEntity<String> createCompany(@RequestBody EmpresaDTO dto) {
         try {
             empresaService.createCompany(dto);
 
@@ -37,5 +40,14 @@ public class EmpresaController {
         return ResponseEntity.status(HttpStatus.OK).body(empresaService.listCompany());
     }
     
-    
+    @PutMapping("updt/{id}")
+    public ResponseEntity<String> updateCompany(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
+        try {
+            empresaService.updateCompany(id, dto);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Empresa Atualizada com sucesso!");
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar atualizar empresa!\n" + e);
+        }
+    }
 }

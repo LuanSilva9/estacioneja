@@ -12,7 +12,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.AcessoDTO;
+import br.com.estacioneja.dto.i.AcessoDTO;
 import jakarta.transaction.Transactional;
 
 @Service

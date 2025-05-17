@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.dto.VinculoDTO;
+import br.com.estacioneja.dto.i.VinculoDTO;
 import br.com.estacioneja.services.Vinculo.VinculoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("vinculos")
+@RequestMapping("api/vinculo")
 public class VinculoController {
     @Autowired
     private VinculoService vinculoService;
@@ -30,12 +30,12 @@ public class VinculoController {
         return ResponseEntity.status(HttpStatus.OK).body(vinculoService.listVinculos());
     }
 
-    @GetMapping("usuario/listar/{id}")
+    @GetMapping("listar/{id}")
     public ResponseEntity<List<Vinculo>> getVinculosByUser(@PathVariable Long id) throws Exception {
         return ResponseEntity.status(HttpStatus.OK).body(vinculoService.listVinculosByUserId(id));
     }
 
-    @PostMapping("usuario/criar")
+    @PostMapping("criar")
     public ResponseEntity<String> createVinculo(@RequestBody VinculoDTO dto) {
         try {
             vinculoService.createVinculo(dto);
@@ -46,7 +46,7 @@ public class VinculoController {
         }
     }
     
-    @DeleteMapping("usuario/desvincular")
+    @DeleteMapping("desvincular")
     public ResponseEntity<String> deleteVinculo(@RequestBody VinculoDTO dto) {
         try {
             vinculoService.deleteVinculo(dto);

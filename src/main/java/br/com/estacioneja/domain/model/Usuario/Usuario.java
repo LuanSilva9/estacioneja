@@ -1,10 +1,19 @@
 package br.com.estacioneja.domain.model.Usuario;
 
-import br.com.estacioneja.dto.UsuarioDTO;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import br.com.estacioneja.domain.model.Reserva.Reserva;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
+import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.dto.i.UsuarioDTO;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -28,6 +37,18 @@ public class Usuario {
     private String email;
     private String senha;
     private String cpf;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference("relacao-vinculo-usuario")
+    private List<Vinculo> vinculos;
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonBackReference("relacao-reserva-usuario")
+    private List<Reserva> reservaLogs;
+
+    @OneToMany(mappedBy = "proprietario")
+    @JsonBackReference("relacao-reserva-usuario")
+    private List<Veiculo> veiculos;
 
     public Usuario(UsuarioDTO dto) {
         this.name = dto.name();

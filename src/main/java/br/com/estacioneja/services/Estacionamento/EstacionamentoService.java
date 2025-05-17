@@ -10,7 +10,7 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
-import br.com.estacioneja.dto.EstacionamentoDTO;
+import br.com.estacioneja.dto.i.EstacionamentoDTO;
 import br.com.estacioneja.services.Vaga.VagaService;
 import jakarta.transaction.Transactional;
 

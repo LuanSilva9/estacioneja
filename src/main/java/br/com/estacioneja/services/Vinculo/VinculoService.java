@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
-import br.com.estacioneja.dto.VinculoDTO;
+import br.com.estacioneja.dto.i.VinculoDTO;
 import jakarta.transaction.Transactional;
 
 @Service

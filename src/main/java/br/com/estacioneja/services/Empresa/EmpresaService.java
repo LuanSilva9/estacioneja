@@ -9,7 +9,7 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.EmpresaDTO;
+import br.com.estacioneja.dto.i.EmpresaDTO;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -21,7 +21,7 @@ public class EmpresaService {
     private UsuarioRepository usuarioRepository;
 
     @Transactional
-    public Empresa createCompany(EmpresaDTO dto) throws Exception{
+    public Empresa createCompany(EmpresaDTO dto) throws Exception {
         Usuario representante = usuarioRepository.findById(dto.representanteId()).orElseThrow(() -> new Exception("ID / Representante não encontrado!"));
 
         Empresa newEmpresa = new Empresa(dto, representante);
@@ -32,5 +32,21 @@ public class EmpresaService {
     @Transactional
     public List<Empresa> listCompany() {
         return empresaRepository.findAll();
+    }
+
+    @Transactional
+    public Empresa updateCompany(Long id, EmpresaDTO dto) throws Exception {
+        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new Exception("Empresa não encontrada"));
+        
+        Usuario representante = usuarioRepository.findById(dto.representanteId()).orElseThrow(() -> new Exception("ID / Representante não encontrado"));
+
+        empresa.setRepresentante(representante);
+        empresa.setNome(dto.nome());
+        empresa.setPrefixo(dto.prefixo());
+        empresa.setCnpj(dto.cnpj());
+        empresa.setEndereco(dto.endereco());
+        empresa.setTipoEmpresa(dto.tipoEmpresa());
+
+        return empresaRepository.save(empresa);
     }
 }

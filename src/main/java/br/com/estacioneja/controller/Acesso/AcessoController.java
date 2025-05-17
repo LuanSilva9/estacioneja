@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
-import br.com.estacioneja.dto.AcessoDTO;
-import br.com.estacioneja.dto.TipoAcessoDTO;
+import br.com.estacioneja.dto.i.AcessoDTO;
+import br.com.estacioneja.dto.i.TipoAcessoDTO;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

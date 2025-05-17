@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.AuthDTO;
+import br.com.estacioneja.dto.i.AuthDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
 

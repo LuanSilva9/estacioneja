@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Reserva.Reserva;
-import br.com.estacioneja.dto.ReservaDTO;
+import br.com.estacioneja.dto.i.ReservaDTO;
 import br.com.estacioneja.services.Reserva.ReservaService;
 
 import java.util.List;
