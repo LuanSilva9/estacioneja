@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto;
+package br.com.estacioneja.dto.i;
 
 import br.com.estacioneja.domain.model.Veiculo.TipoVeiculo;
 

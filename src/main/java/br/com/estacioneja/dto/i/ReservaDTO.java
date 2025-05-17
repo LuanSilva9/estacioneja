@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto;
+package br.com.estacioneja.dto.i;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
