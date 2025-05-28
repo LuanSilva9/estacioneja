@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
+import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.i.EmpresaDTO;
+import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -19,6 +21,9 @@ public class EmpresaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EstacionamentoService estacionamentoService;
 
     @Transactional
     public Empresa createCompany(EmpresaDTO dto) throws Exception {
@@ -48,5 +53,20 @@ public class EmpresaService {
         empresa.setTipoEmpresa(dto.tipoEmpresa());
 
         return empresaRepository.save(empresa);
+    }
+
+    @Transactional
+    public Empresa deleteCompany(Long id) throws Exception {
+        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new Exception("Empresa não encontrada!"));
+        
+        // List<Estacionamento> estacionamentosVinculados = estacionamentoService.listEstacionamentosByCompany(empresa.getId());
+
+        // for(int i = 0; i < estacionamentosVinculados.size(); i++) {
+        //     estacionamentoService.deleteEstacionamento(estacionamentosVinculados.get(i).getId());
+        // }
+
+        empresaRepository.delete(empresa);
+
+        return empresa;
     }
 }

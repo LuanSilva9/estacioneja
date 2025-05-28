@@ -3,11 +3,11 @@ package br.com.estacioneja.domain.model.Empresa;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.i.EmpresaDTO;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,10 +42,9 @@ public class Empresa {
 
     @OneToOne
     @JoinColumn(name="representanteId", referencedColumnName = "id")
-    @JsonIgnore
     private Usuario representante;
 
-    @OneToMany(mappedBy = "empresa")
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-empresa-estacionamento")
     private List<Estacionamento> estacionamentos;
 

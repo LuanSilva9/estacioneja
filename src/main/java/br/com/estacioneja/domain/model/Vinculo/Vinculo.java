@@ -1,8 +1,5 @@
 package br.com.estacioneja.domain.model.Vinculo;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
@@ -35,13 +32,11 @@ public class Vinculo {
     @ManyToOne
     @JoinColumn(name = "usuarioId", referencedColumnName = "id")
     @JsonManagedReference("relacao-vinculo-usuario")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
     @JsonManagedReference("relacao-vinculo-estacionamento")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Estacionamento estacionamento;
 
     public Vinculo(Usuario usuario, Estacionamento estacionamento) {

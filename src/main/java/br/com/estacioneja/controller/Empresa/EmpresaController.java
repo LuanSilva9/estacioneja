@@ -13,6 +13,7 @@ import br.com.estacioneja.dto.i.EmpresaDTO;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,17 @@ public class EmpresaController {
             return ResponseEntity.status(HttpStatus.CREATED).body("Empresa Atualizada com sucesso!");
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar atualizar empresa!\n" + e);
+        }
+    }
+
+    @DeleteMapping("delt/{id}")
+    public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
+        try {
+            empresaService.deleteCompany(id);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Empresa deletada com sucesso!");
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar deletar empresa!\n" + e);
         }
     }
 }

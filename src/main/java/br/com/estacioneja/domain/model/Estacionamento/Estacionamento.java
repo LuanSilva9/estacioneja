@@ -3,9 +3,6 @@ package br.com.estacioneja.domain.model.Estacionamento;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -48,7 +45,6 @@ public class Estacionamento {
 
     @ManyToOne
     @JoinColumn(name="empresaId", referencedColumnName = "id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonManagedReference("relacao-empresa-estacionamento")
     private Empresa empresa;
 

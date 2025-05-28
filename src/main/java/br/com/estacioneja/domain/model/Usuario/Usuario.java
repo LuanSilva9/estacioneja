@@ -32,9 +32,9 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String email;
+
     private String senha;
     private String cpf;
 
@@ -42,11 +42,11 @@ public class Usuario {
     @JsonBackReference("relacao-vinculo-usuario")
     private List<Vinculo> vinculos;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-reserva-usuario")
     private List<Reserva> reservaLogs;
 
-    @OneToMany(mappedBy = "proprietario")
+    @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-reserva-usuario")
     private List<Veiculo> veiculos;
 
