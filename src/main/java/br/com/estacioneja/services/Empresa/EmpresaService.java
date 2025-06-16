@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.i.EmpresaDTO;
-import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -21,9 +19,6 @@ public class EmpresaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private EstacionamentoService estacionamentoService;
 
     @Transactional
     public Empresa createCompany(EmpresaDTO dto) throws Exception {

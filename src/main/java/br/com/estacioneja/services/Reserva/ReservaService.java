@@ -65,11 +65,19 @@ public class ReservaService {
         return reservaRepository.save(newReserva);
     }
 
-    public Boolean isVacancyAvaliable(UUID vagaId) {
+    public Reserva deleteReserva(UUID id) throws Exception {
+        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new Exception("Reserva não encontrada."));
+
+        reservaRepository.delete(reserva);
+
+        return reserva;
+    }
+
+    private Boolean isVacancyAvaliable(UUID vagaId) {
         return reservaRepository.countByAvaliable(vagaId) == 1;
     }
 
-    public Boolean isTimeAvaliable(ReservaDTO dto) {
+    private Boolean isTimeAvaliable(ReservaDTO dto) {
         return reservaRepository.countByTimeConflicts(dto.usuarioId(), dto.horarioEntrada(), dto.horarioSaida()) == 0;
     }
 }
