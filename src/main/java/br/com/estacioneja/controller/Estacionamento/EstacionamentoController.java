@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.dto.i.EstacionamentoDTO;
+import br.com.estacioneja.dto.o.EstacionamentoOutputDTO;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,17 +28,17 @@ public class EstacionamentoController {
     @Autowired private EstacionamentoService estacionamentoService;
 
     @GetMapping("listar")
-    public ResponseEntity<List<Estacionamento>> listarEstacionamentos() {
+    public ResponseEntity<List<EstacionamentoOutputDTO>> listarEstacionamentos() {
         return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentos());
     }
 
     @GetMapping("listar/{id}")
-    public ResponseEntity<Estacionamento> listarEstacionamentosPorId(@PathVariable UUID id) throws Exception {
+    public ResponseEntity<EstacionamentoOutputDTO> listarEstacionamentosPorId(@PathVariable UUID id) throws Exception {
         return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentoById(id));
     }
 
     @GetMapping("listar/empresa/{id}")
-    public ResponseEntity<List<Estacionamento>> listarEstacionamentosPorEmpresas(@PathVariable Long id) throws Exception {
+    public ResponseEntity<List<EstacionamentoOutputDTO>> listarEstacionamentosPorEmpresas(@PathVariable Long id) throws Exception {
         return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentosByCompany(id));
     }
     
@@ -53,7 +53,7 @@ public class EstacionamentoController {
         }
     }
 
-    @PutMapping("updt/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<String> atualizarEstacionamento(@PathVariable UUID id, @RequestBody EstacionamentoDTO dto) {
         try {
             estacionamentoService.updateEstacionamento(id, dto);
@@ -64,7 +64,7 @@ public class EstacionamentoController {
         }
     }
 
-    @DeleteMapping("delt/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deletarEstacionamento(@PathVariable UUID id) {
         try {
             estacionamentoService.deleteEstacionamento(id);

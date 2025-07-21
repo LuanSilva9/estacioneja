@@ -2,6 +2,7 @@ package br.com.estacioneja.controller.Vaga;
 
 import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.dto.i.VagaDTO;
+import br.com.estacioneja.dto.o.VagaOutputDTO;
 import br.com.estacioneja.services.Vaga.VagaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,15 +20,15 @@ public class VagaController {
     private VagaService vagaService;
 
     @GetMapping("listar")
-    public ResponseEntity<List<Vaga>> listarVagas() {
-        List<Vaga> vagas = vagaService.listarVagas();
+    public ResponseEntity<List<VagaOutputDTO>> listarVagas() {
+        List<VagaOutputDTO> vagas = vagaService.listarVagas();
         return ResponseEntity.ok(vagas);
     }
 
     @GetMapping("listar/estacionamento/{estacionamentoId}")
-    public ResponseEntity<List<Vaga>> listarVagasPorEstacionamento(@PathVariable UUID estacionamentoId) {
+    public ResponseEntity<List<VagaOutputDTO>> listarVagasPorEstacionamento(@PathVariable UUID estacionamentoId) {
         try {
-            List<Vaga> vagas = vagaService.listarVagasPorEstacionamento(estacionamentoId);
+            List<VagaOutputDTO> vagas = vagaService.listarVagasPorEstacionamento(estacionamentoId);
             return ResponseEntity.ok(vagas);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -44,7 +45,7 @@ public class VagaController {
         }
     }
 
-    @DeleteMapping("deletar/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deletarVaga(@PathVariable UUID id) {
         try {
             vagaService.deletarVaga(id);

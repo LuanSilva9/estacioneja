@@ -11,6 +11,8 @@ import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.domain.repository.Vaga.VagaRepository;
 import br.com.estacioneja.dto.i.VagaDTO;
+import br.com.estacioneja.dto.o.VagaOutputDTO;
+import br.com.estacioneja.infra.config.mapper.VagaMapper;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -18,16 +20,18 @@ public class VagaService {
     @Autowired private VagaRepository vagaRepository;
     @Autowired private EstacionamentoRepository estacionamentoRepository;
 
+    @Autowired private VagaMapper vagaMapper;
+
     @Transactional
-    public List<Vaga> listarVagas() {
-        return vagaRepository.findAll();
+    public List<VagaOutputDTO> listarVagas() {
+        return vagaMapper.toDtoList(vagaRepository.findAll());
     }
 
     @Transactional
-    public List<Vaga> listarVagasPorEstacionamento(UUID estacionamentoId) throws Exception {
+    public List<VagaOutputDTO> listarVagasPorEstacionamento(UUID estacionamentoId) throws Exception {
         Estacionamento estacionamento = estacionamentoRepository.findById(estacionamentoId).orElseThrow(() -> new Exception("Estacionamento não encontrado"));
 
-        return vagaRepository.findAllByEstacionamento(estacionamento);
+        return vagaMapper.toDtoList(vagaRepository.findAllByEstacionamento(estacionamento));
     }
 
     @Transactional

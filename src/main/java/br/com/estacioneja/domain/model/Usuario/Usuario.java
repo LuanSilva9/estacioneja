@@ -3,6 +3,7 @@ package br.com.estacioneja.domain.model.Usuario;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Reserva.Reserva;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
@@ -47,7 +48,7 @@ public class Usuario {
     private List<Reserva> reservaLogs;
 
     @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference("relacao-reserva-usuario")
+    @JsonManagedReference("relacao-reserva-usuario")
     private List<Veiculo> veiculos;
 
     public Usuario(UsuarioDTO dto) {

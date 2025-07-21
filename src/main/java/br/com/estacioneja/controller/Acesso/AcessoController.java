@@ -47,7 +47,7 @@ public class AcessoController {
         }
     }
 
-    @PutMapping("updt/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<String> putAccess(@PathVariable Long id, @RequestBody TipoAcessoDTO tipoAcesso) throws Exception {
         try {
             this.acessoService.putAccess(id, tipoAcesso.tipoAcesso());
@@ -58,7 +58,7 @@ public class AcessoController {
         }
     }
 
-    @DeleteMapping("delt/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteAccess(@PathVariable Long id) {
         try {
             acessoService.deleteAccess(id);

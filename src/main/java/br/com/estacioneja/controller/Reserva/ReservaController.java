@@ -39,7 +39,7 @@ public class ReservaController {
     @PostMapping("criar")
     public ResponseEntity<String> criarReserva(@RequestBody ReservaDTO dto) {
         try {
-            reservaService.criarReserva(dto);
+            reservaService.realizarReserva(dto);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Reserva Criada com Sucesso");
         } catch(Exception e) {
@@ -47,7 +47,7 @@ public class ReservaController {
         }
     }
     
-    @DeleteMapping("delt/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteReserva(@PathVariable UUID id) {
         try {
             reservaService.deleteReserva(id);

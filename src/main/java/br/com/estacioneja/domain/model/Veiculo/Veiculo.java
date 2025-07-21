@@ -2,8 +2,7 @@ package br.com.estacioneja.domain.model.Veiculo;
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.i.VeiculoDTO;
 import jakarta.persistence.CascadeType;
@@ -39,7 +38,7 @@ public class Veiculo {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="proprietarioId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-usuario-veiculo")
+    @JsonBackReference("relacao-usuario-veiculo")
     private Usuario proprietario;
 
 

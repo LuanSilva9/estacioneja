@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.dto.i.ReservaDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -47,6 +48,10 @@ public class Reserva {
     @JoinColumn(name = "vagaId", referencedColumnName = "id")
     @JsonManagedReference("relacao-reserva-vaga")
     private Vaga vaga;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "veiculoId", referencedColumnName = "id")
+    private Veiculo veiculo;
 
     private ReservaStatus status;
     

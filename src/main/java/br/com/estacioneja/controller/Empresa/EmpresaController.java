@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.dto.i.EmpresaDTO;
+import br.com.estacioneja.dto.o.EmpresaOutputDTO;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,11 +37,11 @@ public class EmpresaController {
     }
 
     @GetMapping("listar")
-    public ResponseEntity<List<Empresa>> listCompany() {
+    public ResponseEntity<List<EmpresaOutputDTO>> listCompany() {
         return ResponseEntity.status(HttpStatus.OK).body(empresaService.listCompany());
     }
     
-    @PutMapping("updt/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<String> updateCompany(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
         try {
             empresaService.updateCompany(id, dto);
@@ -52,7 +52,7 @@ public class EmpresaController {
         }
     }
 
-    @DeleteMapping("delt/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
         try {
             empresaService.deleteCompany(id);
