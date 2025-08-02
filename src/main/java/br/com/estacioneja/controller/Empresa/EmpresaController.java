@@ -1,65 +1,46 @@
 package br.com.estacioneja.controller.Empresa;
 
+import br.com.estacioneja.dto.input.EmpresaDTO;
+import br.com.estacioneja.dto.output.EmpresaOutputDTO;
+import br.com.estacioneja.services.Empresa.EmpresaService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.estacioneja.dto.i.EmpresaDTO;
-import br.com.estacioneja.dto.o.EmpresaOutputDTO;
-import br.com.estacioneja.services.Empresa.EmpresaService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-
 @RestController
-@RequestMapping("api/empresa")
+@RequestMapping("/api/v1/empresas")
 public class EmpresaController {
-    @Autowired
-    private EmpresaService empresaService;
 
-    @PostMapping("criar")
-    public ResponseEntity<String> createCompany(@RequestBody EmpresaDTO dto) {
-        try {
-            empresaService.createCompany(dto);
+    private final EmpresaService empresaService;
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Empresa criada com sucesso!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar criar empresa!\n" + e);
-        }
+    public EmpresaController(EmpresaService empresaService) {
+        this.empresaService = empresaService;
     }
 
-    @GetMapping("listar")
-    public ResponseEntity<List<EmpresaOutputDTO>> listCompany() {
-        return ResponseEntity.status(HttpStatus.OK).body(empresaService.listCompany());
-    }
-    
-    @PutMapping("update/{id}")
-    public ResponseEntity<String> updateCompany(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
-        try {
-            empresaService.updateCompany(id, dto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Empresa Atualizada com sucesso!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar atualizar empresa!\n" + e);
-        }
+    @PostMapping
+    public ResponseEntity<EmpresaOutputDTO> criar(@RequestBody EmpresaDTO dto) {
+        EmpresaOutputDTO criado = empresaService.create(dto);
+        URI location = URI.create(String.format("/api/v1/empresas/%s", criado.id()));
+        return ResponseEntity.created(location).body(criado);
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
-        try {
-            empresaService.deleteCompany(id);
+    @GetMapping
+    public ResponseEntity<List<EmpresaOutputDTO>> listarTodos() {
+        return ResponseEntity.ok(empresaService.findAll());
+    }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Empresa deletada com sucesso!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro ao tentar deletar empresa!\n" + e);
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
+        empresaService.update(id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        empresaService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

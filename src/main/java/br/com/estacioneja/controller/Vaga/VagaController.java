@@ -1,69 +1,57 @@
 package br.com.estacioneja.controller.Vaga;
 
-import br.com.estacioneja.domain.model.Vaga.Vaga;
-import br.com.estacioneja.dto.i.VagaDTO;
-import br.com.estacioneja.dto.o.VagaOutputDTO;
+import br.com.estacioneja.dto.input.VagaDTO;
+import br.com.estacioneja.dto.output.VagaOutputDTO;
 import br.com.estacioneja.services.Vaga.VagaService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/vagas")
+@RequestMapping("/api/v1/vagas")
 public class VagaController {
 
-    @Autowired
-    private VagaService vagaService;
+    private final VagaService vagaService;
 
-    @GetMapping("listar")
-    public ResponseEntity<List<VagaOutputDTO>> listarVagas() {
-        List<VagaOutputDTO> vagas = vagaService.listarVagas();
-        return ResponseEntity.ok(vagas);
+    public VagaController(VagaService vagaService) {
+        this.vagaService = vagaService;
     }
 
-    @GetMapping("listar/estacionamento/{estacionamentoId}")
-    public ResponseEntity<List<VagaOutputDTO>> listarVagasPorEstacionamento(@PathVariable UUID estacionamentoId) {
-        try {
-            List<VagaOutputDTO> vagas = vagaService.listarVagasPorEstacionamento(estacionamentoId);
-            return ResponseEntity.ok(vagas);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<VagaOutputDTO> obterPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(vagaService.findById(id));
     }
 
-    @PostMapping("criar")
-    public ResponseEntity<Vaga> criarVaga(@RequestBody VagaDTO dto) {
-        try {
-            Vaga vaga = vagaService.criarVaga(dto);
-            return ResponseEntity.ok(vaga);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @GetMapping("/estacionamento/{estacionamentoId}")
+    public ResponseEntity<List<VagaOutputDTO>> listarPorEstacionamento(@PathVariable UUID estacionamentoId) {
+        return ResponseEntity.ok(vagaService.findAllByParking(estacionamentoId));
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deletarVaga(@PathVariable UUID id) {
-        try {
-            vagaService.deletarVaga(id);
-
-            return ResponseEntity.status(HttpStatus.OK).body("Vaga Deletada com sucesso");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao deletar vaga, \n" + e);
-        }
+    @PostMapping
+    public ResponseEntity<VagaOutputDTO> criar(@RequestBody VagaDTO dto) {
+        VagaOutputDTO criado = vagaService.create(dto);
+        URI location = URI.create(String.format("/api/v1/vagas/%s", criado.id()));
+        return ResponseEntity.created(location).body(criado);
     }
 
-    @DeleteMapping("deletar-por-estacionamento/{estacionamentoId}")
-    public ResponseEntity<String> deletarVagasPorEstacionamento(@PathVariable UUID estacionamentoId) {
-        try {
-            int counter = vagaService.deletarVagasPorEstacionamento(estacionamentoId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
+        vagaService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 
-            return ResponseEntity.status(HttpStatus.OK).body(counter + " Vagas Deletada com sucesso");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao deletar vaga, \n" + e);
-        }
+    @DeleteMapping("/estacionamento/{estacionamentoId}")
+    public ResponseEntity<Void> deletarPorEstacionamento(@PathVariable UUID estacionamentoId) {
+        vagaService.deleteAllByParking(estacionamentoId);
+        return ResponseEntity.noContent().build();
     }
 }

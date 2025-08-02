@@ -3,14 +3,12 @@ package br.com.estacioneja.controller.Estacionamento;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.dto.i.EstacionamentoDTO;
-import br.com.estacioneja.dto.o.EstacionamentoOutputDTO;
+import br.com.estacioneja.dto.input.EstacionamentoDTO;
+import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,57 +19,44 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 
+import java.net.URI;
 
 @RestController
-@RequestMapping("api/estacionamento")
+@RequestMapping("/api/v1/estacionamentos")
 public class EstacionamentoController {
-    @Autowired private EstacionamentoService estacionamentoService;
 
-    @GetMapping("listar")
-    public ResponseEntity<List<EstacionamentoOutputDTO>> listarEstacionamentos() {
-        return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentos());
+    private final EstacionamentoService estacionamentoService;
+
+    public EstacionamentoController(EstacionamentoService estacionamentoService) {
+        this.estacionamentoService = estacionamentoService;
     }
 
-    @GetMapping("listar/{id}")
-    public ResponseEntity<EstacionamentoOutputDTO> listarEstacionamentosPorId(@PathVariable UUID id) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentoById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<EstacionamentoOutputDTO> obterPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(estacionamentoService.findById(id));
     }
 
-    @GetMapping("listar/empresa/{id}")
-    public ResponseEntity<List<EstacionamentoOutputDTO>> listarEstacionamentosPorEmpresas(@PathVariable Long id) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(estacionamentoService.listEstacionamentosByCompany(id));
-    }
-    
-    @PostMapping("criar")
-    public ResponseEntity<String> criarEstacionamento(@RequestBody EstacionamentoDTO dto) {
-        try {
-            estacionamentoService.createEstacionamento(dto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Estacionamento Criado!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Não foi possivel criar o Estacionamento, \n" + e);
-        }
+    @GetMapping("/empresa/{empresaId}")
+    public ResponseEntity<List<EstacionamentoOutputDTO>> listarPorEmpresa(@PathVariable Long empresaId) {
+        return ResponseEntity.ok(estacionamentoService.findEstacionamentoByEmpresa(empresaId));
     }
 
-    @PutMapping("update/{id}")
-    public ResponseEntity<String> atualizarEstacionamento(@PathVariable UUID id, @RequestBody EstacionamentoDTO dto) {
-        try {
-            estacionamentoService.updateEstacionamento(id, dto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Estacionamento Atualizado!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Não foi possivel atualizar o Estacionamento, \n" + e);
-        }
+    @PostMapping
+    public ResponseEntity<EstacionamentoOutputDTO> criar(@RequestBody EstacionamentoDTO dto) {
+        EstacionamentoOutputDTO criado = estacionamentoService.create(dto);
+        URI location = URI.create(String.format("/api/v1/estacionamentos/%s", criado.id()));
+        return ResponseEntity.created(location).body(criado);
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deletarEstacionamento(@PathVariable UUID id) {
-        try {
-            estacionamentoService.deleteEstacionamento(id);
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EstacionamentoDTO dto) {
+        estacionamentoService.update(id, dto);
+        return ResponseEntity.noContent().build();
+    }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Estacionamento Deletado!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Não foi possivel deletar o Estacionamento, \n" + e);
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
+        estacionamentoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

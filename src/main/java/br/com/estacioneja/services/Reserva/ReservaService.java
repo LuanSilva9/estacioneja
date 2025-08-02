@@ -3,31 +3,40 @@ package br.com.estacioneja.services.Reserva;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Reserva.Reserva;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.domain.model.Vaga.StatusVaga;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
-import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.domain.repository.Reserva.ReservaRepository;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.domain.repository.Vaga.VagaRepository;
-import br.com.estacioneja.domain.repository.Veiculo.VeiculoRepository;
-import br.com.estacioneja.dto.i.ReservaDTO;
-import jakarta.persistence.EntityNotFoundException;
+import br.com.estacioneja.dto.input.ReservaDTO;
+import br.com.estacioneja.exceptions.custom.ParkIsFullException;
+import br.com.estacioneja.exceptions.custom.TimeIsNotAvailableException;
+import br.com.estacioneja.exceptions.custom.VacancyIsNotAvailableException;
+import br.com.estacioneja.exceptions.custom.VeicleNotFoundException;
+import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
+import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.services.Vaga.VagaService;
+import br.com.estacioneja.services.Veiculo.VeiculoService;
 import jakarta.transaction.Transactional;
 
 @Service 
 public class ReservaService {
-    @Autowired private ReservaRepository reservaRepository;
-    @Autowired private UsuarioRepository usuarioRepository;
-    @Autowired private VagaRepository vagaRepository;
-    @Autowired private EstacionamentoRepository estacionamentoRepository;
-    @Autowired private VeiculoRepository veiculoRepository;
+    private final ReservaRepository reservaRepository;
+    private final UsuarioService usuarioService;
+    private final VagaService vagaService;
+    private final EstacionamentoService estacionamentoService;
+    private final VeiculoService veiculoService;
+
+    public ReservaService(ReservaRepository reservaRepository, UsuarioService usuarioService, VagaService vagaService, EstacionamentoService estacionamentoService, VeiculoService veiculoService) {
+        this.reservaRepository = reservaRepository;
+        this.usuarioService = usuarioService;
+        this.vagaService = vagaService;
+        this.estacionamentoService = estacionamentoService;
+        this.veiculoService = veiculoService;
+    }
 
     @Transactional
     public List<Reserva> listaReservas() {
@@ -40,58 +49,59 @@ public class ReservaService {
     }
 
     @Transactional
-    public Reserva realizarReserva(ReservaDTO dto)  throws Exception {
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado!"));
-
-        Vaga vaga = vagaRepository.findById(dto.vagaId())
-            .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada!"));
-
-        Veiculo veiculo = veiculoRepository.findById(dto.veiculoId())
-            .orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado!"));
-
+    public Reserva realizarReserva(ReservaDTO dto) {
+        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+        Vaga vaga = vagaService.findEntityById(dto.vagaId());
+        Veiculo veiculo = veiculoService.getById(dto.veiculoId());
         Estacionamento estacionamento = vaga.getEstacionamento();
 
-        if (!isVacancyAvaliable(dto.vagaId())) {
-            throw new Exception("Vaga já está reservada!");
-        }
+        validarDisponibilidadeVaga(dto.vagaId());
+        validarDisponibilidadeHorario(dto);
+        validarEstacionamento(estacionamento);
+        validarProprietarioVeiculo(veiculo, usuario);
 
-        if (!isTimeAvaliable(dto)) {
-            throw new Exception("Você já possui uma reserva para esse horário!");
-        }
-
-        if (estacionamento.getVagasDisponiveis() == 0) {
-            throw new Exception("Estacionamento lotado no momento. Tente novamente mais tarde.");
-        }
-
-        if (!veiculo.getProprietario().getId().equals(usuario.getId())) {
-            throw new Exception("Este veículo não pertence ao usuário que está tentando reservar.");
-        }
-
-        vaga.setStatusVaga(StatusVaga.AGENDADA);
-        estacionamento.setVagasDisponiveis(estacionamento.getVagasDisponiveis() - 1);
-
-        vagaRepository.save(vaga);
-        estacionamentoRepository.save(estacionamento);
-
-        Reserva reserva = new Reserva(dto, usuario, vaga);
-        return reservaRepository.save(reserva);
+        vagaService.toSchedule(vaga);
+        return reservaRepository.save(new Reserva(dto, usuario, vaga));
     }
 
-
+    @Transactional
     public Reserva deleteReserva(UUID id) throws Exception {
         Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new Exception("Reserva não encontrada."));
-
+        
         reservaRepository.delete(reserva);
-
+        
         return reserva;
     }
-
+    
     private Boolean isVacancyAvaliable(UUID vagaId) {
         return reservaRepository.countByAvaliable(vagaId) == 1;
     }
-
+    
     private Boolean isTimeAvaliable(ReservaDTO dto) {
         return reservaRepository.countByTimeConflicts(dto.usuarioId(), dto.horarioEntrada(), dto.horarioSaida()) == 0;
+    }
+    
+    private void validarDisponibilidadeVaga(UUID vagaId) {
+        if (!isVacancyAvaliable(vagaId)) {
+            throw new VacancyIsNotAvailableException();
+        }
+    }
+
+    private void validarDisponibilidadeHorario(ReservaDTO dto) {
+        if (!isTimeAvaliable(dto)) {
+            throw new TimeIsNotAvailableException();
+        }
+    }
+
+    private void validarEstacionamento(Estacionamento estacionamento) {
+        if (estacionamentoService.getAvaliableVacancies(estacionamento.getId()) == 0) {
+            throw new ParkIsFullException();
+        }
+    }
+
+    private void validarProprietarioVeiculo(Veiculo veiculo, Usuario usuario) {
+        if (!veiculo.getProprietario().getId().equals(usuario.getId())) {
+            throw new VeicleNotFoundException();
+        }
     }
 }

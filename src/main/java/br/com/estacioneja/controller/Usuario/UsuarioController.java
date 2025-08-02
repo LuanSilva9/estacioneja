@@ -1,63 +1,55 @@
 package br.com.estacioneja.controller.Usuario;
 
-import java.util.List;
+import java.net.URI;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.i.UsuarioDTO;
-import br.com.estacioneja.dto.o.UsuarioOutputDTO;
+import br.com.estacioneja.dto.input.UsuarioDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@RequestMapping("api/usuario")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
-    @Autowired
-    private UsuarioService usuarioService;
-    
-    @GetMapping("listar")
-    public ResponseEntity<List<UsuarioOutputDTO>> listUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(usuarioService.listUsers());
+
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
-    @GetMapping("listar/{id}")
-    public ResponseEntity<Usuario> getUser(@PathVariable Long id) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(usuarioService.getUserById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioOutputDTO> obterPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.findById(id));
     }
 
-    @PostMapping("criar")
-    public ResponseEntity<String> createUser(@RequestBody UsuarioDTO dto) {
-        try {
-            usuarioService.createUsuario(dto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuario criado com sucesso!");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao Criar usuario");
-        }
+    @PostMapping
+    public ResponseEntity<UsuarioOutputDTO> criar(@RequestBody UsuarioDTO dto) {
+        UsuarioOutputDTO criado = usuarioService.create(dto);
+        URI location = URI.create(String.format("/api/v1/usuarios/%s", criado.id()));
+        return ResponseEntity.created(location).body(criado);
     }
 
-    
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable Long id, UsuarioDTO dto) {
+        usuarioService.update(id, dto);
 
-    
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        try {
-            usuarioService.deleteUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
 
-            return ResponseEntity.status(HttpStatus.OK).body("Usuario excluido com sucesso");
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao excluir usuario, \n" + e);
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        usuarioService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

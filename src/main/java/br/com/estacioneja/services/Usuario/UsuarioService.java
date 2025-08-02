@@ -1,48 +1,62 @@
 package br.com.estacioneja.services.Usuario;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.i.UsuarioDTO;
-import br.com.estacioneja.dto.o.UsuarioOutputDTO;
+import br.com.estacioneja.dto.input.UsuarioDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.exceptions.custom.UserNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
+import br.com.estacioneja.usecases.interfaces.IUsuario;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UsuarioService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    
-    @Autowired
-    private UsuarioMapper usuarioMapper;
+public class UsuarioService implements IUsuario {
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper;
 
-    @Transactional
-    public Usuario createUsuario(UsuarioDTO dto) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
+        this.usuarioRepository = usuarioRepository;
+        this.usuarioMapper = usuarioMapper;
+    }
+
+    @Override @Transactional
+    public UsuarioOutputDTO create(UsuarioDTO dto) {
         Usuario newUsuario = new Usuario(dto);
 
-        return this.usuarioRepository.save(newUsuario);
+        this.usuarioRepository.save(newUsuario);
+
+        return usuarioMapper.toDto(newUsuario);
     }
 
-    @Transactional
-    public List<UsuarioOutputDTO> listUsers() {
-        return usuarioMapper.toDtoList(usuarioRepository.findAll());
+    @Override @Transactional 
+    public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
+        Usuario usuario = findEntityById(id);
+
+        usuario.setCpf(dto.cpf());
+        usuario.setEmail(dto.email());
+        usuario.setName(dto.senha());
+
+        // Esse método é um pouco mais sensivel então qnd  formos apresentar uma versão mais madura do SaaS teremos que validar algumas coisas a mais e integrar com sistema de mandar email
+        
+        return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
-    @Transactional
-    public Usuario getUserById(Long id) throws Exception {
-        return usuarioRepository.findById(id).orElseThrow(() -> new Exception("Usuario não encontrado"));
-    }
-
-    @Transactional
-    public Usuario deleteUsuario(Long id) throws Exception {
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new Exception("Usuario não encontrado"));
+    @Override @Transactional
+    public void delete(Long id) {
+        Usuario usuario = findEntityById(id);
 
         usuarioRepository.delete(usuario);
+    }
 
-        return usuario;
+    @Override @Transactional
+    public UsuarioOutputDTO findById(Long id) {
+        return usuarioMapper.toDto(findEntityById(id));
+    }
+
+    @Override @Transactional
+    public Usuario findEntityById(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 }

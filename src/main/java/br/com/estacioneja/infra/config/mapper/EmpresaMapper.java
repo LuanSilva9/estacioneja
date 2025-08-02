@@ -5,7 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.dto.o.EmpresaOutputDTO;
+import br.com.estacioneja.dto.output.EmpresaOutputDTO;
 
 @Mapper(componentModel = "spring")
 public interface EmpresaMapper {

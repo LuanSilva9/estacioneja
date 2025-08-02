@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import br.com.estacioneja.domain.model.Reserva.Reserva;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.dto.i.UsuarioDTO;
+import br.com.estacioneja.dto.input.UsuarioDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

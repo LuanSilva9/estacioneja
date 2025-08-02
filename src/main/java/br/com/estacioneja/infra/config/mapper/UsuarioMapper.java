@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.o.UsuarioOutputDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {

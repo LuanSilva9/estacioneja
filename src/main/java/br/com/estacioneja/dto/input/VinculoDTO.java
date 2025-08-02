@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.i;
+package br.com.estacioneja.dto.input;
 
 import java.util.UUID;
 

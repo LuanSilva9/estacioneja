@@ -21,5 +21,4 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
 
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.usuario.id = :usuarioId AND r.horarioEntrada < :horarioSaida AND r.horarioSaida > :horarioEntrada")
     Long countByTimeConflicts(@Param("usuarioId") Long usuarioId, @Param("horarioEntrada") ZonedDateTime horarioEntrada, @Param("horarioSaida") ZonedDateTime horarioSaida);
-
 }

@@ -1,7 +1,5 @@
 package br.com.estacioneja.controller.Acesso;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
-import br.com.estacioneja.dto.i.AcessoDTO;
-import br.com.estacioneja.dto.i.TipoAcessoDTO;
+import br.com.estacioneja.dto.input.AcessoDTO;
+import br.com.estacioneja.dto.input.TipoAcessoDTO;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,15 +23,9 @@ public class AcessoController {
     @Autowired
     private AcessoService acessoService;
 
-    
-    @GetMapping("get")
-    public ResponseEntity<List<Acesso>> getAccess() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.acessoService.listAccess());
-    }
-    
     @GetMapping("get/{id}")
     public ResponseEntity<Acesso> getAccessById(@PathVariable Long id) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(acessoService.listAccessById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(acessoService.getById(id));
     }
     
     @PostMapping("set")

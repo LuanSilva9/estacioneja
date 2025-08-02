@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.dto.i.EstacionamentoDTO;
+import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,8 +37,6 @@ public class Estacionamento {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private Long capacidadeTotal;
-    private Long vagasDisponiveis;
     private StatusEstacionamento statusEstacionamento;
 
     private String prefixo;
@@ -57,10 +55,8 @@ public class Estacionamento {
     private List<Vaga> vagas;    
 
     public Estacionamento(EstacionamentoDTO dto, Empresa empresa) {
-        this.capacidadeTotal = dto.capacidade();
         this.statusEstacionamento = dto.statusEstacionamento();
         this.prefixo = dto.prefixo();
-        this.vagasDisponiveis = capacidadeTotal;
         this.empresa = empresa;
     }
 }

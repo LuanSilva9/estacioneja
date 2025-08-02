@@ -3,85 +3,109 @@ package br.com.estacioneja.services.Vaga;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.domain.model.Vaga.StatusVaga;
 import br.com.estacioneja.domain.model.Vaga.Vaga;
-import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.domain.repository.Vaga.VagaRepository;
-import br.com.estacioneja.dto.i.VagaDTO;
-import br.com.estacioneja.dto.o.VagaOutputDTO;
+import br.com.estacioneja.dto.input.VagaDTO;
+import br.com.estacioneja.dto.output.VagaOutputDTO;
+import br.com.estacioneja.exceptions.custom.VacancyNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VagaMapper;
+import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
+import br.com.estacioneja.usecases.interfaces.IVaga;
 import jakarta.transaction.Transactional;
 
 @Service
-public class VagaService {
-    @Autowired private VagaRepository vagaRepository;
-    @Autowired private EstacionamentoRepository estacionamentoRepository;
+public class VagaService implements IVaga {
+    private final VagaRepository vagaRepository;
+    private final EstacionamentoService estacionamentoService;
+    private final VagaMapper vagaMapper;
 
-    @Autowired private VagaMapper vagaMapper;
+    
 
-    @Transactional
-    public List<VagaOutputDTO> listarVagas() {
-        return vagaMapper.toDtoList(vagaRepository.findAll());
+    public VagaService(VagaRepository vagaRepository, EstacionamentoService estacionamentoService, VagaMapper vagaMapper) {
+        this.vagaRepository = vagaRepository;
+        this.estacionamentoService = estacionamentoService;
+        this.vagaMapper = vagaMapper;
     }
 
-    @Transactional
-    public List<VagaOutputDTO> listarVagasPorEstacionamento(UUID estacionamentoId) throws Exception {
-        Estacionamento estacionamento = estacionamentoRepository.findById(estacionamentoId).orElseThrow(() -> new Exception("Estacionamento não encontrado"));
-
-        return vagaMapper.toDtoList(vagaRepository.findAllByEstacionamento(estacionamento));
-    }
-
-    @Transactional
-    public Vaga criarVaga(VagaDTO dto) throws Exception {
-        Estacionamento estacionamento = estacionamentoRepository.findById(dto.estacionamentoId()).orElseThrow(() -> new Exception("Estacionamento não encontrado"));
+    @Override @Transactional
+    public VagaOutputDTO create(VagaDTO dto) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
         Vaga newVaga = new Vaga(dto, estacionamento);
 
-        estacionamento.setCapacidadeTotal(estacionamento.getCapacidadeTotal() + 1);
-        estacionamento.setVagasDisponiveis(estacionamento.getVagasDisponiveis() + 1);
+        return save(newVaga);
+    }
+
+    @Override @Transactional
+    public VagaOutputDTO update(UUID id, VagaDTO dto) {
+        Vaga vaga = findEntityById(id);
+
+        vaga.setSlug(dto.slug());
+        vaga.setTipoVaga(dto.tipoVaga());
         
-        estacionamentoRepository.save(estacionamento);
-
-        return vagaRepository.save(newVaga);
+        return vagaMapper.toDto(vagaRepository.save(vaga));
     }
 
-    @Transactional
-    public Vaga criarVaga(Estacionamento estacionamento, String slug) throws Exception {
-        Vaga newVaga = new Vaga(estacionamento, slug);
-
-        return vagaRepository.save(newVaga);
-    }
-
-    @Transactional
-    public Vaga deletarVaga(UUID id) throws Exception {
-        Vaga vaga = vagaRepository.findById(id).orElseThrow(() -> new Exception("Vaga não encontrada!"));
-
-        Estacionamento estacionamento = vaga.getEstacionamento();
-
-        estacionamento.setVagasDisponiveis(estacionamento.getVagasDisponiveis() - 1);
-
-        estacionamentoRepository.save(estacionamento);
+    @Override @Transactional
+    public void delete(UUID id)  {
+        Vaga vaga = findEntityById(id);
 
         vagaRepository.delete(vaga);
+    }
 
-        return vaga;
+    @Override @Transactional
+    public void deleteAllByParking(UUID estacionamentoId) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+
+        vagaRepository.deleteAllByEstacionamento(estacionamento);
     }
 
     @Transactional
-    public int deletarVagasPorEstacionamento(UUID id) throws Exception {
-        Estacionamento estacionamento = estacionamentoRepository.findById(id).orElseThrow(() -> new Exception("Estacionamento não encontrado!"));
+    public VagaOutputDTO save(Vaga vaga) {
+        return vagaMapper.toDto(vagaRepository.save(vaga));
+    }
 
-        int vagasRemovidas = vagaRepository.countByEstacionamento(estacionamento);
+    @Override @Transactional
+    public VagaOutputDTO toFree(Vaga vaga) {
+        vaga.setStatusVaga(StatusVaga.LIVRE);
 
-        estacionamento.setVagasDisponiveis(0L);
-        estacionamentoRepository.save(estacionamento);
+        return vagaMapper.toDto(vagaRepository.save(vaga));
+    }
 
-        vagaRepository.deleteAllByEstacionamento(estacionamento);
+    @Override @Transactional
+    public VagaOutputDTO toSchedule(Vaga vaga) {
+        vaga.setStatusVaga(StatusVaga.AGENDADA);
 
-        return vagasRemovidas;
+        return vagaMapper.toDto(vagaRepository.save(vaga));
+    }
+
+    @Override @Transactional
+    public VagaOutputDTO toOccupy(Vaga vaga) {
+        vaga.setStatusVaga(StatusVaga.OCUPADA);
+
+        return vagaMapper.toDto(vagaRepository.save(vaga));
+    }
+    
+    @Override @Transactional
+    public VagaOutputDTO findById(UUID vagaId) {
+        return vagaMapper.toDto(findEntityById(vagaId));
+    }
+
+    @Override @Transactional
+    public Vaga findEntityById(UUID vagaId) {
+        return vagaRepository.findById(vagaId).orElseThrow(VacancyNotFoundException::new);
+    }
+
+
+    @Override @Transactional
+    public List<VagaOutputDTO> findAllByParking(UUID idEstacionamento) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(idEstacionamento);
+
+        return vagaMapper.toDtoList(vagaRepository.findAllByEstacionamento(estacionamento));
     }
 
 }

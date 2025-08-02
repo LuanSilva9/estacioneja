@@ -6,13 +6,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import br.com.estacioneja.domain.model.Vaga.Vaga;
-import br.com.estacioneja.dto.o.VagaOutputDTO;
+import br.com.estacioneja.dto.output.VagaOutputDTO;
 
 @Mapper(componentModel = "spring")
 public interface VagaMapper {
     @Mapping(source = "estacionamento.id", target = "estacionamentoId")
     VagaOutputDTO toDto(Vaga vaga);
 
-    @Mapping(source = "estacionamento.id", target = "estacionamentoId")
     List<VagaOutputDTO> toDtoList(List<Vaga> vagas);
 }

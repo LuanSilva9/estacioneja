@@ -2,56 +2,72 @@ package br.com.estacioneja.services.Empresa;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.i.AcessoDTO;
-import br.com.estacioneja.dto.i.EmpresaDTO;
-import br.com.estacioneja.dto.o.EmpresaOutputDTO;
+import br.com.estacioneja.dto.input.AcessoDTO;
+import br.com.estacioneja.dto.input.EmpresaDTO;
+import br.com.estacioneja.dto.output.EmpresaOutputDTO;
+import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.services.Acesso.AcessoService;
+import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.usecases.interfaces.IEmpresa;
 import jakarta.transaction.Transactional;
 
 @Service
-public class EmpresaService {
-    @Autowired
-    private EmpresaRepository empresaRepository;
+public class EmpresaService implements IEmpresa {
+    private final EmpresaRepository empresaRepository;
+    private final UsuarioService usuarioService;
+    private final AcessoService acessoService;
+    private final EmpresaMapper empresaMapper;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, AcessoService acessoService, EmpresaMapper empresaMapper) {
+        this.empresaRepository = empresaRepository;
+        this.usuarioService = usuarioService;
+        this.acessoService = acessoService;
+        this.empresaMapper = empresaMapper;
+    }
 
-    @Autowired
-    private AcessoService acessoService;
+    /* CONSULTAS */
+    
+    @Override
+    public Empresa findEntityById(Long empresaId) {
+        return empresaRepository.findById(empresaId).orElseThrow(CompanyNotFoundException::new); 
+    }
 
-    @Autowired
-    private EmpresaMapper empresaMapper;
+    @Override
+    public EmpresaOutputDTO findById(Long empresaId) {
+       return empresaMapper.toDto(findEntityById(empresaId));
+    }
 
-    @Transactional
-    public Empresa createCompany(EmpresaDTO dto) throws Exception {
-        Usuario representante = usuarioRepository.findById(dto.representanteId()).orElseThrow(() -> new Exception("ID / Representante não encontrado!"));
 
+    @Override
+    public List<EmpresaOutputDTO> findAll() {
+        return empresaMapper.toDtoList(empresaRepository.findAll());
+    }
+
+
+    /* TRANSACOES */
+
+    @Override @Transactional
+    public EmpresaOutputDTO create(EmpresaDTO dto) {
+        Usuario representante = usuarioService.findEntityById(dto.representanteId());
+        
         Empresa newEmpresa = new Empresa(dto, representante);
         
         acessoService.createAccess(new AcessoDTO(TipoAcesso.MASTER, representante.getId(), newEmpresa.getId()));
 
-        return empresaRepository.save(newEmpresa);
+        return empresaMapper.toDto(empresaRepository.save(newEmpresa));
     }
 
-    @Transactional
-    public List<EmpresaOutputDTO> listCompany() {
-        return empresaMapper.toDtoList(empresaRepository.findAll());
-    }
-
-    @Transactional
-    public Empresa updateCompany(Long id, EmpresaDTO dto) throws Exception {
-        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new Exception("Empresa não encontrada"));
-        
-        Usuario representante = usuarioRepository.findById(dto.representanteId()).orElseThrow(() -> new Exception("ID / Representante não encontrado"));
+    @Override @Transactional
+    public EmpresaOutputDTO update(Long id, EmpresaDTO dto) {
+        Empresa empresa = findEntityById(id);
+        Usuario representante = usuarioService.findEntityById(id);
 
         empresa.setRepresentante(representante);
         empresa.setNome(dto.nome());
@@ -60,15 +76,14 @@ public class EmpresaService {
         empresa.setEndereco(dto.endereco());
         empresa.setTipoEmpresa(dto.tipoEmpresa());
 
-        return empresaRepository.save(empresa);
+        return empresaMapper.toDto(empresaRepository.save(empresa));
     }
 
-    @Transactional
-    public Empresa deleteCompany(Long id) throws Exception {
-        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new Exception("Empresa não encontrada!"));
+    @Override @Transactional
+    public void delete(Long id) {
+        Empresa empresa = findEntityById(id);
 
         empresaRepository.delete(empresa);
-
-        return empresa;
     }
+
 }

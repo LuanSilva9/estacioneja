@@ -1,8 +1,5 @@
 package br.com.estacioneja.services.Acesso;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
@@ -12,22 +9,29 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.i.AcessoDTO;
+import br.com.estacioneja.dto.input.AcessoDTO;
+import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
+import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
+import br.com.estacioneja.exceptions.custom.UserNotFoundException;
+import br.com.estacioneja.usecases.interfaces.IAcesso;
 import jakarta.transaction.Transactional;
 
 @Service
-public class AcessoService {
-    @Autowired
-    private AcessoRepository acessoRepository;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private EmpresaRepository empresaRepository;
+public class AcessoService implements IAcesso {
+    private final AcessoRepository acessoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final EmpresaRepository empresaRepository;
+
+    public AcessoService(AcessoRepository acessoRepository, UsuarioRepository usuarioRepository, EmpresaRepository empresaRepository) {
+        this.acessoRepository = acessoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.empresaRepository = empresaRepository;
+    }
 
     @Transactional
-    public Acesso createAccess(AcessoDTO dto) throws Exception {
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId()).orElseThrow(() -> new Exception("Usuario não encontrado"));
-        Empresa empresa = empresaRepository.findById(dto.empresaId()).orElseThrow(() -> new Exception("Empresa não encontrada"));
+    public Acesso createAccess(AcessoDTO dto)  {
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId()).orElseThrow(UserNotFoundException::new);
+        Empresa empresa = empresaRepository.findById(dto.empresaId()).orElseThrow(CompanyNotFoundException::new);
 
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
 
@@ -35,18 +39,8 @@ public class AcessoService {
     }  
 
     @Transactional
-    public List<Acesso> listAccess() {
-        return acessoRepository.findAll();
-    }
-
-    @Transactional
-    public Acesso listAccessById(Long id) throws Exception {
-        return acessoRepository.findById(id).orElseThrow(() -> new Exception("Nenhum ID Encontrado"));
-    }
-
-    @Transactional
     public Acesso putAccess(Long id, TipoAcesso tipoAcesso) throws Exception {
-        Acesso acesso = acessoRepository.findById(id).orElseThrow(() -> new Exception("Acesso não encontrado"));
+        Acesso acesso = getById(id);
 
         acesso.setTipoAcesso(tipoAcesso);
 
@@ -55,10 +49,15 @@ public class AcessoService {
 
     @Transactional
     public Acesso deleteAccess(Long id) throws Exception {
-        Acesso acesso = acessoRepository.findById(id).orElseThrow(() -> new Exception("Acesso não encontrado"));
+        Acesso acesso = getById(id);
         
         acessoRepository.deleteById(id);
 
         return acesso;
+    }
+
+    @Override
+    public Acesso getById(Long id) {
+        return acessoRepository.findById(id).orElseThrow(AccessNotFoundException::new);
     }
 }
