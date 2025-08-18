@@ -2,7 +2,6 @@ package br.com.estacioneja.services.Reserva;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.dto.output.VagaOutputDTO;
@@ -10,11 +9,15 @@ import br.com.estacioneja.infra.config.mapper.VagaMapper;
 
 @Service
 public class CheckService {
-    @Autowired ReservaService reservaService;
+    public final ReservaService reservaService;
+    public final VagaMapper vagaMapper;
 
-    @Autowired VagaMapper vagaMapper;
+    public CheckService(ReservaService reservaService, VagaMapper vagaMapper) {
+        this.reservaService = reservaService;
+        this.vagaMapper = vagaMapper;
+    }
 
-    public VagaOutputDTO checkinBase(UUID vagaId) throws Exception {
+    public VagaOutputDTO checkinBase(UUID vagaId) {
         return null;
     }
 }
