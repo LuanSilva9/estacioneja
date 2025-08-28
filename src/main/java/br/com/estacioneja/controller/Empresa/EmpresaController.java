@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/api/v1/empresas")
@@ -31,6 +33,12 @@ public class EmpresaController {
     public ResponseEntity<List<EmpresaOutputDTO>> listarTodos() {
         return ResponseEntity.ok(empresaService.findAll());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmpresaOutputDTO> listarEmpresa(@PathVariable Long id) {
+        return ResponseEntity.ok(empresaService.findById(id));
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizar(@PathVariable Long id, @RequestBody EmpresaDTO dto) {

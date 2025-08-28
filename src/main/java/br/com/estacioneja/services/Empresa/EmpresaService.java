@@ -50,7 +50,6 @@ public class EmpresaService implements IEmpresa {
         return empresaMapper.toDtoList(empresaRepository.findAll());
     }
 
-
     /* TRANSACOES */
 
     @Override @Transactional
@@ -58,10 +57,12 @@ public class EmpresaService implements IEmpresa {
         Usuario representante = usuarioService.findEntityById(dto.representanteId());
         
         Empresa newEmpresa = new Empresa(dto, representante);
+
+        empresaRepository.save(newEmpresa);
         
         acessoService.create(new AcessoDTO(TipoAcesso.MASTER, representante.getId(), newEmpresa.getId()));
 
-        return empresaMapper.toDto(empresaRepository.save(newEmpresa));
+        return empresaMapper.toDto(newEmpresa);
     }
 
     @Override @Transactional
