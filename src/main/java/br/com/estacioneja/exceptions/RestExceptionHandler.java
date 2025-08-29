@@ -19,6 +19,9 @@ import br.com.estacioneja.exceptions.custom.VacancyNotFoundException;
 import br.com.estacioneja.exceptions.custom.VeicleNotFoundException;
 import br.com.estacioneja.exceptions.custom.VincleNotFoundException;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Hidden
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 

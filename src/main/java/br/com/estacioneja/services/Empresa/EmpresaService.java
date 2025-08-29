@@ -60,7 +60,7 @@ public class EmpresaService implements IEmpresa {
 
         empresaRepository.save(newEmpresa);
         
-        acessoService.createAccess(new AcessoDTO(TipoAcesso.MASTER, representante.getId(), newEmpresa.getId()));
+        acessoService.create(new AcessoDTO(TipoAcesso.MASTER, representante.getId(), newEmpresa.getId()));
 
         return empresaMapper.toDto(newEmpresa);
     }

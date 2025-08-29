@@ -1,63 +1,67 @@
 package br.com.estacioneja.services.Acesso;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
-import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
-import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
+import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
-import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
-import br.com.estacioneja.exceptions.custom.UserNotFoundException;
+import br.com.estacioneja.infra.config.mapper.AcessoMapper;
+import br.com.estacioneja.services.Empresa.EmpresaService;
+import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IAcesso;
 import jakarta.transaction.Transactional;
 
 @Service
 public class AcessoService implements IAcesso {
     private final AcessoRepository acessoRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final EmpresaRepository empresaRepository;
+    private final UsuarioService usuarioService;
+    private final EmpresaService empresaService;
+    private final AcessoMapper acessoMapper;
 
-    public AcessoService(AcessoRepository acessoRepository, UsuarioRepository usuarioRepository, EmpresaRepository empresaRepository) {
+    public AcessoService(AcessoRepository acessoRepository, UsuarioService usuarioService, EmpresaService empresaService, AcessoMapper acessoMapper) {
         this.acessoRepository = acessoRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.empresaRepository = empresaRepository;
+        this.usuarioService = usuarioService;
+        this.empresaService = empresaService;
+        this.acessoMapper = acessoMapper;
     }
 
     @Transactional
-    public Acesso createAccess(AcessoDTO dto)  {
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId()).orElseThrow(UserNotFoundException::new);
-        Empresa empresa = empresaRepository.findById(dto.empresaId()).orElseThrow(CompanyNotFoundException::new);
+    public AcessoOutputDTO create(AcessoDTO dto)  {
+        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+        Empresa empresa = empresaService.findEntityById(dto.empresaId());
 
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
 
-        return acessoRepository.save(newAcesso);
+        return acessoMapper.toDto(acessoRepository.save(newAcesso));
     }  
 
-    @Transactional
-    public Acesso putAccess(Long id, TipoAcesso tipoAcesso) throws Exception {
-        Acesso acesso = getById(id);
+    @Override @Transactional
+    public AcessoOutputDTO update(UUID id, AcessoDTO dto) {
+        Acesso acesso = findEntityById(id);
 
-        acesso.setTipoAcesso(tipoAcesso);
+        acesso.setTipoAcesso(dto.tipoAcesso());
 
-        return acessoRepository.save(acesso);
+        return acessoMapper.toDto(acessoRepository.save(acesso));
     }
 
-    @Transactional
-    public Acesso deleteAccess(Long id) throws Exception {
-        Acesso acesso = getById(id);
-        
+    @Override @Transactional
+    public void delete(UUID id) {
         acessoRepository.deleteById(id);
-
-        return acesso;
     }
 
     @Override
-    public Acesso getById(Long id) {
+    public Acesso findEntityById(UUID id) {
         return acessoRepository.findById(id).orElseThrow(AccessNotFoundException::new);
+    }
+
+    @Override @Transactional
+    public AcessoOutputDTO findById(UUID id) {
+        return acessoMapper.toDto(findEntityById(id));
     }
 }

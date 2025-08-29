@@ -1,5 +1,7 @@
 package br.com.estacioneja.domain.model.Acesso;
 
+import java.util.UUID;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -28,8 +30,8 @@ import lombok.Setter;
 
 public class Acesso {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private TipoAcesso tipoAcesso;
 
