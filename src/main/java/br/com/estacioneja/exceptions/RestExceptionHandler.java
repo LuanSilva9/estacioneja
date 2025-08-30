@@ -9,6 +9,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import br.com.estacioneja.dto.output.ResponseExceptionDTO;
 import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
 import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
+import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
+import br.com.estacioneja.exceptions.custom.DuplicateUserException;
 import br.com.estacioneja.exceptions.custom.ParkIsFullException;
 import br.com.estacioneja.exceptions.custom.ParkNotFoundException;
 import br.com.estacioneja.exceptions.custom.UserNotFoundException;
@@ -35,6 +37,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<ResponseExceptionDTO> handleFull(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseExceptionDTO(exception.getMessage()));
 
+    }
+
+    @ExceptionHandler({
+        DuplicateUserException.class,
+        DuplicateCompanyException.class
+    })
+    private ResponseEntity<ResponseExceptionDTO> handleDuplicate(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseExceptionDTO(exception.getMessage()));
     }
 
 }

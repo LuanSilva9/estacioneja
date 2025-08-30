@@ -6,5 +6,5 @@ import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IUsuario extends IBase<Usuario, Long, UsuarioDTO, UsuarioOutputDTO>{
-
+    void existsEmailOrCpf(String email, String cpf);
 }

@@ -9,6 +9,7 @@ import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
 import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
+import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IEmpresa;
@@ -49,6 +50,8 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public EmpresaOutputDTO create(EmpresaDTO dto) {
+        existsByCnpj(dto.cnpj());
+        
         Usuario representante = usuarioService.findEntityById(dto.representanteId());
         
         Empresa newEmpresa = new Empresa(dto, representante);
@@ -60,6 +63,7 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public EmpresaOutputDTO update(Long id, EmpresaDTO dto) {
+        existsByCnpj(dto.cnpj());
         Empresa empresa = findEntityById(id);
         Usuario representante = usuarioService.findEntityById(id);
 
@@ -79,5 +83,10 @@ public class EmpresaService implements IEmpresa {
 
         empresaRepository.delete(empresa);
     }
+
+    @Override
+    public void existsByCnpj(String cnpj) {
+        if(this.empresaRepository.existsByCnpj(cnpj)) throw new DuplicateCompanyException();
+    } 
 
 }

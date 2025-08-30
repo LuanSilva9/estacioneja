@@ -6,6 +6,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.exceptions.custom.DuplicateUserException;
 import br.com.estacioneja.exceptions.custom.UserNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
 import br.com.estacioneja.usecases.interfaces.IUsuario;
@@ -23,6 +24,8 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional
     public UsuarioOutputDTO create(UsuarioDTO dto) {
+        existsEmailOrCpf(dto.email(), dto.cpf());
+
         Usuario newUsuario = new Usuario(dto);
 
         this.usuarioRepository.save(newUsuario);
@@ -32,11 +35,13 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional 
     public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
+        existsEmailOrCpf(dto.email(), dto.cpf());
+
         Usuario usuario = findEntityById(id);
 
+        usuario.setName(dto.name());
         usuario.setCpf(dto.cpf());
         usuario.setEmail(dto.email());
-        usuario.setName(dto.senha());
 
         return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
@@ -56,5 +61,10 @@ public class UsuarioService implements IUsuario {
     @Override
     public Usuario findEntityById(Long id) {
         return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public void existsEmailOrCpf(String email, String cpf) {
+        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateUserException();
     }
 }
