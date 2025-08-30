@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Vaga.StatusVaga;
-import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
-import br.com.estacioneja.domain.repository.Vaga.VagaRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
 import br.com.estacioneja.exceptions.custom.ParkNotFoundException;
@@ -23,13 +20,11 @@ import jakarta.transaction.Transactional;
 public class EstacionamentoService implements IEstacionamento {
     private final EstacionamentoRepository estacionamentoRepository;
     private final EmpresaService empresaService;
-    private final VagaRepository vagaRepository;
     private final EstacionamentoMapper estacionamentoMapper;
 
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, VagaRepository vagaRepository, EstacionamentoMapper estacionamentoMapper) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EstacionamentoMapper estacionamentoMapper) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.empresaService = empresaService;
-        this.vagaRepository = vagaRepository;
         this.estacionamentoMapper = estacionamentoMapper;
     }
 
@@ -39,12 +34,6 @@ public class EstacionamentoService implements IEstacionamento {
 
         Estacionamento newEstacionamento = new Estacionamento(dto, empresa);
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
-
-        for (long i = 0L; i < dto.capacidade(); i++) {
-            String slug = empresa.getPrefixo() + "-" + saved.getPrefixo() + "-" + i;
-            Vaga newVaga = new Vaga(saved, slug);
-            vagaRepository.save(newVaga);
-        }        
 
         return estacionamentoMapper.toDto(saved);
     }
@@ -83,16 +72,6 @@ public class EstacionamentoService implements IEstacionamento {
         Empresa empresa = empresaService.findEntityById(idEmpresa);
 
         return estacionamentoMapper.toDtoList(estacionamentoRepository.findAllByEmpresa(empresa));
-    }
-
-    @Override
-    public Long getAvaliableVacancies(UUID idEstacionamento) {
-        return vagaRepository.countByEstacionamentoIdAndStatusVaga(idEstacionamento, StatusVaga.LIVRE);
-    }
-
-    @Override
-    public Long getTotalVacancies(UUID idEstacionamento) {
-        return vagaRepository.countByEstacionamentoId(idEstacionamento);
     }
 
 }

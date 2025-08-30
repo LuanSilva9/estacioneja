@@ -9,8 +9,5 @@ import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
 import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IEstacionamento extends IBase<Estacionamento, UUID, EstacionamentoDTO, EstacionamentoOutputDTO> {
-    Long getAvaliableVacancies(UUID idEstacionamento); 
-    Long getTotalVacancies(UUID idEstacionamento); 
-
     List<EstacionamentoOutputDTO> findEstacionamentoByEmpresa(Long idEmpresa);
 }
