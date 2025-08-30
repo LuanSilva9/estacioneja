@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Vaga.Vaga;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import jakarta.persistence.CascadeType;
@@ -49,14 +48,13 @@ public class Estacionamento {
     @OneToMany(mappedBy = "estacionamento", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-vinculo-estacionamento")
     private List<Vinculo> vinculos;
-
-    @OneToMany(mappedBy = "estacionamento", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference("relacao-vaga-estacionamento")
-    private List<Vaga> vagas;    
+    
+    private Long capacidade;
 
     public Estacionamento(EstacionamentoDTO dto, Empresa empresa) {
         this.statusEstacionamento = dto.statusEstacionamento();
         this.prefixo = dto.prefixo();
         this.empresa = empresa;
+        this.capacidade = dto.capacidade();
     }
 }
