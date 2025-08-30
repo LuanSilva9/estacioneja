@@ -38,8 +38,6 @@ public class UsuarioService implements IUsuario {
         usuario.setEmail(dto.email());
         usuario.setName(dto.senha());
 
-        // Esse método é um pouco mais sensivel então qnd  formos apresentar uma versão mais madura do SaaS teremos que validar algumas coisas a mais e integrar com sistema de mandar email
-        
         return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
@@ -50,12 +48,12 @@ public class UsuarioService implements IUsuario {
         usuarioRepository.delete(usuario);
     }
 
-    @Override @Transactional
+    @Override
     public UsuarioOutputDTO findById(Long id) {
         return usuarioMapper.toDto(findEntityById(id));
     }
 
-    @Override @Transactional
+    @Override
     public Usuario findEntityById(Long id) {
         return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
