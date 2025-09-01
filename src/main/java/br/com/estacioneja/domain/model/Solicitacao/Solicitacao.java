@@ -1,8 +1,7 @@
-package br.com.estacioneja.domain.model.Vinculo;
+package br.com.estacioneja.domain.model.Solicitacao;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
@@ -20,29 +19,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "vinculos")
+@Table(name = "solicitacoes")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
-public class Vinculo {
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Solicitacao {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private UUID id;    
 
     @ManyToOne
     @JoinColumn(name = "usuarioId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-vinculo-usuario")
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-vinculo-estacionamento")
     private Estacionamento estacionamento;
+    
+    private Situacao situacao;
+    private LocalDateTime createdAt;
 
-    public Vinculo(Usuario usuario, Estacionamento estacionamento) {
+    public Solicitacao(Usuario usuario, Estacionamento estacionamento, Situacao situacao) {
         this.usuario = usuario;
         this.estacionamento = estacionamento;
+        this.situacao = situacao;
+        this.createdAt = LocalDateTime.now();
     }
 }

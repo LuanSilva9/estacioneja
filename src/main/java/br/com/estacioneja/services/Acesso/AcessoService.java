@@ -1,5 +1,6 @@
 package br.com.estacioneja.services.Acesso;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -63,5 +64,12 @@ public class AcessoService implements IAcesso {
     @Override @Transactional
     public AcessoOutputDTO findById(UUID id) {
         return acessoMapper.toDto(findEntityById(id));
+    }
+
+    @Override
+    public List<AcessoOutputDTO> findAccessByCompany(Long empresaId) {
+        Empresa empresa = empresaService.findEntityById(empresaId);
+
+        return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
     }
 }

@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
+import java.util.List;
+import br.com.estacioneja.domain.model.Empresa.Empresa;
+
 
 @Repository
 public interface AcessoRepository extends JpaRepository<Acesso, UUID> {
-    
+    List<Acesso> findAllByEmpresa(Empresa empresa);
 }

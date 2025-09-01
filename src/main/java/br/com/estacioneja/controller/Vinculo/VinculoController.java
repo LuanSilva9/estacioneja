@@ -1,5 +1,6 @@
 package br.com.estacioneja.controller.Vinculo;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,12 @@ public class VinculoController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> criar(@RequestBody VinculoDTO dto) {
-        vinculoService.create(dto);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<VinculoOutputDTO> criar(@RequestBody VinculoDTO dto) {
+        VinculoOutputDTO vinculo = vinculoService.create(dto);
+
+        URI location = URI.create(String.format("/api/v1/vinculos/%s", vinculo.id()));
+
+        return ResponseEntity.created(location).body(vinculo);
     }
 
     @DeleteMapping("/{id}")
