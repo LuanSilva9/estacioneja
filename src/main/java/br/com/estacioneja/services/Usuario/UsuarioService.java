@@ -22,6 +22,8 @@ public class UsuarioService implements IUsuario {
         this.usuarioMapper = usuarioMapper;
     }
 
+    /* TRANSACOES */
+
     @Override @Transactional
     public UsuarioOutputDTO create(UsuarioDTO dto) {
         existsEmailOrCpf(dto.email(), dto.cpf());
@@ -35,7 +37,7 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional 
     public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
-        existsEmailOrCpf(dto.email(), dto.cpf());
+        // existsEmailOrCpf(dto.email(), dto.cpf());
 
         Usuario usuario = findEntityById(id);
 
@@ -52,6 +54,8 @@ public class UsuarioService implements IUsuario {
 
         usuarioRepository.delete(usuario);
     }
+
+    /* CONSULTAS */
 
     @Override
     public UsuarioOutputDTO findById(Long id) {

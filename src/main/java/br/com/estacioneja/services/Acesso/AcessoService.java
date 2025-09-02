@@ -32,6 +32,8 @@ public class AcessoService implements IAcesso {
         this.acessoMapper = acessoMapper;
     }
 
+    /* TRANSACOES */
+
     @Transactional
     public AcessoOutputDTO create(AcessoDTO dto)  {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
@@ -56,6 +58,8 @@ public class AcessoService implements IAcesso {
         acessoRepository.deleteById(id);
     }
 
+    /* CONSULTAS */
+
     @Override
     public Acesso findEntityById(UUID id) {
         return acessoRepository.findById(id).orElseThrow(AccessNotFoundException::new);
@@ -71,5 +75,14 @@ public class AcessoService implements IAcesso {
         Empresa empresa = empresaService.findEntityById(empresaId);
 
         return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
+    }
+
+    @Override
+    public Acesso findAccessByUserAndCompany(Usuario usuario, Empresa empresa) {
+        Acesso acesso = this.acessoRepository.findByUsuarioAndEmpresa(usuario, empresa);
+
+        if(acesso == null) throw new AccessNotFoundException();
+
+        return acesso;
     }
 }

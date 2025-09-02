@@ -28,6 +28,8 @@ public class EstacionamentoService implements IEstacionamento {
         this.estacionamentoMapper = estacionamentoMapper;
     }
 
+    /* TRANSACOES */
+
     @Override @Transactional
     public EstacionamentoOutputDTO create(EstacionamentoDTO dto) {
         Empresa empresa = empresaService.findEntityById(dto.empresaId());
@@ -56,6 +58,8 @@ public class EstacionamentoService implements IEstacionamento {
 
         estacionamentoRepository.delete(estacionamento);
     }
+
+    /* CONSULTAS */
     
     @Override
     public EstacionamentoOutputDTO findById(UUID idEstacionamento) {

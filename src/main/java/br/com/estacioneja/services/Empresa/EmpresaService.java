@@ -19,35 +19,19 @@ import jakarta.transaction.Transactional;
 public class EmpresaService implements IEmpresa {
     private final EmpresaRepository empresaRepository;
     private final UsuarioService usuarioService;
-
+    private final CadastroRepresentanteService cadastroRepresentanteService;
     private final EmpresaMapper empresaMapper;
 
-    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, EmpresaMapper empresaMapper) {
+    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, CadastroRepresentanteService cadastroRepresentanteService, EmpresaMapper empresaMapper) {
         this.empresaRepository = empresaRepository;
         this.usuarioService = usuarioService;
+        this.cadastroRepresentanteService = cadastroRepresentanteService;
         this.empresaMapper = empresaMapper;
     }
 
-    /* CONSULTAS */
     
-    @Override
-    public Empresa findEntityById(Long empresaId) {
-        return empresaRepository.findById(empresaId).orElseThrow(CompanyNotFoundException::new); 
-    }
-
-    @Override
-    public EmpresaOutputDTO findById(Long empresaId) {
-       return empresaMapper.toDto(findEntityById(empresaId));
-    }
-
-
-    @Override
-    public List<EmpresaOutputDTO> findAll() {
-        return empresaMapper.toDtoList(empresaRepository.findAll());
-    }
-
     /* TRANSACOES */
-
+    
     @Override @Transactional
     public EmpresaOutputDTO create(EmpresaDTO dto) {
         existsByCnpj(dto.cnpj());
@@ -55,9 +39,11 @@ public class EmpresaService implements IEmpresa {
         Usuario representante = usuarioService.findEntityById(dto.representanteId());
         
         Empresa newEmpresa = new Empresa(dto, representante);
-
+        
         empresaRepository.save(newEmpresa);
 
+        cadastroRepresentanteService.cadastrarRepresentante(representante.getId(), newEmpresa.getId());
+        
         return empresaMapper.toDto(newEmpresa);
     }
 
@@ -66,21 +52,21 @@ public class EmpresaService implements IEmpresa {
         existsByCnpj(dto.cnpj());
         Empresa empresa = findEntityById(id);
         Usuario representante = usuarioService.findEntityById(id);
-
+        
         empresa.setRepresentante(representante);
         empresa.setNome(dto.nome());
         empresa.setPrefixo(dto.prefixo());
         empresa.setCnpj(dto.cnpj());
         empresa.setEndereco(dto.endereco());
         empresa.setTipoEmpresa(dto.tipoEmpresa());
-
+        
         return empresaMapper.toDto(empresaRepository.save(empresa));
     }
-
+    
     @Override @Transactional
     public void delete(Long id) {
         Empresa empresa = findEntityById(id);
-
+        
         empresaRepository.delete(empresa);
     }
 
@@ -88,5 +74,22 @@ public class EmpresaService implements IEmpresa {
     public void existsByCnpj(String cnpj) {
         if(this.empresaRepository.existsByCnpj(cnpj)) throw new DuplicateCompanyException();
     } 
-
+    
+    /* CONSULTAS */
+    
+    @Override
+    public Empresa findEntityById(Long empresaId) {
+        return empresaRepository.findById(empresaId).orElseThrow(CompanyNotFoundException::new); 
+    }
+    
+    @Override
+    public EmpresaOutputDTO findById(Long empresaId) {
+       return empresaMapper.toDto(findEntityById(empresaId));
+    }
+    
+    
+    @Override
+    public List<EmpresaOutputDTO> findAll() {
+        return empresaMapper.toDtoList(empresaRepository.findAll());
+    }
 }
