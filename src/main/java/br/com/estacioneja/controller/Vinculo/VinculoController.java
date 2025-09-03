@@ -2,6 +2,7 @@ package br.com.estacioneja.controller.Vinculo;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +44,7 @@ public class VinculoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desvincular(@PathVariable Long id) {
+    public ResponseEntity<Void> desvincular(@PathVariable UUID id) {
         vinculoService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package br.com.estacioneja.services.Vinculo;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ public class VinculoService implements IVinculo {
     }
     
     @Override @Transactional
-    public VinculoOutputDTO update(Long id, VinculoDTO dto) {
+    public VinculoOutputDTO update(UUID id, VinculoDTO dto) {
         Vinculo vinculo = findEntityById(id);
         
         vinculo.setEstacionamento(estacionamentoService.findEntityById(dto.estacionamentoId()));
@@ -62,7 +63,7 @@ public class VinculoService implements IVinculo {
     }
     
     @Override @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         Vinculo vinculo = findEntityById(id);
         
         vinculoRepository.delete(vinculo);
@@ -71,12 +72,12 @@ public class VinculoService implements IVinculo {
     /* CONSULTAS */
     
     @Override
-    public Vinculo findEntityById(Long id) {
+    public Vinculo findEntityById(UUID id) {
         return vinculoRepository.findById(id).orElseThrow(VincleNotFoundException::new);
     }
     
     @Override
-    public VinculoOutputDTO findById(Long id) {
+    public VinculoOutputDTO findById(UUID id) {
         return vinculoMapper.toDto(findEntityById(id));
     }
     
