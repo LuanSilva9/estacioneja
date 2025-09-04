@@ -12,6 +12,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
 import br.com.estacioneja.dto.input.VinculoDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
 import br.com.estacioneja.exceptions.custom.ParkIsPrivateException;
 import br.com.estacioneja.exceptions.custom.VincleNotFoundException;
@@ -67,6 +68,21 @@ public class VinculoService implements IVinculo {
         Vinculo vinculo = findEntityById(id);
         
         vinculoRepository.delete(vinculo);
+    }
+
+    @Override @Transactional
+    public void createAll(List<UsuarioOutputDTO> usuarios, UUID estacionamentoId) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+        
+        for(UsuarioOutputDTO usuarioDTO : usuarios) {
+            Usuario usuario = usuarioService.findEntityById(usuarioDTO.id());
+            
+            if(vinculoRepository.existsByUsuarioAndEstacionamento(usuario, estacionamento)) continue;
+            
+            Vinculo vinculo = new Vinculo(usuario, estacionamento);
+            vinculoRepository.save(vinculo);
+        }
+
     }
 
     /* CONSULTAS */

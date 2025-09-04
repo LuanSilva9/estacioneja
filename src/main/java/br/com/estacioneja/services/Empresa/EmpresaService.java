@@ -32,7 +32,7 @@ public class EmpresaService implements IEmpresa {
     
     /* TRANSACOES */
     
-    @Override @Transactional
+    @Override @Transactional 
     public EmpresaOutputDTO create(EmpresaDTO dto) {
         existsByCnpj(dto.cnpj());
         
@@ -42,7 +42,7 @@ public class EmpresaService implements IEmpresa {
         
         empresaRepository.save(newEmpresa);
 
-        cadastroRepresentanteService.cadastrarRepresentante(representante.getId(), newEmpresa.getId());
+        cadastroRepresentanteService.cadastrarRepresentante(representante.getId(), newEmpresa.getId()); 
         
         return empresaMapper.toDto(newEmpresa);
     }

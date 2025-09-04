@@ -8,9 +8,12 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IAcesso extends IBase<Acesso, UUID, AcessoDTO, AcessoOutputDTO> {
     List<AcessoOutputDTO> findAccessByCompany(Long empresaId);
+    List<UsuarioOutputDTO> findAllUsersByEmpresa(Long empresaId);
+
     Acesso findAccessByUserAndCompany(Usuario usuario, Empresa empresa);
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 
 
@@ -14,5 +15,5 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 public interface VinculoRepository extends JpaRepository<Vinculo, UUID> {
     List<Vinculo> findAllByUsuario(Usuario usuario);
     
-    // Optional<Vinculo> findByUsuarioAndEstacionamento(Usuario usuario, Estacionamento estacionamento);
+    Boolean existsByUsuarioAndEstacionamento(Usuario usuario, Estacionamento estacionamento);
 }

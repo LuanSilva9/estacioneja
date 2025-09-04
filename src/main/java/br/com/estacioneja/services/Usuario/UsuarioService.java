@@ -1,5 +1,7 @@
 package br.com.estacioneja.services.Usuario;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
@@ -70,5 +72,15 @@ public class UsuarioService implements IUsuario {
     @Override
     public void existsEmailOrCpf(String email, String cpf) {
         if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateUserException();
+    }
+
+    /* Mappers */
+
+    public UsuarioOutputDTO toDto(Usuario usuario) {
+        return usuarioMapper.toDto(usuario);
+    }
+
+    public List<UsuarioOutputDTO> toDtoList(List<Usuario> usuarios) {
+        return usuarioMapper.toDtoList(usuarios);
     }
 }
