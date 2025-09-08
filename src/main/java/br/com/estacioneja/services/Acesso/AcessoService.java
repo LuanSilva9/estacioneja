@@ -3,9 +3,12 @@ package br.com.estacioneja.services.Acesso;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.events.EmpresaCriada.EmpresaCriadaEvent;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
+import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
@@ -57,6 +60,11 @@ public class AcessoService implements IAcesso {
     @Override @Transactional
     public void delete(UUID id) {
         acessoRepository.deleteById(id);
+    }
+
+    @EventListener
+    public void handleEventEmpresaCriada(EmpresaCriadaEvent empresaCriadaEvent) {
+        create(new AcessoDTO(TipoAcesso.MASTER, empresaCriadaEvent.representanteId(), empresaCriadaEvent.empresaId()));
     }
 
     /* CONSULTAS */

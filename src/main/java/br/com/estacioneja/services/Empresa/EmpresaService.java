@@ -2,7 +2,10 @@ package br.com.estacioneja.services.Empresa;
 
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import br.com.estacioneja.domain.events.EmpresaCriada.EmpresaCriadaEvent;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
@@ -19,13 +22,13 @@ import jakarta.transaction.Transactional;
 public class EmpresaService implements IEmpresa {
     private final EmpresaRepository empresaRepository;
     private final UsuarioService usuarioService;
-    private final CadastroRepresentanteService cadastroRepresentanteService;
+    private final ApplicationEventPublisher eventPublisher;
     private final EmpresaMapper empresaMapper;
 
-    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, CadastroRepresentanteService cadastroRepresentanteService, EmpresaMapper empresaMapper) {
+    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, ApplicationEventPublisher eventPublisher, EmpresaMapper empresaMapper) {
         this.empresaRepository = empresaRepository;
         this.usuarioService = usuarioService;
-        this.cadastroRepresentanteService = cadastroRepresentanteService;
+        this.eventPublisher = eventPublisher;
         this.empresaMapper = empresaMapper;
     }
 
@@ -42,7 +45,7 @@ public class EmpresaService implements IEmpresa {
         
         empresaRepository.save(newEmpresa);
 
-        cadastroRepresentanteService.cadastrarRepresentante(representante.getId(), newEmpresa.getId()); 
+        eventPublisher.publishEvent(new EmpresaCriadaEvent(newEmpresa.getId(), representante.getId()));
         
         return empresaMapper.toDto(newEmpresa);
     }

@@ -3,8 +3,10 @@ package br.com.estacioneja.services.Vinculo;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.events.EstacionamentoCriado.EstacionamentoCriadoEvent;
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Estacionamento.StatusEstacionamento;
@@ -83,6 +85,11 @@ public class VinculoService implements IVinculo {
             vinculoRepository.save(vinculo);
         }
 
+    }
+
+    @EventListener 
+    public void handleEventEstacionamentoCriado(EstacionamentoCriadoEvent estacionamentoCriadoEvent) {
+        createAll(estacionamentoCriadoEvent.usuariosVinculo(), estacionamentoCriadoEvent.estacionamentoId());
     }
 
     /* CONSULTAS */
