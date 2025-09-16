@@ -3,15 +3,19 @@ package br.com.estacioneja.services.Estacionamento;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.events.EstacionamentoCriado.EstacionamentoCriadoEvent;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
+import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.exceptions.custom.ParkNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EstacionamentoMapper;
+import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.usecases.interfaces.IEstacionamento;
 import jakarta.transaction.Transactional;
@@ -20,13 +24,19 @@ import jakarta.transaction.Transactional;
 public class EstacionamentoService implements IEstacionamento {
     private final EstacionamentoRepository estacionamentoRepository;
     private final EmpresaService empresaService;
+    private final AcessoService acessoService;
+    private final ApplicationEventPublisher eventPublisher;
     private final EstacionamentoMapper estacionamentoMapper;
 
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EstacionamentoMapper estacionamentoMapper) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EstacionamentoMapper estacionamentoMapper, AcessoService acessoService, ApplicationEventPublisher eventPublisher) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.empresaService = empresaService;
         this.estacionamentoMapper = estacionamentoMapper;
+        this.eventPublisher = eventPublisher;
+        this.acessoService = acessoService;
     }
+
+    /* TRANSACOES */
 
     @Override @Transactional
     public EstacionamentoOutputDTO create(EstacionamentoDTO dto) {
@@ -34,6 +44,10 @@ public class EstacionamentoService implements IEstacionamento {
 
         Estacionamento newEstacionamento = new Estacionamento(dto, empresa);
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
+
+        List<UsuarioOutputDTO> usuariosPorEmpresa = acessoService.findAllUsersByEmpresa(dto.empresaId());
+        
+        eventPublisher.publishEvent(new EstacionamentoCriadoEvent(usuariosPorEmpresa, newEstacionamento.getId()));
 
         return estacionamentoMapper.toDto(saved);
     }
@@ -56,6 +70,8 @@ public class EstacionamentoService implements IEstacionamento {
 
         estacionamentoRepository.delete(estacionamento);
     }
+
+    /* CONSULTAS */
     
     @Override
     public EstacionamentoOutputDTO findById(UUID idEstacionamento) {

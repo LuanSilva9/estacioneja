@@ -1,5 +1,7 @@
 package br.com.estacioneja.controller.Acesso;
 
+import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PutMapping; 
 
 @RestController
 @RequestMapping("/api/v1/acessos")
@@ -31,10 +33,19 @@ public class AcessoController {
         return ResponseEntity.ok(acessoService.findById(id));
     }
 
+    @GetMapping("/empresa/{empresaId}")
+    public ResponseEntity<List<AcessoOutputDTO>> obterPorEmpresa(@PathVariable Long empresaId) {
+        return ResponseEntity.ok().body(acessoService.findAccessByCompany(empresaId));
+    }
+    
+
     @PostMapping
-    public ResponseEntity<Void> criar(@RequestBody AcessoDTO dto) {
-        acessoService.create(dto);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<AcessoOutputDTO> criar(@RequestBody AcessoDTO dto) {
+        AcessoOutputDTO acesso = acessoService.create(dto);
+
+        URI location = URI.create(String.format("/api/v1/acesso/%s", acesso.id()));
+
+        return ResponseEntity.created(location).body(acesso);
     }
 
     @PutMapping("/{id}")

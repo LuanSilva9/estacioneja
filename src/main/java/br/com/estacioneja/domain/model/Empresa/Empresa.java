@@ -8,6 +8,7 @@ import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,6 +38,8 @@ public class Empresa {
     private String nome;
     private String endereco;
     private TipoEmpresa tipoEmpresa;
+
+    @Column(unique = true)
     private String cnpj;
     private String prefixo;
 

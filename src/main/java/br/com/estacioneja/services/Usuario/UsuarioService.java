@@ -1,11 +1,14 @@
 package br.com.estacioneja.services.Usuario;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.exceptions.custom.DuplicateUserException;
 import br.com.estacioneja.exceptions.custom.UserNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
 import br.com.estacioneja.usecases.interfaces.IUsuario;
@@ -21,8 +24,12 @@ public class UsuarioService implements IUsuario {
         this.usuarioMapper = usuarioMapper;
     }
 
+    /* TRANSACOES */
+
     @Override @Transactional
     public UsuarioOutputDTO create(UsuarioDTO dto) {
+        existsEmailOrCpf(dto.email(), dto.cpf());
+
         Usuario newUsuario = new Usuario(dto);
 
         this.usuarioRepository.save(newUsuario);
@@ -32,14 +39,14 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional 
     public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
+        // existsEmailOrCpf(dto.email(), dto.cpf());
+
         Usuario usuario = findEntityById(id);
 
+        usuario.setName(dto.name());
         usuario.setCpf(dto.cpf());
         usuario.setEmail(dto.email());
-        usuario.setName(dto.senha());
 
-        // Esse método é um pouco mais sensivel então qnd  formos apresentar uma versão mais madura do SaaS teremos que validar algumas coisas a mais e integrar com sistema de mandar email
-        
         return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
@@ -50,13 +57,30 @@ public class UsuarioService implements IUsuario {
         usuarioRepository.delete(usuario);
     }
 
-    @Override @Transactional
+    /* CONSULTAS */
+
+    @Override
     public UsuarioOutputDTO findById(Long id) {
         return usuarioMapper.toDto(findEntityById(id));
     }
 
-    @Override @Transactional
+    @Override
     public Usuario findEntityById(Long id) {
         return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public void existsEmailOrCpf(String email, String cpf) {
+        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateUserException();
+    }
+
+    /* Mappers */
+
+    public UsuarioOutputDTO toDto(Usuario usuario) {
+        return usuarioMapper.toDto(usuario);
+    }
+
+    public List<UsuarioOutputDTO> toDtoList(List<Usuario> usuarios) {
+        return usuarioMapper.toDtoList(usuarios);
     }
 }
