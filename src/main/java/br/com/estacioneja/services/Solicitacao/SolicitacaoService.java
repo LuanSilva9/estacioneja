@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.enums.Privacidade;
+import br.com.estacioneja.domain.enums.Situacao;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Estacionamento.StatusEstacionamento;
-import br.com.estacioneja.domain.model.Solicitacao.Situacao;
 import br.com.estacioneja.domain.model.Solicitacao.Solicitacao;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Solicitacao.SolicitacaoRepository;
@@ -41,7 +41,7 @@ public class SolicitacaoService implements ISolicitacao {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
-        if(estacionamento.getStatusEstacionamento().equals(StatusEstacionamento.PUBLICO)) throw new ParkIsPublicException();
+        if(estacionamento.getPrivacidade().equals(Privacidade.PUBLICO)) throw new ParkIsPublicException();
 
         Solicitacao novaSolicitacao = new Solicitacao(usuario, estacionamento, Situacao.PENDENTE);
 

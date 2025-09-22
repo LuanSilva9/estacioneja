@@ -6,10 +6,10 @@ import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.events.EstacionamentoCriado.EstacionamentoCriadoEvent;
+import br.com.estacioneja.domain.enums.Privacidade;
+import br.com.estacioneja.domain.events.Estacionamento.EstacionamentoCriadoEvent;
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Estacionamento.StatusEstacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
@@ -48,7 +48,7 @@ public class VinculoService implements IVinculo {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
         
-        if(estacionamento.getStatusEstacionamento().equals(StatusEstacionamento.PRIVADO) && acessoService.findAccessByUserAndCompany(usuario,estacionamento.getEmpresa()).getTipoAcesso() != TipoAcesso.MASTER) throw new ParkIsPrivateException();
+        if(estacionamento.getPrivacidade().equals(Privacidade.PRIVADO) && acessoService.findAccessByUserAndCompany(usuario,estacionamento.getEmpresa()).getTipoAcesso() != TipoAcesso.MASTER) throw new ParkIsPrivateException();
         
         Vinculo vinculo = new Vinculo(usuario, estacionamento);
         

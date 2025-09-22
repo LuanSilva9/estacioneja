@@ -6,8 +6,9 @@ import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.events.EstacionamentoCriado.EstacionamentoCriadoEvent;
+import br.com.estacioneja.domain.events.Estacionamento.EstacionamentoCriadoEvent;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
+import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
@@ -17,6 +18,7 @@ import br.com.estacioneja.exceptions.custom.ParkNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EstacionamentoMapper;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
+import br.com.estacioneja.services.Endereco.EnderecoService;
 import br.com.estacioneja.usecases.interfaces.IEstacionamento;
 import jakarta.transaction.Transactional;
 
@@ -25,15 +27,17 @@ public class EstacionamentoService implements IEstacionamento {
     private final EstacionamentoRepository estacionamentoRepository;
     private final EmpresaService empresaService;
     private final AcessoService acessoService;
+    private final EnderecoService enderecoService;
     private final ApplicationEventPublisher eventPublisher;
     private final EstacionamentoMapper estacionamentoMapper;
 
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EstacionamentoMapper estacionamentoMapper, AcessoService acessoService, ApplicationEventPublisher eventPublisher) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EnderecoService enderecoService, EstacionamentoMapper estacionamentoMapper, AcessoService acessoService, ApplicationEventPublisher eventPublisher) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.empresaService = empresaService;
         this.estacionamentoMapper = estacionamentoMapper;
         this.eventPublisher = eventPublisher;
         this.acessoService = acessoService;
+        this.enderecoService = enderecoService;
     }
 
     /* TRANSACOES */
@@ -42,7 +46,10 @@ public class EstacionamentoService implements IEstacionamento {
     public EstacionamentoOutputDTO create(EstacionamentoDTO dto) {
         Empresa empresa = empresaService.findEntityById(dto.empresaId());
 
-        Estacionamento newEstacionamento = new Estacionamento(dto, empresa);
+        Endereco endereco = enderecoService.createEntity(dto.endereco());
+
+        Estacionamento newEstacionamento = new Estacionamento(dto, endereco, empresa);
+
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
 
         List<UsuarioOutputDTO> usuariosPorEmpresa = acessoService.findAllUsersByEmpresa(dto.empresaId());
@@ -59,7 +66,7 @@ public class EstacionamentoService implements IEstacionamento {
         Estacionamento estacionamento = findEntityById(id);
 
         estacionamento.setEmpresa(empresa);
-        estacionamento.setStatusEstacionamento(dto.statusEstacionamento());
+        estacionamento.setPrivacidade(dto.privacidade());
 
         return estacionamentoMapper.toDto(estacionamentoRepository.save(estacionamento));
     }

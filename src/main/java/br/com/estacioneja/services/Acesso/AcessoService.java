@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.events.EmpresaCriada.EmpresaCriadaEvent;
+import br.com.estacioneja.domain.events.Empresa.EmpresaCriadaEvent;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.events.EmpresaCriada.EmpresaCriadaEvent;
+import br.com.estacioneja.domain.events.Empresa.EmpresaCriadaEvent;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;

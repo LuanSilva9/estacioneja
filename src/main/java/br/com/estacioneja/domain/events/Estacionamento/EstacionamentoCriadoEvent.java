@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.events.EstacionamentoCriado;
+package br.com.estacioneja.domain.events.Estacionamento;
 
 import java.util.List;
 import java.util.UUID;

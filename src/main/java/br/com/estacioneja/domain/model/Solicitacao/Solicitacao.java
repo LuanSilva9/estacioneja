@@ -3,6 +3,7 @@ package br.com.estacioneja.domain.model.Solicitacao;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import br.com.estacioneja.domain.enums.Situacao;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import jakarta.persistence.Entity;

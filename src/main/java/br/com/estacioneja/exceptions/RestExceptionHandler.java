@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import br.com.estacioneja.dto.output.ResponseExceptionDTO;
 import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
+import br.com.estacioneja.exceptions.custom.AddressNotFoundException;
 import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
 import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
 import br.com.estacioneja.exceptions.custom.DuplicateUserException;
@@ -31,7 +32,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ParkNotFoundException.class,
         AccessNotFoundException.class,
         VincleNotFoundException.class,
-        SolicitationNotFoundException.class
+        SolicitationNotFoundException.class,
+        AddressNotFoundException.class
     })
     private ResponseEntity<ResponseExceptionDTO> handleNotFound(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseExceptionDTO(exception.getMessage()));
