@@ -36,7 +36,6 @@ public class Empresa {
     private Long id;
 
     private String nome;
-    private String endereco;
     private TipoEmpresa tipoEmpresa;
 
     @Column(unique = true)
@@ -53,7 +52,6 @@ public class Empresa {
 
     public Empresa(EmpresaDTO dto, Usuario representante) {
         this.nome = dto.nome();
-        this.endereco = dto.endereco();
         this.cnpj = dto.cnpj();
         this.tipoEmpresa = dto.tipoEmpresa();
         this.prefixo = dto.prefixo();

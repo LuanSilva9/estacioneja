@@ -60,7 +60,6 @@ public class EmpresaService implements IEmpresa {
         empresa.setNome(dto.nome());
         empresa.setPrefixo(dto.prefixo());
         empresa.setCnpj(dto.cnpj());
-        empresa.setEndereco(dto.endereco());
         empresa.setTipoEmpresa(dto.tipoEmpresa());
         
         return empresaMapper.toDto(empresaRepository.save(empresa));
