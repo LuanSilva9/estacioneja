@@ -10,6 +10,7 @@ import br.com.estacioneja.dto.output.VinculoOutputDTO;
 @Mapper(componentModel = "spring")
 public interface VinculoMapper {
     VinculoOutputDTO toDto(Vinculo vinculo);
-
+ 
     List<VinculoOutputDTO> toDtoList(List<Vinculo> vinculos);
 }
+ 

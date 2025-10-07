@@ -4,6 +4,6 @@ import java.util.UUID;
 
 import br.com.estacioneja.domain.enums.Situacao;
 
-public record SolicitacaoDTO(Long usuarioId, UUID estacionamentoId, Situacao situacao) {
+public record SolicitacaoDTO(Long usuarioId, UUID filialId, UUID veiculoId, Situacao situacao) {
     
 }

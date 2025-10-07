@@ -14,3 +14,4 @@ public interface EstacionamentoMapper {
     List<EstacionamentoOutputDTO> toDtoList(List<Estacionamento> estacionamentos);
 
 }
+ 

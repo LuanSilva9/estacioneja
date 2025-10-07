@@ -9,5 +9,4 @@ public interface IBase<T, ID, IDTO, ODTO> {
     /* Consultas */
     T findEntityById(ID id);
     ODTO findById(ID id);
-
 }

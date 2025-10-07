@@ -7,5 +7,4 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
-    Boolean existsByCnpj(String cnpj);
 }

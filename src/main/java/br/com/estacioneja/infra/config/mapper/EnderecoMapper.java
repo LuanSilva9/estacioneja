@@ -12,4 +12,7 @@ import br.com.estacioneja.dto.output.EnderecoOutputDTO;
 public interface EnderecoMapper {
     EnderecoOutputDTO toDto(Endereco endereco);
     List<EnderecoOutputDTO> toDtoList(List<Endereco> enderecos);
+
+    Endereco toEntity(EnderecoOutputDTO dto);
+    List<Endereco> toEntityList(List<EnderecoOutputDTO> dtoList);
 }

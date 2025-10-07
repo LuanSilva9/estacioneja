@@ -5,6 +5,6 @@ import java.util.UUID;
 
 import br.com.estacioneja.domain.enums.Situacao;
 
-public record SolicitacaoOutputDTO(UUID id, UsuarioOutputDTO usuario, EstacionamentoOutputDTO estacionamento, Situacao situacao, LocalDateTime createdAt) {
+public record SolicitacaoOutputDTO(UUID id, UsuarioOutputDTO usuario, FilialOutputDTO filial, VeiculoOutputDTO veiculo, Situacao situacao, LocalDateTime createdAt) {
     
 }

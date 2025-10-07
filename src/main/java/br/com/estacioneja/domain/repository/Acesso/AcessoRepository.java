@@ -9,16 +9,16 @@ import org.springframework.stereotype.Repository;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import java.util.List;
-import br.com.estacioneja.domain.model.Empresa.Empresa;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 
 
 @Repository
 public interface AcessoRepository extends JpaRepository<Acesso, UUID> {
-    @Query("SELECT a.usuario FROM Acesso a WHERE a.empresa.id = :empresaId")
-    List<Usuario> findAllUsersByEmpresa(@Param("empresaId") Long empresaId);
+    @Query("SELECT a.usuario FROM Acesso a WHERE a.filial.id = :filialId")
+    List<Usuario> findAllUsersByFilial(@Param("filialId") UUID filialId);
 
-    List<Acesso> findAllByEmpresa(Empresa empresa);
+    List<Acesso> findAllByFilial(Filial filial);
     
-    Acesso findByUsuarioAndEmpresa(Usuario usuario, Empresa empresa);
+    Acesso findByUsuarioAndFilial(Usuario usuario, Filial filial);
 }

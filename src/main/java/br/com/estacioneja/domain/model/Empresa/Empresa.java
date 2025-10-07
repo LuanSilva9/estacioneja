@@ -2,20 +2,19 @@ package br.com.estacioneja.domain.model.Empresa;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -36,27 +35,19 @@ public class Empresa {
     private Long id;
 
     private String nome;
-    private String endereco;
     private TipoEmpresa tipoEmpresa;
 
-    @Column(unique = true)
-    private String cnpj;
-    private String prefixo;
-
-    @OneToOne
-    @JoinColumn(name="representanteId", referencedColumnName = "id")
-    private Usuario representante;
-
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference("relacao-empresa-estacionamento")
-    private List<Estacionamento> estacionamentos;
+    @JsonManagedReference("relacao-empresa-filial")
+    private List<Filial> filiais;
 
-    public Empresa(EmpresaDTO dto, Usuario representante) {
+    @ManyToOne
+    @JoinColumn(name="representanteMasterId", referencedColumnName = "id")
+    private Usuario representanteMaster;
+
+    public Empresa(EmpresaDTO dto, Usuario representanteMaster) {
         this.nome = dto.nome();
-        this.endereco = dto.endereco();
-        this.cnpj = dto.cnpj();
         this.tipoEmpresa = dto.tipoEmpresa();
-        this.prefixo = dto.prefixo();
-        this.representante = representante;
+        this.representanteMaster = representanteMaster;
     }
 }

@@ -11,6 +11,7 @@ import br.com.estacioneja.domain.events.Estacionamento.EstacionamentoCriadoEvent
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
 import br.com.estacioneja.dto.input.VinculoDTO;
@@ -22,6 +23,7 @@ import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.IVinculo;
 import jakarta.transaction.Transactional;
 
@@ -30,15 +32,17 @@ public class VinculoService implements IVinculo {
     private final VinculoRepository vinculoRepository;
     private final UsuarioService usuarioService;
     private final EstacionamentoService estacionamentoService;
+    private final VeiculoService veiculoService;
     private final AcessoService acessoService;
     private final VinculoMapper vinculoMapper;
 
-    public VinculoService(VinculoRepository vinculoRepository, UsuarioService usuarioService, EstacionamentoService estacionamentoService, AcessoService acessoService, VinculoMapper vinculoMapper) {
+    public VinculoService(VinculoRepository vinculoRepository, UsuarioService usuarioService, EstacionamentoService estacionamentoService, AcessoService acessoService, VeiculoService veiculoService, VinculoMapper vinculoMapper) {
         this.vinculoRepository = vinculoRepository;
         this.usuarioService = usuarioService;
         this.estacionamentoService = estacionamentoService;
         this.acessoService = acessoService;
         this.vinculoMapper = vinculoMapper;
+        this.veiculoService = veiculoService;
     }
 
     /* TRANSACOES */    
@@ -47,10 +51,11 @@ public class VinculoService implements IVinculo {
     public VinculoOutputDTO create(VinculoDTO dto) {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
+        Veiculo veiculo = veiculoService.findEntityById(dto.veiculoId());
         
-        if(estacionamento.getPrivacidade().equals(Privacidade.PRIVADO) && acessoService.findAccessByUserAndCompany(usuario,estacionamento.getEmpresa()).getTipoAcesso() != TipoAcesso.MASTER) throw new ParkIsPrivateException();
+        if(estacionamento.getPrivacidade().equals(Privacidade.PRIVADO) && acessoService.findAccessByUserAndFilial(usuario,estacionamento.getFilial()).getTipoAcesso() != TipoAcesso.MASTER) throw new ParkIsPrivateException();
         
-        Vinculo vinculo = new Vinculo(usuario, estacionamento);
+        Vinculo vinculo = new Vinculo(usuario, estacionamento, veiculo);
         
         return vinculoMapper.toDto(vinculoRepository.save(vinculo));
     }
@@ -78,11 +83,16 @@ public class VinculoService implements IVinculo {
         
         for(UsuarioOutputDTO usuarioDTO : usuarios) {
             Usuario usuario = usuarioService.findEntityById(usuarioDTO.id());
+            List<Veiculo> veiculos = veiculoService.findByProprietarioId(usuario.getId());
+
             
             if(vinculoRepository.existsByUsuarioAndEstacionamento(usuario, estacionamento)) continue;
             
-            Vinculo vinculo = new Vinculo(usuario, estacionamento);
-            vinculoRepository.save(vinculo);
+            for(Veiculo veiculo : veiculos) {
+                Vinculo vinculo = new Vinculo(usuario, estacionamento, veiculo);
+                vinculoRepository.save(vinculo);
+            }
+
         }
 
     }

@@ -7,9 +7,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.events.Empresa.EmpresaCriadaEvent;
+import br.com.estacioneja.domain.events.Empresa.FilialCriadaEvent;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
@@ -18,6 +20,7 @@ import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
+import br.com.estacioneja.services.Filial.FilialService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IAcesso;
 import jakarta.transaction.Transactional;
@@ -26,22 +29,34 @@ import jakarta.transaction.Transactional;
 public class AcessoService implements IAcesso {
     private final AcessoRepository acessoRepository;
     private final UsuarioService usuarioService;
+    private final FilialService filialService;
     private final EmpresaService empresaService;
     private final AcessoMapper acessoMapper;
 
-    public AcessoService(AcessoRepository acessoRepository, UsuarioService usuarioService, EmpresaService empresaService, AcessoMapper acessoMapper) {
+    public AcessoService(AcessoRepository acessoRepository, UsuarioService usuarioService, FilialService FilialService, EmpresaService empresaService, AcessoMapper acessoMapper) {
         this.acessoRepository = acessoRepository;
         this.usuarioService = usuarioService;
+        this.filialService = FilialService;
         this.empresaService = empresaService;
         this.acessoMapper = acessoMapper;
     }
 
     /* TRANSACOES */
 
-    @Transactional
-    public AcessoOutputDTO create(AcessoDTO dto)  {
+    @Override @Transactional
+    public AcessoOutputDTO createFilial(AcessoDTO dto, UUID filialId)  {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
-        Empresa empresa = empresaService.findEntityById(dto.empresaId());
+        Filial filial = filialService.findEntityById(filialId);
+
+        Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, filial);
+
+        return acessoMapper.toDto(acessoRepository.save(newAcesso));
+    }  
+
+    @Override @Transactional
+    public AcessoOutputDTO createEmpresa(AcessoDTO dto, Long empresaId)  {
+        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+        Empresa empresa = empresaService.findEntityById(empresaId);
 
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
 
@@ -63,8 +78,13 @@ public class AcessoService implements IAcesso {
     }
 
     @EventListener
+    public void handleEventFilialCriada(FilialCriadaEvent filialCriadaEvent) {
+        createFilial(new AcessoDTO(TipoAcesso.MASTER, filialCriadaEvent.representanteId()), filialCriadaEvent.filialId());
+    }
+
+    @EventListener
     public void handleEventEmpresaCriada(EmpresaCriadaEvent empresaCriadaEvent) {
-        create(new AcessoDTO(TipoAcesso.MASTER, empresaCriadaEvent.representanteId(), empresaCriadaEvent.empresaId()));
+        createEmpresa(new AcessoDTO(TipoAcesso.MASTER, empresaCriadaEvent.representanteId()), empresaCriadaEvent.empresaId());
     }
 
     /* CONSULTAS */
@@ -80,15 +100,15 @@ public class AcessoService implements IAcesso {
     }
 
     @Override
-    public List<AcessoOutputDTO> findAccessByCompany(Long empresaId) {
-        Empresa empresa = empresaService.findEntityById(empresaId);
+    public List<AcessoOutputDTO> findAccessByFilial(UUID filialId) {
+        Filial filial = filialService.findEntityById(filialId);
 
-        return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
+        return acessoMapper.toDtoList(this.acessoRepository.findAllByFilial(filial));
     }
 
     @Override
-    public Acesso findAccessByUserAndCompany(Usuario usuario, Empresa empresa) {
-        Acesso acesso = this.acessoRepository.findByUsuarioAndEmpresa(usuario, empresa);
+    public Acesso findAccessByUserAndFilial(Usuario usuario, Filial filial) {
+        Acesso acesso = this.acessoRepository.findByUsuarioAndFilial(usuario, filial);
 
         if(acesso == null) throw new AccessNotFoundException();
 
@@ -96,7 +116,15 @@ public class AcessoService implements IAcesso {
     }
 
     @Override
-    public List<UsuarioOutputDTO> findAllUsersByEmpresa(Long empresaId) {
-        return this.usuarioService.toDtoList(this.acessoRepository.findAllUsersByEmpresa(empresaId));
+    public List<UsuarioOutputDTO> findAllUsersByFilial(UUID filialId) {
+        return this.usuarioService.toDtoList(this.acessoRepository.findAllUsersByFilial(filialId));
     }
+
+    @Override
+    public AcessoOutputDTO create(AcessoDTO dto) {
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+
+
 }

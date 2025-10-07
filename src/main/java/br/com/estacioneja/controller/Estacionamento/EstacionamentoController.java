@@ -1,6 +1,5 @@
 package br.com.estacioneja.controller.Estacionamento;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -34,11 +33,6 @@ public class EstacionamentoController {
     @GetMapping("/{id}")
     public ResponseEntity<EstacionamentoOutputDTO> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(estacionamentoService.findById(id));
-    }
-
-    @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<EstacionamentoOutputDTO>> listarPorEmpresa(@PathVariable Long empresaId) {
-        return ResponseEntity.ok(estacionamentoService.findEstacionamentoByEmpresa(empresaId));
     }
 
     @PostMapping
