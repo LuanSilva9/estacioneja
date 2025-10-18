@@ -9,5 +9,5 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 
 public interface VeiculoRepository extends JpaRepository<Veiculo, UUID>{
-    List<Veiculo> findByProprietario(Usuario proprietario);
+    List<Veiculo> findByUsuario(Usuario usuario);
 }

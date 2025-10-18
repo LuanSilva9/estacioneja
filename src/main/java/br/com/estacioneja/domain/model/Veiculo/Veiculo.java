@@ -42,14 +42,14 @@ public class Veiculo {
 
     @ManyToOne
     @JoinColumn(name = "proprietarioId", referencedColumnName = "id")
-    private Usuario proprietario;
+    private Usuario usuario;
     
     public Veiculo(VeiculoDTO dto, Usuario proprietario) {
         this.placa = dto.placa();
         this.modelo = dto.modelo();
         this.cor = dto.cor();
         this.tipoVeiculo = dto.tipoVeiculo();
-        this.proprietario = proprietario;
+        this.usuario = proprietario;
     }
 
 }

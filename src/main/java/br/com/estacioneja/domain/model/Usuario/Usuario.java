@@ -47,7 +47,7 @@ public class Usuario {
     @JsonBackReference("relacao-vinculo-usuario")
     private List<Vinculo> vinculos;
 
-    @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-veiculo-usuario")
     private List<Veiculo> veiculos;
 
