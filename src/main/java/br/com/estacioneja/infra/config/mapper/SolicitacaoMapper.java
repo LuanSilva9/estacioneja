@@ -10,7 +10,7 @@ import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
 @Mapper(componentModel = "spring")
 public interface SolicitacaoMapper {
     SolicitacaoOutputDTO toDto(Solicitacao solicitacao);
-
+ 
     List<SolicitacaoOutputDTO> toDtoList(List<Solicitacao> solicitacoes);
 
 }

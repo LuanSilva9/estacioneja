@@ -39,8 +39,6 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional 
     public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
-        // existsEmailOrCpf(dto.email(), dto.cpf());
-
         Usuario usuario = findEntityById(id);
 
         usuario.setName(dto.name());

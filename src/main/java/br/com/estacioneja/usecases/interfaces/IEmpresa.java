@@ -9,6 +9,4 @@ import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IEmpresa extends IBase<Empresa, Long, EmpresaDTO, EmpresaOutputDTO>  {
     List<EmpresaOutputDTO> findAll();
-    
-    void existsByCnpj(String cnpj);
 }

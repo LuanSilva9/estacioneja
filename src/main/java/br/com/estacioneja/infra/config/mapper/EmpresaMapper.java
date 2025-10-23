@@ -14,3 +14,4 @@ public interface EmpresaMapper {
     List<EmpresaOutputDTO> toDtoList(List<Empresa> empresas);
 
 }
+ 

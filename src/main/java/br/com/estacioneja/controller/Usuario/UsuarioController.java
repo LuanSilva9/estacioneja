@@ -52,4 +52,8 @@ public class UsuarioController {
         usuarioService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Veiculos
+
+    
 }

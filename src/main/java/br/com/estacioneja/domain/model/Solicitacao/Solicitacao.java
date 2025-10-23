@@ -4,8 +4,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import br.com.estacioneja.domain.enums.Situacao;
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,16 +37,21 @@ public class Solicitacao {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
-    private Estacionamento estacionamento;
+    @JoinColumn(name = "filialId", referencedColumnName = "id")
+    private Filial filial;
+
+    @ManyToOne
+    @JoinColumn(name = "veiculoId", referencedColumnName = "id")
+    private Veiculo veiculo;
     
     private Situacao situacao;
     private LocalDateTime createdAt;
 
-    public Solicitacao(Usuario usuario, Estacionamento estacionamento, Situacao situacao) {
+    public Solicitacao(Usuario usuario, Filial filial, Veiculo veiculo, Situacao situacao) {
         this.usuario = usuario;
-        this.estacionamento = estacionamento;
+        this.filial = filial;
         this.situacao = situacao;
+        this.veiculo = veiculo;
         this.createdAt = LocalDateTime.now();
     }
 }

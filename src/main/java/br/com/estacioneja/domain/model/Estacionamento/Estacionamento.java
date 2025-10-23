@@ -6,13 +6,14 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.enums.Plano;
 import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Endereco.Endereco;
+import br.com.estacioneja.domain.enums.TipoVeiculo;
+import br.com.estacioneja.domain.model.Equipamento.Equipamento;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +21,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -46,33 +46,29 @@ public class Estacionamento {
 
     private Privacidade privacidade;
 
+    @ElementCollection
     @Enumerated(EnumType.STRING)
-    private Plano plano;
+    private List<TipoVeiculo> regraEstacionamento;
 
-    private String prefixo;
-
-    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JoinColumn(name = "enderecoId", referencedColumnName = "id")
-    private Endereco endereco;
-
-    @ManyToOne
-    @JoinColumn(name="empresaId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-empresa-estacionamento")
-    private Empresa empresa;
+    @OneToOne
+    @JoinColumn(name="filialId", referencedColumnName = "id")
+    @JsonBackReference("relacao-filial-estacionamento")
+    private Filial filial;
 
     @OneToMany(mappedBy = "estacionamento", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-vinculo-estacionamento")
     private List<Vinculo> vinculos;
-    
+
+    @OneToMany(mappedBy = "estacionamento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("relacao-equipamento-estacionamento")
+    private List<Equipamento> equipamentos;
+
     private Long capacidade;
 
-    public Estacionamento(EstacionamentoDTO dto, Endereco endereco, Empresa empresa) {
+    public Estacionamento(EstacionamentoDTO dto, Filial filial) {
         this.privacidade = dto.privacidade();
         this.descricao = dto.descricao();
-        this.prefixo = dto.prefixo();
-        this.empresa = empresa;
+        this.filial = filial;
         this.capacidade = dto.capacidade();
-        this.plano = dto.plano();
-        this.endereco = endereco;
     }
 }

@@ -7,9 +7,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.events.Estacionamento.EstacionamentoCriadoEvent;
-import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
@@ -19,40 +18,37 @@ import br.com.estacioneja.infra.config.mapper.EstacionamentoMapper;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Endereco.EnderecoService;
+import br.com.estacioneja.services.Filial.FilialService;
 import br.com.estacioneja.usecases.interfaces.IEstacionamento;
 import jakarta.transaction.Transactional;
 
 @Service
 public class EstacionamentoService implements IEstacionamento {
     private final EstacionamentoRepository estacionamentoRepository;
-    private final EmpresaService empresaService;
+    private final FilialService filialService;
     private final AcessoService acessoService;
-    private final EnderecoService enderecoService;
     private final ApplicationEventPublisher eventPublisher;
     private final EstacionamentoMapper estacionamentoMapper;
 
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EnderecoService enderecoService, EstacionamentoMapper estacionamentoMapper, AcessoService acessoService, ApplicationEventPublisher eventPublisher) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EnderecoService enderecoService, EstacionamentoMapper estacionamentoMapper, AcessoService acessoService, ApplicationEventPublisher eventPublisher, FilialService filialService) {
         this.estacionamentoRepository = estacionamentoRepository;
-        this.empresaService = empresaService;
+        this.filialService = filialService;
         this.estacionamentoMapper = estacionamentoMapper;
         this.eventPublisher = eventPublisher;
         this.acessoService = acessoService;
-        this.enderecoService = enderecoService;
     }
 
     /* TRANSACOES */
 
     @Override @Transactional
     public EstacionamentoOutputDTO create(EstacionamentoDTO dto) {
-        Empresa empresa = empresaService.findEntityById(dto.empresaId());
+        Filial filial = filialService.findEntityById(dto.filialId());
 
-        Endereco endereco = enderecoService.createEntity(dto.endereco());
-
-        Estacionamento newEstacionamento = new Estacionamento(dto, endereco, empresa);
+        Estacionamento newEstacionamento = new Estacionamento(dto, filial);
 
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
 
-        List<UsuarioOutputDTO> usuariosPorEmpresa = acessoService.findAllUsersByEmpresa(dto.empresaId());
+        List<UsuarioOutputDTO> usuariosPorEmpresa = acessoService.findAllUsersByFilial(dto.filialId());
         
         eventPublisher.publishEvent(new EstacionamentoCriadoEvent(usuariosPorEmpresa, newEstacionamento.getId()));
 
@@ -61,11 +57,11 @@ public class EstacionamentoService implements IEstacionamento {
     
     @Override @Transactional
     public EstacionamentoOutputDTO update(UUID id, EstacionamentoDTO dto) {
-        Empresa empresa = empresaService.findEntityById(dto.empresaId());
+        Filial filial = filialService.findEntityById(dto.filialId());
 
         Estacionamento estacionamento = findEntityById(id);
 
-        estacionamento.setEmpresa(empresa);
+        estacionamento.setFilial(filial);
         estacionamento.setPrivacidade(dto.privacidade());
 
         return estacionamentoMapper.toDto(estacionamentoRepository.save(estacionamento));
@@ -88,13 +84,6 @@ public class EstacionamentoService implements IEstacionamento {
     @Override
     public Estacionamento findEntityById(UUID idEstacionamento) {
        return estacionamentoRepository.findById(idEstacionamento).orElseThrow(ParkNotFoundException::new); 
-    }
-
-    @Override
-    public List<EstacionamentoOutputDTO> findEstacionamentoByEmpresa(Long idEmpresa) {
-        Empresa empresa = empresaService.findEntityById(idEmpresa);
-
-        return estacionamentoMapper.toDtoList(estacionamentoRepository.findAllByEmpresa(empresa));
     }
 
 }
