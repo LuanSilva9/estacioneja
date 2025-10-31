@@ -11,4 +11,4 @@ import br.com.estacioneja.dto.output.FilialOutputDTO;
 public interface FilialMapper {
     FilialOutputDTO toDto(Filial filial);
     List<FilialOutputDTO> toDtoList(List<Filial> filiais);
-}   
+}  
