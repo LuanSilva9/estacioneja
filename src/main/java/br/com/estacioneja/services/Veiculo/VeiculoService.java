@@ -39,14 +39,14 @@ public class VeiculoService implements IVeiculo {
     }
 
     @Override
-    public VeiculoOutputDTO update(UUID id, VeiculoDTO dto) {
+    public void update(UUID id, VeiculoDTO dto) {
         Veiculo veiculo = findEntityById(id);
 
         veiculo.setCor(dto.cor());
         veiculo.setModelo(dto.modelo());
         veiculo.setTipoVeiculo(dto.tipoVeiculo());
 
-        return veiculoMapper.toDto(veiculoRepository.save(veiculo));
+        veiculoRepository.save(veiculo);
     }
 
     @Override

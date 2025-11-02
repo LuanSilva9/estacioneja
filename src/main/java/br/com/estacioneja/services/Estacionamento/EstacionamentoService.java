@@ -56,7 +56,7 @@ public class EstacionamentoService implements IEstacionamento {
     }
     
     @Override @Transactional
-    public EstacionamentoOutputDTO update(UUID id, EstacionamentoDTO dto) {
+    public void update(UUID id, EstacionamentoDTO dto) {
         Filial filial = filialService.findEntityById(dto.filialId());
 
         Estacionamento estacionamento = findEntityById(id);
@@ -64,7 +64,7 @@ public class EstacionamentoService implements IEstacionamento {
         estacionamento.setFilial(filial);
         estacionamento.setPrivacidade(dto.privacidade());
 
-        return estacionamentoMapper.toDto(estacionamentoRepository.save(estacionamento));
+        estacionamentoRepository.save(estacionamento);
     }
 
     @Override @Transactional

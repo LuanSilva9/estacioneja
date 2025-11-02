@@ -64,12 +64,12 @@ public class AcessoService implements IAcesso {
     }  
 
     @Override @Transactional
-    public AcessoOutputDTO update(UUID id, AcessoDTO dto) {
+    public void update(UUID id, AcessoDTO dto) {
         Acesso acesso = findEntityById(id);
 
         acesso.setTipoAcesso(dto.tipoAcesso());
-
-        return acessoMapper.toDto(acessoRepository.save(acesso));
+        
+        acessoRepository.save(acesso);
     }
 
     @Override @Transactional

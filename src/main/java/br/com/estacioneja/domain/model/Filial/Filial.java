@@ -1,5 +1,6 @@
 package br.com.estacioneja.domain.model.Filial;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -21,7 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -53,9 +54,9 @@ public class Filial {
     @Column(unique = true)
     private String cnpj;
 
-    @OneToOne(mappedBy = "filial", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "filial", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-filial-estacionamento")
-    private Estacionamento estacionamento;
+    private List<Estacionamento> estacionamento;
 
     @ManyToOne
     @JoinColumn(name = "empresaId", referencedColumnName = "id")

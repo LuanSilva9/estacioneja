@@ -38,14 +38,14 @@ public class UsuarioService implements IUsuario {
     }
 
     @Override @Transactional 
-    public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
+    public void update(Long id, UsuarioDTO dto) {
         Usuario usuario = findEntityById(id);
 
         usuario.setName(dto.name());
         usuario.setCpf(dto.cpf());
         usuario.setEmail(dto.email());
 
-        return usuarioMapper.toDto(usuarioRepository.save(usuario));
+        usuarioRepository.save(usuario);
     }
 
     @Override @Transactional

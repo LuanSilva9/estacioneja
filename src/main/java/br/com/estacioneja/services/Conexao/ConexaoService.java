@@ -31,13 +31,13 @@ public class ConexaoService implements IConexao {
     }
 
     @Override
-    public ConexaoOutputDTO update(UUID id, ConexaoDTO dto) {
+    public void update(UUID id, ConexaoDTO dto) {
         Conexao conexao = findEntityById(id);
 
         conexao.setEndereco(dto.endereco());
         conexao.setPorta(dto.porta());
         
-        return conexaoMapper.toDto(conexaoRepository.save(conexao));
+        conexaoRepository.save(conexao);
     }
 
     @Override

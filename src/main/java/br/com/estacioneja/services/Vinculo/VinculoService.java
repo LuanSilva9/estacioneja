@@ -61,13 +61,13 @@ public class VinculoService implements IVinculo {
     }
     
     @Override @Transactional
-    public VinculoOutputDTO update(UUID id, VinculoDTO dto) {
+    public void update(UUID id, VinculoDTO dto) {
         Vinculo vinculo = findEntityById(id);
         
         vinculo.setEstacionamento(estacionamentoService.findEntityById(dto.estacionamentoId()));
         vinculo.setUsuario(usuarioService.findEntityById(dto.usuarioId()));
         
-        return vinculoMapper.toDto(vinculoRepository.save(vinculo));
+        vinculoRepository.save(vinculo);
     }
     
     @Override @Transactional

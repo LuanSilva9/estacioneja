@@ -12,6 +12,7 @@ import br.com.estacioneja.exceptions.custom.AddressNotFoundException;
 import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
 import br.com.estacioneja.exceptions.custom.ConectionIsDownException;
 import br.com.estacioneja.exceptions.custom.ConectionNotFoundException;
+import br.com.estacioneja.exceptions.custom.CustomMessageException;
 import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
 import br.com.estacioneja.exceptions.custom.DuplicatePlateException;
 import br.com.estacioneja.exceptions.custom.DuplicateUserException;
@@ -71,6 +72,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     })
     private ResponseEntity<ResponseExceptionDTO> handleConection(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ResponseExceptionDTO(exception.getMessage()));
+    }
+
+    @ExceptionHandler({
+        CustomMessageException.class
+    })
+    private ResponseEntity<ResponseExceptionDTO> handleCustomMessage(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).body(new ResponseExceptionDTO(exception.getMessage()));
     }
 
 }

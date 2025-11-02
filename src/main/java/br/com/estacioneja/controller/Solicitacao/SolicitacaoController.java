@@ -3,6 +3,7 @@ package br.com.estacioneja.controller.Solicitacao;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.estacioneja.dto.actions.ResolveSolicitacaoDTO;
 import br.com.estacioneja.dto.input.SolicitacaoDTO;
 import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
 import br.com.estacioneja.services.Solicitacao.SolicitacaoService;
@@ -44,8 +45,10 @@ public class SolicitacaoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SolicitacaoOutputDTO> atualizar(@PathVariable UUID id, @RequestBody SolicitacaoDTO dto) {
-        return ResponseEntity.ok().body(this.solicitacaoService.update(id, dto));
+    public ResponseEntity<String> atualizar(@PathVariable UUID id, @RequestBody ResolveSolicitacaoDTO dto) {
+        this.solicitacaoService.resolveSolicitacao(id, dto);
+
+        return ResponseEntity.ok().body("Situação da Solicitação mudou para o estado: " + dto.situacao());
     }
     
     @DeleteMapping("/{id}")

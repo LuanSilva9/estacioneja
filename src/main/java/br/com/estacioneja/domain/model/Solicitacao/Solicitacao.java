@@ -47,11 +47,11 @@ public class Solicitacao {
     private Situacao situacao;
     private LocalDateTime createdAt;
 
-    public Solicitacao(Usuario usuario, Filial filial, Veiculo veiculo, Situacao situacao) {
+    public Solicitacao(Usuario usuario, Filial filial, Veiculo veiculo) {
         this.usuario = usuario;
         this.filial = filial;
-        this.situacao = situacao;
         this.veiculo = veiculo;
+        this.situacao = Situacao.PENDENTE;
         this.createdAt = LocalDateTime.now();
     }
 }

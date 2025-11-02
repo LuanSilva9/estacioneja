@@ -7,6 +7,7 @@ import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.input.FilialDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.output.FilialOutputDTO;
+import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Filial.FilialService;
 
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-
 
 @RestController
 @RequestMapping("/api/v1/filiais")
@@ -43,7 +43,11 @@ public class FilialController {
     public ResponseEntity<List<FilialOutputDTO>> listarPorEmpresa(@PathVariable Long empresaId) {
         return ResponseEntity.ok(filialService.findAllByEmpresaId(empresaId));
     }
-    
+
+    @GetMapping("/{id}/solicitacoes")
+    public ResponseEntity<List<SolicitacaoOutputDTO>> listarSolicitacoes(@PathVariable UUID id) {
+        return ResponseEntity.ok(filialService.findAllRequests(id));
+    }
 
     @PostMapping
     public ResponseEntity<FilialOutputDTO> criar(@RequestBody FilialDTO dto) {
@@ -84,14 +88,14 @@ public class FilialController {
     }
 
     @PutMapping("/{filialId}/acessos/{id}")
-    public ResponseEntity<Void> atualizarTipo(@PathVariable UUID filialId, @PathVariable UUID id, @RequestBody AcessoDTO dto) {
+    public ResponseEntity<Void> atualizarAcesso(@PathVariable UUID filialId, @PathVariable UUID id, @RequestBody AcessoDTO dto) {
         acessoService.update(id, dto);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{filialId}/acessos/{id}")
-    public ResponseEntity<Void> atualizarTipo(@PathVariable UUID filialId, @PathVariable UUID id) {
+    public ResponseEntity<Void> deletarAcesso(@PathVariable UUID filialId, @PathVariable UUID id) {
         acessoService.delete(id);
         
         return ResponseEntity.noContent().build();

@@ -1,7 +1,6 @@
 package br.com.estacioneja.controller.Usuario;
 
 import java.net.URI;
-import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,11 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.dto.input.UsuarioDTO;
-import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 import br.com.estacioneja.services.Usuario.UsuarioService;
-import br.com.estacioneja.services.Veiculo.VeiculoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +21,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
-
     private final UsuarioService usuarioService;
-    private final VeiculoService veiculoService;
 
-    public UsuarioController(UsuarioService usuarioService, VeiculoService veiculoService) {
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        this.veiculoService = veiculoService;
     }
 
     @GetMapping("/{id}")

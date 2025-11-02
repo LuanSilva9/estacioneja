@@ -44,7 +44,7 @@ public class EquipamentoService implements IEquipamento {
         return equipamentoMapper.toDto(equipamentoRepository.save(equipamento));
     }
     @Override
-    public EquipamentoOutputDTO update(UUID id, EquipamentoDTO dto) {
+    public void update(UUID id, EquipamentoDTO dto) {
         Equipamento equipamento = findEntityById(id);
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
         Conexao conexao = conexaoService.findEntityById(equipamento.getConexaoHardware().getId());
@@ -58,7 +58,7 @@ public class EquipamentoService implements IEquipamento {
         equipamento.setEstacionamento(estacionamento);
         equipamento.setConexaoHardware(conexao);
 
-        return equipamentoMapper.toDto(equipamentoRepository.save(equipamento));
+        equipamentoRepository.save(equipamento);
     }
     @Override
     public void delete(UUID id) {

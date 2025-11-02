@@ -5,19 +5,20 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.enums.Situacao;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Solicitacao.Solicitacao;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Solicitacao.SolicitacaoRepository;
+import br.com.estacioneja.dto.actions.ResolveSolicitacaoDTO;
 import br.com.estacioneja.dto.input.SolicitacaoDTO;
 import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
+import br.com.estacioneja.exceptions.custom.CustomMessageException;
 import br.com.estacioneja.exceptions.custom.ParkIsPublicException;
 import br.com.estacioneja.exceptions.custom.SolicitationNotFoundException;
 import br.com.estacioneja.infra.config.mapper.SolicitacaoMapper;
-import br.com.estacioneja.services.Filial.FilialService;
+import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.ISolicitacao;
@@ -27,16 +28,16 @@ import jakarta.transaction.Transactional;
 public class SolicitacaoService implements ISolicitacao {
     private final SolicitacaoRepository solicitacaoRepository;
     private final UsuarioService usuarioService;
-    private final FilialService filialService;
     private final VeiculoService veiculoService;
+    private final EstacionamentoService estacionamentoService;
     private final SolicitacaoMapper solicitacaoMapper;
 
-    public SolicitacaoService(SolicitacaoRepository solicitacaoRepository, UsuarioService usuarioService, FilialService filialService, VeiculoService veiculoService, SolicitacaoMapper solicitacaoMapper) {
+    public SolicitacaoService(SolicitacaoRepository solicitacaoRepository, UsuarioService usuarioService, VeiculoService veiculoService, EstacionamentoService estacionamentoService, SolicitacaoMapper solicitacaoMapper) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.usuarioService = usuarioService;
-        this.filialService = filialService;
         this.veiculoService = veiculoService;
         this.solicitacaoMapper = solicitacaoMapper;
+        this.estacionamentoService = estacionamentoService;
     }
 
     /* TRANSACOES */
@@ -44,27 +45,31 @@ public class SolicitacaoService implements ISolicitacao {
     @Override @Transactional
     public SolicitacaoOutputDTO create(SolicitacaoDTO dto) {
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
-        Filial filial = filialService.findEntityById(dto.filialId());
-
-        Estacionamento estacionamento = filial.getEstacionamento();
+        Filial filial = estacionamento.getFilial();
         
         Veiculo veiculo = veiculoService.findEntityById(dto.veiculoId());
 
         if(estacionamento.getPrivacidade().equals(Privacidade.PUBLICO)) throw new ParkIsPublicException();
 
-        Solicitacao novaSolicitacao = new Solicitacao(usuario, filial, veiculo, Situacao.PENDENTE);
+        Solicitacao novaSolicitacao = new Solicitacao(usuario, filial, veiculo);
 
         return solicitacaoMapper.toDto(solicitacaoRepository.save(novaSolicitacao));
     }
     
     @Override @Transactional
-    public SolicitacaoOutputDTO update(UUID id, SolicitacaoDTO dto) {
+    public void update(UUID id, SolicitacaoDTO dto) {
+        throw new CustomMessageException("Essa entidade não pode ser atualizada da maneira casual!");
+    }
+
+    @Override @Transactional
+    public void resolveSolicitacao(UUID id, ResolveSolicitacaoDTO dto) {
         Solicitacao solicitacao = findEntityById(id);
 
         solicitacao.setSituacao(dto.situacao());
 
-        return this.solicitacaoMapper.toDto(this.solicitacaoRepository.save(solicitacao));
+        solicitacaoRepository.save(solicitacao);
     }
 
     @Override @Transactional
@@ -85,7 +90,6 @@ public class SolicitacaoService implements ISolicitacao {
     public SolicitacaoOutputDTO findById(UUID id) {
         return this.solicitacaoMapper.toDto(findEntityById(id));
     }
-
 
     
 }

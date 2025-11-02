@@ -33,7 +33,22 @@ public class EnderecoService implements IEndereco {
     }
 
     @Override @Transactional
-    public EnderecoOutputDTO update(Long id, EnderecoDTO dto) {
+    public void update(Long id, EnderecoDTO dto) {
+        Endereco endereco = findEntityById(id);
+
+        endereco.setLogradouro(dto.logradouro());
+        endereco.setBairro(dto.bairro());
+        endereco.setCidade(dto.cidade());
+        endereco.setUf(dto.uf());
+        endereco.setCep(dto.cep());
+        endereco.setLatitude(dto.latitude());
+        endereco.setLongitude(dto.longitude());
+
+        enderecoMapper.toDto(enderecoRepository.save(endereco));
+    }
+
+    @Transactional
+    public EnderecoOutputDTO updateAndReturn(Long id, EnderecoDTO dto) {
         Endereco endereco = findEntityById(id);
 
         endereco.setLogradouro(dto.logradouro());

@@ -14,9 +14,11 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Filial.FilialRepository;
 import br.com.estacioneja.dto.input.FilialDTO;
 import br.com.estacioneja.dto.output.FilialOutputDTO;
+import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
 import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
 import br.com.estacioneja.exceptions.custom.FilialNotFoundException;
 import br.com.estacioneja.infra.config.mapper.FilialMapper;
+import br.com.estacioneja.infra.config.mapper.SolicitacaoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Endereco.EnderecoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
@@ -31,14 +33,16 @@ public class FilialService implements IFilial {
     private final ApplicationEventPublisher eventPublisher;
     private final FilialRepository filialRepository;
     private final FilialMapper filialMapper;
+    private final SolicitacaoMapper solicitacaoMapper;
 
-    public FilialService(FilialRepository filialRepository, FilialMapper filialMapper, EnderecoService enderecoService, EmpresaService empresaService, ApplicationEventPublisher eventPublisher, UsuarioService usuarioService) {
+    public FilialService(FilialRepository filialRepository, FilialMapper filialMapper, EnderecoService enderecoService, EmpresaService empresaService, ApplicationEventPublisher eventPublisher, UsuarioService usuarioService, SolicitacaoMapper solicitacaoMapper) {
         this.enderecoService = enderecoService;
         this.empresaService = empresaService;
         this.filialRepository = filialRepository;
         this.filialMapper = filialMapper;
         this.eventPublisher = eventPublisher;
         this.usuarioService = usuarioService;
+        this.solicitacaoMapper = solicitacaoMapper;
     }
 
 
@@ -61,9 +65,9 @@ public class FilialService implements IFilial {
     }
 
     @Override @Transactional
-    public FilialOutputDTO update(UUID id, FilialDTO dto) {
+    public void update(UUID id, FilialDTO dto) {
         Endereco enderecoExistente = findEntityById(id).getEndereco();
-        Endereco endereco = enderecoService.toEntity(enderecoService.update(enderecoExistente.getId(), dto.endereco()));
+        Endereco endereco = enderecoService.toEntity(enderecoService.updateAndReturn(enderecoExistente.getId(), dto.endereco()));
 
         Filial filial = findEntityById(id);
 
@@ -73,7 +77,7 @@ public class FilialService implements IFilial {
         filial.setPlano(dto.plano());
         filial.setEndereco(endereco);
 
-        return filialMapper.toDto(filialRepository.save(filial));
+        filialRepository.save(filial);
     }
 
     @Override @Transactional
@@ -104,6 +108,11 @@ public class FilialService implements IFilial {
     @Override
     public List<FilialOutputDTO> findAllByEmpresaId(Long empresaId) {
         return filialMapper.toDtoList(filialRepository.findAllByEmpresaId(empresaId));
+    }
+
+    @Override
+    public List<SolicitacaoOutputDTO> findAllRequests(UUID id) {
+        return this.solicitacaoMapper.toDtoList(filialRepository.findSolicitacoesByFilial(id));
     }
     
 }

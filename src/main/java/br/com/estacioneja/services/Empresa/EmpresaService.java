@@ -48,7 +48,7 @@ public class EmpresaService implements IEmpresa {
     }
 
     @Override @Transactional
-    public EmpresaOutputDTO update(Long id, EmpresaDTO dto) {
+    public void update(Long id, EmpresaDTO dto) {
         Empresa empresa = findEntityById(id);
         Usuario representanteMaster = usuarioService.findEntityById(dto.representanteId());
 
@@ -57,7 +57,7 @@ public class EmpresaService implements IEmpresa {
         empresa.setTipoEmpresa(dto.tipoEmpresa());
         empresa.setRepresentanteMaster(representanteMaster);
         
-        return empresaMapper.toDto(empresaRepository.save(empresa));
+        empresaRepository.save(empresa);
     }
     
     @Override @Transactional

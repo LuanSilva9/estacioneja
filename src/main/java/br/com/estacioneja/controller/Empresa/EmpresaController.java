@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 @RequestMapping("/api/v1/empresas")
 public class EmpresaController {
-
     private final EmpresaService empresaService;
 
     public EmpresaController(EmpresaService empresaService) {
