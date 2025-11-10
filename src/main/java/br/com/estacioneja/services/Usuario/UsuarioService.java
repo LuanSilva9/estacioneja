@@ -8,8 +8,8 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.exceptions.custom.DuplicateUserException;
-import br.com.estacioneja.exceptions.custom.UserNotFoundException;
+import br.com.estacioneja.exceptions.custom.DuplicateException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
 import br.com.estacioneja.usecases.interfaces.IUsuario;
 import jakarta.transaction.Transactional;
@@ -64,12 +64,12 @@ public class UsuarioService implements IUsuario {
 
     @Override
     public Usuario findEntityById(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
     }
 
     @Override
     public void existsEmailOrCpf(String email, String cpf) {
-        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateUserException();
+        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateException();
     }
 
     /* Mappers */

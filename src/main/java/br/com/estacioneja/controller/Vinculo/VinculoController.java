@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -33,6 +35,18 @@ public class VinculoController {
     public ResponseEntity<List<VinculoOutputDTO>> listarPorUsuario(@PathVariable Long userId) throws Exception {
         return ResponseEntity.ok(vinculoService.findVincleByUserId(userId));
     }
+
+    @GetMapping("/estacionamento/{estacionamentoId}")
+    public ResponseEntity<Void> verificaVinculo(@PathVariable UUID estacionamentoId, @RequestParam(name = "placa") String placa) {
+        Boolean response = vinculoService.existsByEstacionamentoAndProprietarioVeiculo(placa, estacionamentoId);
+
+        if(!response) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+    
 
     @PostMapping
     public ResponseEntity<VinculoOutputDTO> criar(@RequestBody VinculoDTO dto) {

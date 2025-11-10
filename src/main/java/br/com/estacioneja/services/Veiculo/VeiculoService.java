@@ -10,7 +10,7 @@ import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Veiculo.VeiculoRepository;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
-import br.com.estacioneja.exceptions.custom.VeicleNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VeiculoMapper;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IVeiculo;
@@ -59,7 +59,12 @@ public class VeiculoService implements IVeiculo {
     /* CONSULTAS */
     @Override
     public Veiculo findEntityById(UUID id) {
-        return veiculoRepository.findById(id).orElseThrow(VeicleNotFoundException::new);
+        return veiculoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado"));
+    }
+
+    @Override 
+    public Veiculo findByPlaca(String placa) {
+        return veiculoRepository.findByPlaca(placa).orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado"));
     }
 
     @Override
@@ -72,4 +77,6 @@ public class VeiculoService implements IVeiculo {
         Usuario proprietario = usuarioService.findEntityById(proprietarioId);
         return veiculoRepository.findByUsuario(proprietario);
     }
+
+
 }

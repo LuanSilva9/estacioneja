@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.model.Empresa;
+package br.com.estacioneja.domain.enums;
 
 public enum TipoEmpresa {
     UNIVERSIDADE,

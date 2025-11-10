@@ -44,12 +44,12 @@ public class Usuario {
     private String cpf;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference("relacao-vinculo-usuario")
-    private List<Vinculo> vinculos;
-
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-veiculo-usuario")
     private List<Veiculo> veiculos;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference("relacao-vinculo-usuario")
+    private List<Vinculo> vinculos;
 
     public Usuario(UsuarioDTO dto) {
         this.name = dto.name();

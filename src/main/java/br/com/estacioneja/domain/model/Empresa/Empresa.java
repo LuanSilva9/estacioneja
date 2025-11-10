@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import br.com.estacioneja.domain.enums.TipoEmpresa;
 import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.EmpresaDTO;

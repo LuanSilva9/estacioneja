@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.repository.Equipamento.EquipamentoRepository;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
-import br.com.estacioneja.exceptions.custom.EquipamentNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
 import br.com.estacioneja.services.Conexao.ConexaoService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
@@ -71,7 +71,7 @@ public class EquipamentoService implements IEquipamento {
     /* CONSULTAS */
     @Override
     public Equipamento findEntityById(UUID id) {
-        return equipamentoRepository.findById(id).orElseThrow(EquipamentNotFoundException::new);
+        return equipamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
     }
     @Override
     public EquipamentoOutputDTO findById(UUID id) {

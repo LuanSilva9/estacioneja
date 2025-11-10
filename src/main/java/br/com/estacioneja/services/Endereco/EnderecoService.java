@@ -8,7 +8,7 @@ import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.repository.Endereco.EnderecoRepository;
 import br.com.estacioneja.dto.input.EnderecoDTO;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
-import br.com.estacioneja.exceptions.custom.AddressNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EnderecoMapper;
 import br.com.estacioneja.usecases.interfaces.IEndereco;
 import jakarta.transaction.Transactional;
@@ -73,7 +73,7 @@ public class EnderecoService implements IEndereco {
 
     @Override
     public Endereco findEntityById(Long id) {
-        return enderecoRepository.findById(id).orElseThrow(AddressNotFoundException::new);
+        return enderecoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Endereço não encontrado"));
     }
 
     @Override

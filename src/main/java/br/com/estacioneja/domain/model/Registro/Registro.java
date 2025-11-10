@@ -1,11 +1,12 @@
-package br.com.estacioneja.domain.model.Vinculo;
+package br.com.estacioneja.domain.model.Registro;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
+import br.com.estacioneja.domain.enums.TipoRegistro;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,36 +14,38 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "vinculos")
+@Table(name = "registro_entrada_saida")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
-public class Vinculo {
+public class Registro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-vinculo-estacionamento")
-    private Estacionamento estacionamento;
+    @JoinColumn(name = "veiculoId", referencedColumnName = "id")
+    private Veiculo veiculo;
 
     @ManyToOne
-    @JoinColumn(name = "usuarioId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-vinculo-usuario")
-    private Usuario usuario;
+    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
+    private Estacionamento estacionamento;
 
-    public Vinculo(Estacionamento estacionamento, Usuario usuario) {
+    private TipoRegistro tipoRegistro;
+
+    private LocalDateTime dataRegistro;
+    
+    public Registro(Veiculo veiculo, Estacionamento estacionamento, TipoRegistro tipoRegistro) {
+        this.veiculo = veiculo;
         this.estacionamento = estacionamento;
-        this.usuario = usuario;
+        this.tipoRegistro = tipoRegistro;
+        this.dataRegistro = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 }

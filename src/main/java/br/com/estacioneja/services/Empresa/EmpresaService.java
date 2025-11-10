@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
-import br.com.estacioneja.exceptions.custom.CompanyNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IEmpresa;
@@ -71,7 +71,7 @@ public class EmpresaService implements IEmpresa {
     
     @Override
     public Empresa findEntityById(Long empresaId) {
-        return empresaRepository.findById(empresaId).orElseThrow(CompanyNotFoundException::new); 
+        return empresaRepository.findById(empresaId).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada")); 
     }
     
     @Override

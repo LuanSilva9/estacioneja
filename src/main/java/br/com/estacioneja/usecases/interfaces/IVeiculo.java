@@ -10,4 +10,5 @@ import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IVeiculo extends IBase<Veiculo, UUID, VeiculoDTO, VeiculoOutputDTO>{
     List<Veiculo> findByProprietarioId(Long proprietarioId);
+    Veiculo findByPlaca(String placa);
 }

@@ -10,10 +10,9 @@ import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 
-
 @Repository
 public interface VinculoRepository extends JpaRepository<Vinculo, UUID> {
     List<Vinculo> findAllByUsuario(Usuario usuario);
     
-    Boolean existsByUsuarioAndEstacionamento(Usuario usuario, Estacionamento estacionamento);
+    Boolean existsByEstacionamentoAndUsuario(Estacionamento estacionamento, Usuario usuario);
 }

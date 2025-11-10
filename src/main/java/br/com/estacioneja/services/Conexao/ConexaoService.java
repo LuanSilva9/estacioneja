@@ -8,7 +8,7 @@ import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.repository.Conexao.ConexaoRepository;
 import br.com.estacioneja.dto.input.ConexaoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
-import br.com.estacioneja.exceptions.custom.ConectionNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.ConexaoMapper;
 import br.com.estacioneja.usecases.interfaces.IConexao;
 
@@ -51,7 +51,7 @@ public class ConexaoService implements IConexao {
 
     @Override
     public Conexao findEntityById(UUID id) {
-        return conexaoRepository.findById(id).orElseThrow(ConectionNotFoundException::new);
+        return conexaoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Conexão não encontrada."));
     }
 
     @Override

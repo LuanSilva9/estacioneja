@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;

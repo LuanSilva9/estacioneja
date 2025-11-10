@@ -9,5 +9,4 @@ import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 
 @Repository
 public interface EstacionamentoRepository extends JpaRepository<Estacionamento, UUID> {
-
 }

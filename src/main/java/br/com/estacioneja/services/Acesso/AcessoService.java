@@ -1,23 +1,23 @@
 package br.com.estacioneja.services.Acesso;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.events.Empresa.EmpresaCriadaEvent;
 import br.com.estacioneja.domain.events.Empresa.FilialCriadaEvent;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
-import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Filial.FilialService;
@@ -91,7 +91,7 @@ public class AcessoService implements IAcesso {
 
     @Override
     public Acesso findEntityById(UUID id) {
-        return acessoRepository.findById(id).orElseThrow(AccessNotFoundException::new);
+        return acessoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Acesso não encontrado"));
     }
 
     @Override @Transactional
@@ -107,17 +107,18 @@ public class AcessoService implements IAcesso {
     }
 
     @Override
-    public Acesso findAccessByUserAndFilial(Usuario usuario, Filial filial) {
-        Acesso acesso = this.acessoRepository.findByUsuarioAndFilial(usuario, filial);
-
-        if(acesso == null) throw new AccessNotFoundException();
-
-        return acesso;
+    public Optional<Acesso> findAccessByUserAndFilial(Usuario usuario, Filial filial) {
+        return Optional.ofNullable(acessoRepository.findByUsuarioAndFilial(usuario, filial));
     }
 
     @Override
-    public List<UsuarioOutputDTO> findAllUsersByFilial(UUID filialId) {
-        return this.usuarioService.toDtoList(this.acessoRepository.findAllUsersByFilial(filialId));
+    public Optional<Acesso> findAccessByUserAndEmpresa(Usuario usuario, Empresa empresa) {
+        return Optional.ofNullable(acessoRepository.findByUsuarioAndEmpresa(usuario, empresa));
+    }
+
+    @Override
+    public List<Usuario> findAllUsersByFilial(UUID filialId) {
+        return this.acessoRepository.findAllUsersByFilial(filialId);
     }
 
     @Override

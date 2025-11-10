@@ -7,7 +7,6 @@ import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.input.FilialDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.output.FilialOutputDTO;
-import br.com.estacioneja.dto.output.SolicitacaoOutputDTO;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Filial.FilialService;
 
@@ -42,11 +41,6 @@ public class FilialController {
     @GetMapping("/empresa/{empresaId}")
     public ResponseEntity<List<FilialOutputDTO>> listarPorEmpresa(@PathVariable Long empresaId) {
         return ResponseEntity.ok(filialService.findAllByEmpresaId(empresaId));
-    }
-
-    @GetMapping("/{id}/solicitacoes")
-    public ResponseEntity<List<SolicitacaoOutputDTO>> listarSolicitacoes(@PathVariable UUID id) {
-        return ResponseEntity.ok(filialService.findAllRequests(id));
     }
 
     @PostMapping

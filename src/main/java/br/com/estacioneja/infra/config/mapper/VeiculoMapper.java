@@ -10,8 +10,6 @@ import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 @Mapper(componentModel = "spring")
 public interface VeiculoMapper {
     VeiculoOutputDTO toDto(Veiculo veiculo);
-    Veiculo toEntity(VeiculoOutputDTO veiculoOutputDTO);
 
     List<VeiculoOutputDTO> toDtoList(List<Veiculo> veiculos);
-    List<Veiculo> toEntityList(List<VeiculoOutputDTO> veiculoOutputDTO);
 }

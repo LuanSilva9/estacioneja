@@ -64,11 +64,13 @@ public class Estacionamento {
     private List<Equipamento> equipamentos;
 
     private Long capacidade;
+    private Long capacidadeDisponivel;
 
     public Estacionamento(EstacionamentoDTO dto, Filial filial) {
         this.privacidade = dto.privacidade();
         this.descricao = dto.descricao();
         this.filial = filial;
         this.capacidade = dto.capacidade();
+        this.capacidadeDisponivel = dto.capacidade();
     }
 }

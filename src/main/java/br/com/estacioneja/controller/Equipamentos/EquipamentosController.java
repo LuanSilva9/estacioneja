@@ -41,12 +41,14 @@ public class EquipamentosController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EquipamentoDTO dto) {
         equipamentoService.update(id, dto);
+
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         equipamentoService.delete(id);
+        
         return ResponseEntity.noContent().build();
     }
 }

@@ -3,22 +3,20 @@ package br.com.estacioneja.services.Vinculo;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.events.Estacionamento.EstacionamentoCriadoEvent;
-import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
 import br.com.estacioneja.dto.input.VinculoDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
+import br.com.estacioneja.exceptions.custom.DuplicateException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.exceptions.custom.ParkIsPrivateException;
-import br.com.estacioneja.exceptions.custom.VincleNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
@@ -47,16 +45,34 @@ public class VinculoService implements IVinculo {
 
     /* TRANSACOES */    
     
-    @Override @Transactional
+    @Override
+    @Transactional
     public VinculoOutputDTO create(VinculoDTO dto) {
-        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+        if(existsByEstacionamentoAndUsuario(dto.usuarioId(), dto.estacionamentoId())) {
+            throw new DuplicateException("Usuario já possui vinculo nesse estacionamento!");
+        }
+
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
-        Veiculo veiculo = veiculoService.findEntityById(dto.veiculoId());
-        
-        if(estacionamento.getPrivacidade().equals(Privacidade.PRIVADO) && acessoService.findAccessByUserAndFilial(usuario,estacionamento.getFilial()).getTipoAcesso() != TipoAcesso.MASTER) throw new ParkIsPrivateException();
-        
-        Vinculo vinculo = new Vinculo(usuario, estacionamento, veiculo);
-        
+        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+
+        boolean isPrivado = estacionamento.getPrivacidade().equals(Privacidade.PRIVADO);
+
+        if (isPrivado) {
+            boolean hasMasterAccess = 
+                acessoService.findAccessByUserAndFilial(usuario, estacionamento.getFilial())
+                    .map(a -> a.getTipoAcesso() == TipoAcesso.MASTER)
+                    .orElse(false) 
+                ||
+                acessoService.findAccessByUserAndEmpresa(usuario, estacionamento.getFilial().getEmpresa())
+                    .map(a -> a.getTipoAcesso() == TipoAcesso.MASTER)
+                    .orElse(false);
+
+            if (!hasMasterAccess) {
+                throw new ParkIsPrivateException();
+            }
+        }
+
+        Vinculo vinculo = new Vinculo(estacionamento, usuario);
         return vinculoMapper.toDto(vinculoRepository.save(vinculo));
     }
     
@@ -65,7 +81,6 @@ public class VinculoService implements IVinculo {
         Vinculo vinculo = findEntityById(id);
         
         vinculo.setEstacionamento(estacionamentoService.findEntityById(dto.estacionamentoId()));
-        vinculo.setUsuario(usuarioService.findEntityById(dto.usuarioId()));
         
         vinculoRepository.save(vinculo);
     }
@@ -77,36 +92,11 @@ public class VinculoService implements IVinculo {
         vinculoRepository.delete(vinculo);
     }
 
-    @Override @Transactional
-    public void createAll(List<UsuarioOutputDTO> usuarios, UUID estacionamentoId) {
-        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
-        
-        for(UsuarioOutputDTO usuarioDTO : usuarios) {
-            Usuario usuario = usuarioService.findEntityById(usuarioDTO.id());
-            List<Veiculo> veiculos = veiculoService.findByProprietarioId(usuario.getId());
-
-            
-            if(vinculoRepository.existsByUsuarioAndEstacionamento(usuario, estacionamento)) continue;
-            
-            for(Veiculo veiculo : veiculos) {
-                Vinculo vinculo = new Vinculo(usuario, estacionamento, veiculo);
-                vinculoRepository.save(vinculo);
-            }
-
-        }
-
-    }
-
-    @EventListener 
-    public void handleEventEstacionamentoCriado(EstacionamentoCriadoEvent estacionamentoCriadoEvent) {
-        createAll(estacionamentoCriadoEvent.usuariosVinculo(), estacionamentoCriadoEvent.estacionamentoId());
-    }
-
     /* CONSULTAS */
     
     @Override
     public Vinculo findEntityById(UUID id) {
-        return vinculoRepository.findById(id).orElseThrow(VincleNotFoundException::new);
+        return vinculoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
     }
     
     @Override
@@ -121,9 +111,22 @@ public class VinculoService implements IVinculo {
         return vinculoMapper.toDtoList(vinculoRepository.findAllByUsuario(usuario));
     }
     
-    // @Override
-    // public Vinculo findByUsuarioAndEstacionamento(Usuario usuario, Estacionamento estacionamento) {
-        //     return vinculoRepository.findByUsuarioAndEstacionamento(usuario, estacionamento).orElseThrow(VincleNotFoundException::new);
-        // }
+    @Override
+    public Boolean existsByEstacionamentoAndProprietarioVeiculo(String placaVeiculo, UUID estacionamentoId) {
+        Veiculo veiculo = veiculoService.findByPlaca(placaVeiculo);
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+
+        if(veiculo == null || estacionamento == null) return false;
+
+
+        return vinculoRepository.existsByEstacionamentoAndUsuario(estacionamento, veiculo.getUsuario());
+    }
+
+    public Boolean existsByEstacionamentoAndUsuario(Long usuarioId, UUID estacionamentoId) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+        Usuario usuario = usuarioService.findEntityById(usuarioId);
+
+        return vinculoRepository.existsByEstacionamentoAndUsuario(estacionamento, usuario);
+    }
         
 }
