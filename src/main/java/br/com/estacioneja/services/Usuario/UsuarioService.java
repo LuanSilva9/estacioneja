@@ -72,7 +72,7 @@ public class UsuarioService implements IUsuario {
         if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateException();
     }
 
-    /* Mappers */
+    /* MAPPERS */
 
     public UsuarioOutputDTO toDto(Usuario usuario) {
         return usuarioMapper.toDto(usuario);

@@ -67,7 +67,7 @@ public class EstacionamentoService implements IEstacionamento {
 
         if(novaCapacidade < 0 ||novaCapacidade > estacionamento.getCapacidade()) throw new ParkSizeViolatedException();
 
-        estacionamento.setCapacidade(novaCapacidade);
+        estacionamento.setCapacidadeDisponivel(novaCapacidade);
     }
 
     /* CONSULTAS */

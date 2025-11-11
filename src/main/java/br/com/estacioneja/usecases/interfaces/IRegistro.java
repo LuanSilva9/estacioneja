@@ -8,4 +8,5 @@ import br.com.estacioneja.dto.output.RegistroOutputDTO;
 import br.com.estacioneja.usecases.adapter.IBase;
 
 public interface IRegistro extends IBase<Registro, UUID, RegistroDTO, RegistroOutputDTO> { 
+    RegistroOutputDTO registrarSaida(Registro registro);
 }

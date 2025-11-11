@@ -8,6 +8,8 @@ import br.com.estacioneja.domain.enums.TipoRegistro;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,14 +40,15 @@ public class Registro {
     @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
     private Estacionamento estacionamento;
 
+    @Enumerated(EnumType.STRING)
     private TipoRegistro tipoRegistro;
 
     private LocalDateTime dataRegistro;
     
-    public Registro(Veiculo veiculo, Estacionamento estacionamento, TipoRegistro tipoRegistro) {
+    public Registro(Veiculo veiculo, Estacionamento estacionamento) {
         this.veiculo = veiculo;
         this.estacionamento = estacionamento;
-        this.tipoRegistro = tipoRegistro;
+        this.tipoRegistro = TipoRegistro.ENTRADA;
         this.dataRegistro = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 }

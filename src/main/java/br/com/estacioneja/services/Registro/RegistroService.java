@@ -18,6 +18,7 @@ import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.services.Vinculo.VinculoService;
 import br.com.estacioneja.usecases.interfaces.IRegistro;
+import jakarta.transaction.Transactional;
 
 @Service
 public class RegistroService implements IRegistro {
@@ -37,32 +38,44 @@ public class RegistroService implements IRegistro {
 
     /* TRANSACOES */
 
-    @Override
+    @Override @Transactional
     public RegistroOutputDTO create(RegistroDTO dto) {
-        if(!vinculoService.existsByEstacionamentoAndProprietarioVeiculo(dto.placa(), dto.estacionamentoId())) throw new ForbiddenException("Esse veiculo não está autorizado a: " + dto.tipoRegistro() + " pois não possui vinculo com o estacionamento");
+        if(!vinculoService.existsByEstacionamentoAndProprietarioVeiculo(dto.placa(), dto.estacionamentoId())) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
 
         Veiculo veiculo = veiculoService.findByPlaca(dto.placa());
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
-        Registro newRegistro = new Registro(veiculo, estacionamento, dto.tipoRegistro());
+        Registro entradaExistente = registroRepository.findByVeiculoAndEstacionamentoAndTipoRegistro(veiculo, estacionamento, TipoRegistro.ENTRADA);
+        
+        if(entradaExistente != null) {
+            return registrarSaida(entradaExistente);
+        } else {
+            Registro newRegistro = new Registro(veiculo, estacionamento);
 
-        if(dto.tipoRegistro() == TipoRegistro.ENTRADA) {
             estacionamentoService.atualizarCapacidadeDisponivel(estacionamento.getId(), estacionamento.getCapacidadeDisponivel() - 1);
-        } else if (dto.tipoRegistro() == TipoRegistro.SAIDA) {
-            estacionamentoService.atualizarCapacidadeDisponivel(estacionamento.getId(), estacionamento.getCapacidadeDisponivel() + 1);
+
+            return registroMapper.toDto(registroRepository.save(newRegistro));
         }
-
-        return registroMapper.toDto(registroRepository.save(newRegistro));
     }
 
-    @Override
+    @Override @Transactional
     public void update(UUID id, RegistroDTO dto) {
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        throw new UnsupportedOperationException("Unimplemented method cvupdate");
     }
 
-    @Override
+    @Override @Transactional
     public void delete(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Registro registro = findEntityById(id);
+
+        registroRepository.delete(registro);
+    }
+    
+    @Override @Transactional
+    public RegistroOutputDTO registrarSaida(Registro registro) {
+        registro.setTipoRegistro(TipoRegistro.SAIDA);
+        estacionamentoService.atualizarCapacidadeDisponivel(registro.getEstacionamento().getId(), registro.getEstacionamento().getCapacidadeDisponivel() + 1);
+
+        return registroMapper.toDto(registroRepository.save(registro));
     }
 
     /* CONSULTAS */
