@@ -9,7 +9,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByEmailAndSenha(String email, String senha);
+    Optional<Usuario> findByEmail(String email);
 
     Boolean existsByEmail(String email);
     Boolean existsByCpf(String cpf);

@@ -2,6 +2,7 @@ package br.com.estacioneja.services.Usuario;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
@@ -18,10 +19,12 @@ import jakarta.transaction.Transactional;
 public class UsuarioService implements IUsuario {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /* TRANSACOES */
@@ -31,6 +34,8 @@ public class UsuarioService implements IUsuario {
         existsEmailOrCpf(dto.email(), dto.cpf());
 
         Usuario newUsuario = new Usuario(dto);
+
+        newUsuario.setSenha(passwordEncoder.encode(dto.senha()));
 
         this.usuarioRepository.save(newUsuario);
 
