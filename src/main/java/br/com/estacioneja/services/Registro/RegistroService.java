@@ -40,10 +40,10 @@ public class RegistroService implements IRegistro {
 
     @Override @Transactional
     public RegistroOutputDTO create(RegistroDTO dto) {
-        if(!vinculoService.existsByEstacionamentoAndProprietarioVeiculo(dto.placa(), dto.estacionamentoId())) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
-
         Veiculo veiculo = veiculoService.findByPlaca(dto.placa());
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
+        
+        if(!vinculoService.existsByEstacionamentoAndVeiculo(veiculo, estacionamento)) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
 
         Registro entradaExistente = registroRepository.findByVeiculoAndEstacionamentoAndTipoRegistro(veiculo, estacionamento, TipoRegistro.ENTRADA);
         

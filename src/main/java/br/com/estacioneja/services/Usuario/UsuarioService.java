@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
@@ -31,7 +32,7 @@ public class UsuarioService implements IUsuario {
 
     @Override @Transactional
     public UsuarioOutputDTO create(UsuarioDTO dto) {
-        existsEmailOrCpf(dto.email(), dto.cpf());
+        existsEmailOrCpf(dto.email(), dto.cpf(), dto.tipoUsuario());
 
         Usuario newUsuario = new Usuario(dto);
 
@@ -73,8 +74,8 @@ public class UsuarioService implements IUsuario {
     }
 
     @Override
-    public void existsEmailOrCpf(String email, String cpf) {
-        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateException();
+    public void existsEmailOrCpf(String email, String cpf, TipoUsuario tipoUsuario) {
+        if(this.usuarioRepository.existsByCpfAndTipoUsuario(cpf, tipoUsuario) || this.usuarioRepository.existsByEmailAndTipoUsuario(email, tipoUsuario)) throw new DuplicateException();
     }
 
     /* MAPPERS */

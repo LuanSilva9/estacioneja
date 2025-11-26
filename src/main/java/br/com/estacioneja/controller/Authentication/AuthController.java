@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.estacioneja.dto.input.AuthDTO;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.JWTOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.infra.config.security.AuthenticationService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 
@@ -36,7 +35,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UsuarioDTO dto) {
-        UsuarioOutputDTO criado = usuarioService.create(dto);
+        usuarioService.create(dto);
         
         return ResponseEntity.ok().build();
     }

@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.VinculoDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
 import br.com.estacioneja.services.Vinculo.VinculoService;
@@ -31,14 +33,16 @@ public class VinculoController {
         this.vinculoService = vinculoService;
     }
 
-    @GetMapping("/usuario/{userId}")
-    public ResponseEntity<List<VinculoOutputDTO>> listarPorUsuario(@PathVariable Long userId) throws Exception {
-        return ResponseEntity.ok(vinculoService.findVincleByUserId(userId));
+    @GetMapping
+    public ResponseEntity<List<VinculoOutputDTO>> listarPorUsuario(Authentication authentication) {
+        Usuario user = (Usuario) authentication.getPrincipal();
+
+        return ResponseEntity.ok(vinculoService.findVincleByUser(user));
     }
 
     @GetMapping("/estacionamento/{estacionamentoId}")
     public ResponseEntity<Void> verificaVinculo(@PathVariable UUID estacionamentoId, @RequestParam(name = "placa") String placa) {
-        Boolean response = vinculoService.existsByEstacionamentoAndProprietarioVeiculo(placa, estacionamentoId);
+        Boolean response = vinculoService.hasVincle(placa, estacionamentoId);
 
         if(!response) {
             return ResponseEntity.notFound().build();

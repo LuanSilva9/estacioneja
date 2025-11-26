@@ -1,10 +1,15 @@
 package br.com.estacioneja.domain.model.Veiculo;
 
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import br.com.estacioneja.domain.enums.TipoVeiculo;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.VeiculoDTO;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -43,6 +49,10 @@ public class Veiculo {
     @ManyToOne
     @JoinColumn(name = "proprietarioId", referencedColumnName = "id")
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference("relacao-vinculo-veiculo")
+    private List<Vinculo> vinculos;
     
     public Veiculo(VeiculoDTO dto, Usuario proprietario) {
         this.placa = dto.placa();

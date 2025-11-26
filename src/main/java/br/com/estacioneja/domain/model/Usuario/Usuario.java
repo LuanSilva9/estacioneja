@@ -2,7 +2,6 @@ package br.com.estacioneja.domain.model.Usuario;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
@@ -18,6 +18,9 @@ import br.com.estacioneja.dto.input.UsuarioDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -50,6 +53,9 @@ public class Usuario implements UserDetails {
     @Column(unique = true)
     private String cpf;
 
+    @Enumerated(EnumType.STRING)
+    private TipoUsuario tipoUsuario;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-veiculo-usuario")
     private List<Veiculo> veiculos;
@@ -58,7 +64,7 @@ public class Usuario implements UserDetails {
     @JsonBackReference("relacao-vinculo-usuario")
     private List<Vinculo> vinculos;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonBackReference("relacao-acesso-usuario")
     private List<Acesso> acessos;
 
@@ -67,17 +73,17 @@ public class Usuario implements UserDetails {
         this.email = dto.email();
         this.senha = dto.senha();
         this.cpf = dto.cpf();
+        this.tipoUsuario = dto.tipoUsuario();
     }
 
      @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (acessos == null) return List.of();
+        String role = switch(this.tipoUsuario) {
+            case COMUM -> "ROLE_USER";
+            case ADMINISTRATIVO -> "ROLE_ADMIN";
+        };
 
-        return acessos.stream()
-                .map(Acesso::getTipoAcesso)
-                .distinct()
-                .map(tipo -> new SimpleGrantedAuthority("ROLE_" + tipo.name()))
-                .collect(Collectors.toList());
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

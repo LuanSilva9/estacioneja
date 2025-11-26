@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.enums.Privacidade;
 import br.com.estacioneja.domain.enums.TipoVeiculo;
+import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
-import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import jakarta.persistence.CascadeType;
@@ -37,7 +37,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
-public class Estacionamento {
+public class  Estacionamento {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -51,9 +51,9 @@ public class Estacionamento {
     private List<TipoVeiculo> regraEstacionamento;
 
     @ManyToOne
-    @JoinColumn(name="filialId", referencedColumnName = "id")
-    @JsonBackReference("relacao-filial-estacionamento")
-    private Filial filial;
+    @JoinColumn(name="empresaId", referencedColumnName = "id")
+    @JsonBackReference("relacao-empresa-estacionamento")
+    private Empresa empresa;
 
     @OneToMany(mappedBy = "estacionamento", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-vinculo-estacionamento")
@@ -66,10 +66,10 @@ public class Estacionamento {
     private Long capacidade;
     private Long capacidadeDisponivel;
 
-    public Estacionamento(EstacionamentoDTO dto, Filial filial) {
+    public Estacionamento(EstacionamentoDTO dto, Empresa empresa) {
         this.privacidade = dto.privacidade();
         this.descricao = dto.descricao();
-        this.filial = filial;
+        this.empresa = empresa;
         this.capacidade = dto.capacidade();
         this.capacidadeDisponivel = dto.capacidade();
     }

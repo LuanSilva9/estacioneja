@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
@@ -14,19 +14,18 @@ import br.com.estacioneja.exceptions.custom.ParkSizeViolatedException;
 import br.com.estacioneja.infra.config.mapper.EstacionamentoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Endereco.EnderecoService;
-import br.com.estacioneja.services.Filial.FilialService;
 import br.com.estacioneja.usecases.interfaces.IEstacionamento;
 import jakarta.transaction.Transactional;
 
 @Service
 public class EstacionamentoService implements IEstacionamento {
     private final EstacionamentoRepository estacionamentoRepository;
-    private final FilialService filialService;
+    private final EmpresaService empresaService;
     private final EstacionamentoMapper estacionamentoMapper;
 
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EnderecoService enderecoService, EstacionamentoMapper estacionamentoMapper, FilialService filialService) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, EmpresaService empresaService, EnderecoService enderecoService, EstacionamentoMapper estacionamentoMapper) {
         this.estacionamentoRepository = estacionamentoRepository;
-        this.filialService = filialService;
+        this.empresaService = empresaService;
         this.estacionamentoMapper = estacionamentoMapper;
     }
 
@@ -34,9 +33,9 @@ public class EstacionamentoService implements IEstacionamento {
 
     @Override @Transactional
     public EstacionamentoOutputDTO create(EstacionamentoDTO dto) {
-        Filial filial = filialService.findEntityById(dto.filialId());
+        Empresa empresa = empresaService.findEntityById(dto.empresaId());
 
-        Estacionamento newEstacionamento = new Estacionamento(dto, filial);
+        Estacionamento newEstacionamento = new Estacionamento(dto, empresa);
 
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
 
@@ -45,11 +44,8 @@ public class EstacionamentoService implements IEstacionamento {
     
     @Override @Transactional
     public void update(UUID id, EstacionamentoDTO dto) {
-        Filial filial = filialService.findEntityById(dto.filialId());
-
         Estacionamento estacionamento = findEntityById(id);
-
-        estacionamento.setFilial(filial);
+ 
         estacionamento.setPrivacidade(dto.privacidade());
 
         estacionamentoRepository.save(estacionamento);

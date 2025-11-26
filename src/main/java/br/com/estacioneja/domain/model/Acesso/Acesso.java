@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Filial.Filial;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,22 +49,9 @@ public class Acesso {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Empresa empresa;
 
-    @ManyToOne
-    @JoinColumn(name = "filialId", referencedColumnName = "id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Filial filial;
-
-    public Acesso(TipoAcesso tipoAcesso, Usuario usuario, Filial filial) {
-        this.tipoAcesso = tipoAcesso;
-        this.usuario = usuario;
-        this.empresa = null;
-        this.filial = filial;
-    }
-
     public Acesso(TipoAcesso tipoAcesso, Usuario usuario, Empresa empresa) {
         this.tipoAcesso = tipoAcesso;
         this.usuario = usuario;
         this.empresa = empresa;
-        this.filial = null;
     }
 }

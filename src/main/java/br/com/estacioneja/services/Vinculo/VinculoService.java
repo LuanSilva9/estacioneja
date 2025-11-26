@@ -5,8 +5,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
@@ -16,9 +14,7 @@ import br.com.estacioneja.dto.input.VinculoDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
 import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
-import br.com.estacioneja.exceptions.custom.ParkIsPrivateException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
-import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
@@ -28,17 +24,13 @@ import jakarta.transaction.Transactional;
 @Service
 public class VinculoService implements IVinculo {
     private final VinculoRepository vinculoRepository;
-    private final UsuarioService usuarioService;
     private final EstacionamentoService estacionamentoService;
     private final VeiculoService veiculoService;
-    private final AcessoService acessoService;
     private final VinculoMapper vinculoMapper;
 
-    public VinculoService(VinculoRepository vinculoRepository, UsuarioService usuarioService, EstacionamentoService estacionamentoService, AcessoService acessoService, VeiculoService veiculoService, VinculoMapper vinculoMapper) {
+    public VinculoService(VinculoRepository vinculoRepository, UsuarioService usuarioService, EstacionamentoService estacionamentoService, VeiculoService veiculoService, VinculoMapper vinculoMapper) {
         this.vinculoRepository = vinculoRepository;
-        this.usuarioService = usuarioService;
         this.estacionamentoService = estacionamentoService;
-        this.acessoService = acessoService;
         this.vinculoMapper = vinculoMapper;
         this.veiculoService = veiculoService;
     }
@@ -48,31 +40,15 @@ public class VinculoService implements IVinculo {
     @Override
     @Transactional
     public VinculoOutputDTO create(VinculoDTO dto) {
-        if(existsByEstacionamentoAndUsuario(dto.usuarioId(), dto.estacionamentoId())) {
-            throw new DuplicateException("Usuario já possui vinculo nesse estacionamento!");
-        }
-
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
-        Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
-
-        boolean isPrivado = estacionamento.getPrivacidade().equals(Privacidade.PRIVADO);
-
-        if (isPrivado) {
-            boolean hasMasterAccess = 
-                acessoService.findAccessByUserAndFilial(usuario, estacionamento.getFilial())
-                    .map(a -> a.getTipoAcesso() == TipoAcesso.MASTER)
-                    .orElse(false) 
-                ||
-                acessoService.findAccessByUserAndEmpresa(usuario, estacionamento.getFilial().getEmpresa())
-                    .map(a -> a.getTipoAcesso() == TipoAcesso.MASTER)
-                    .orElse(false);
-
-            if (!hasMasterAccess) {
-                throw new ParkIsPrivateException();
-            }
+        Veiculo veiculo = veiculoService.findByPlaca(dto.placaVeiculo());
+        Usuario usuario = veiculo.getUsuario();
+        
+        if(existsByEstacionamentoAndVeiculo(veiculo, estacionamento)) {
+            throw new DuplicateException("Esse veiculo já está vinculado nesse estacionamento");
         }
 
-        Vinculo vinculo = new Vinculo(estacionamento, usuario);
+        Vinculo vinculo = new Vinculo(estacionamento, usuario, veiculo);
         return vinculoMapper.toDto(vinculoRepository.save(vinculo));
     }
     
@@ -105,28 +81,21 @@ public class VinculoService implements IVinculo {
     }
     
     @Override
-    public List<VinculoOutputDTO> findVincleByUserId(Long id) {
-        Usuario usuario = usuarioService.findEntityById(id);
-
+    public List<VinculoOutputDTO> findVincleByUser(Usuario usuario) {
         return vinculoMapper.toDtoList(vinculoRepository.findAllByUsuario(usuario));
     }
-    
+
     @Override
-    public Boolean existsByEstacionamentoAndProprietarioVeiculo(String placaVeiculo, UUID estacionamentoId) {
+    public Boolean hasVincle(String placaVeiculo, UUID estacionamentoId) {
         Veiculo veiculo = veiculoService.findByPlaca(placaVeiculo);
         Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
 
-        if(veiculo == null || estacionamento == null) return false;
-
-
-        return vinculoRepository.existsByEstacionamentoAndUsuario(estacionamento, veiculo.getUsuario());
+        return existsByEstacionamentoAndVeiculo(veiculo, estacionamento);
+    }
+    
+    @Override
+    public Boolean existsByEstacionamentoAndVeiculo(Veiculo veiculo, Estacionamento estacionamento) {
+        return this.vinculoRepository.existsByEstacionamentoAndVeiculo(estacionamento, veiculo);
     }
 
-    public Boolean existsByEstacionamentoAndUsuario(Long usuarioId, UUID estacionamentoId) {
-        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
-        Usuario usuario = usuarioService.findEntityById(usuarioId);
-
-        return vinculoRepository.existsByEstacionamentoAndUsuario(estacionamento, usuario);
-    }
-        
 }

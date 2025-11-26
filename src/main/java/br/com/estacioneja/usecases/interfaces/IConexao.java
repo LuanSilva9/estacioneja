@@ -5,8 +5,14 @@ import java.util.UUID;
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.dto.input.ConexaoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
-import br.com.estacioneja.usecases.adapter.IBase;
 
-public interface IConexao extends IBase<Conexao, UUID, ConexaoDTO, ConexaoOutputDTO>{
-    
+public interface IConexao {
+    /* CRUD */
+    ConexaoOutputDTO create(ConexaoDTO dto);
+    void update(UUID id, ConexaoDTO dto);
+    void delete(UUID id);
+
+    /* Consultas */
+    Conexao findEntityById(UUID id);
+    ConexaoOutputDTO findById(UUID id);
 }

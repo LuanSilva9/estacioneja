@@ -1,5 +1,6 @@
 package br.com.estacioneja.controller.Veiculos;
 
+import org.springframework.security.core.Authentication;
 import java.net.URI;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
@@ -27,13 +29,16 @@ public class VeiculoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VeiculoOutputDTO> listarPorId(@PathVariable UUID id) {
-        return ResponseEntity.ok().body(veiculoService.findById(id));
+    public ResponseEntity<VeiculoOutputDTO> listarPorId(@PathVariable UUID id, Authentication authentication) {
+        Usuario user = (Usuario) authentication.getPrincipal();
+        
+        return ResponseEntity.ok().body(veiculoService.findById(id, user));
     }
     
     @PostMapping
-    public ResponseEntity<VeiculoOutputDTO> criar(@RequestBody VeiculoDTO dto) {
-        VeiculoOutputDTO veiculo = veiculoService.create(dto);
+    public ResponseEntity<VeiculoOutputDTO> criar(@RequestBody VeiculoDTO dto, Authentication authentication) {
+        Usuario proprietario = (Usuario) authentication.getPrincipal();
+        VeiculoOutputDTO veiculo = veiculoService.create(dto, proprietario);
 
         URI location = URI.create(String.format("/api/v1/usuarios/veiculos/%s", veiculo.id()));
 
@@ -41,14 +46,18 @@ public class VeiculoController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody VeiculoDTO dto) {
-        veiculoService.update(id, dto);
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody VeiculoDTO dto, Authentication authentication) {
+        Usuario proprietario = (Usuario) authentication.getPrincipal();
+        
+        veiculoService.update(id, dto, proprietario);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
-        veiculoService.delete(id);
+    public ResponseEntity<Void> deletar(@PathVariable UUID id, Authentication authentication) {
+        Usuario proprietario = (Usuario) authentication.getPrincipal();
+
+        veiculoService.delete(id, proprietario);
         return ResponseEntity.noContent().build();
     }
 }

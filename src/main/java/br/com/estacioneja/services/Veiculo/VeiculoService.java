@@ -11,6 +11,7 @@ import br.com.estacioneja.domain.repository.Veiculo.VeiculoRepository;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.exceptions.custom.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.VeiculoMapper;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IVeiculo;
@@ -30,36 +31,36 @@ public class VeiculoService implements IVeiculo {
 
     /* TRANSACOES */
     @Override @Transactional
-    public VeiculoOutputDTO create(VeiculoDTO dto) {
-        Usuario proprietario = usuarioService.findEntityById(dto.proprietarioId());
-
+    public VeiculoOutputDTO create(VeiculoDTO dto, Usuario proprietario) {
         Veiculo newVeiculo = new Veiculo(dto, proprietario);
 
         return veiculoMapper.toDto(veiculoRepository.save(newVeiculo));
     }
 
-    @Override
-    public void update(UUID id, VeiculoDTO dto) {
-        Veiculo veiculo = findEntityById(id);
+    @Override @Transactional
+    public void update(UUID id, VeiculoDTO dto, Usuario proprietario) {
+        Veiculo veiculo = findEntityById(id, proprietario);
 
         veiculo.setCor(dto.cor());
         veiculo.setModelo(dto.modelo());
         veiculo.setTipoVeiculo(dto.tipoVeiculo());
-
-        veiculoRepository.save(veiculo);
     }
 
-    @Override
-    public void delete(UUID id) {
-        Veiculo veiculo = findEntityById(id);
+    @Override @Transactional
+    public void delete(UUID id, Usuario proprietario) {
+        Veiculo veiculo = findEntityById(id, proprietario);
 
         veiculoRepository.delete(veiculo);
     }
 
     /* CONSULTAS */
     @Override
-    public Veiculo findEntityById(UUID id) {
-        return veiculoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado"));
+    public Veiculo findEntityById(UUID id, Usuario proprietario) {
+        Veiculo veiculo = veiculoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado"));
+
+        authorizeUser(veiculo, proprietario);
+
+        return veiculo;
     }
 
     @Override 
@@ -68,8 +69,8 @@ public class VeiculoService implements IVeiculo {
     }
 
     @Override
-    public VeiculoOutputDTO findById(UUID id) {
-        return veiculoMapper.toDto(findEntityById(id));
+    public VeiculoOutputDTO findById(UUID id, Usuario proprietario) {
+        return veiculoMapper.toDto(findEntityById(id, proprietario));
     }
 
     @Override
@@ -78,5 +79,10 @@ public class VeiculoService implements IVeiculo {
         return veiculoRepository.findByUsuario(proprietario);
     }
 
+    /* Authorize */
+    @Override 
+    public void authorizeUser(Veiculo veiculo, Usuario proprietario) {
+        if(!veiculo.getUsuario().getId().equals(proprietario.getId())) throw new ForbiddenException("Você não possui permissão para executar essa funcionalidade");
+    }
 
 }
