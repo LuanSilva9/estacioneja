@@ -1,6 +1,9 @@
 package br.com.estacioneja.dto.output;
 
+import java.util.UUID;
 
-public record UsuarioOutputDTO(Long id, String name, String email) {
+import br.com.estacioneja.domain.enums.TipoUsuario;
+
+public record UsuarioOutputDTO(UUID id, String name, String cpf, String email, TipoUsuario tipoUsuario) {
     
 }

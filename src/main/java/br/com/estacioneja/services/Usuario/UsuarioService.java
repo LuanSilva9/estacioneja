@@ -1,6 +1,7 @@
 package br.com.estacioneja.services.Usuario;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class UsuarioService implements IUsuario {
     }
 
     @Override @Transactional 
-    public void update(Long id, UsuarioDTO dto) {
+    public void update(UUID id, UsuarioDTO dto) {
         Usuario usuario = findEntityById(id);
 
         usuario.setName(dto.name());
@@ -55,7 +56,7 @@ public class UsuarioService implements IUsuario {
     }
 
     @Override @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         Usuario usuario = findEntityById(id);
 
         usuarioRepository.delete(usuario);
@@ -64,12 +65,12 @@ public class UsuarioService implements IUsuario {
     /* CONSULTAS */
 
     @Override
-    public UsuarioOutputDTO findById(Long id) {
+    public UsuarioOutputDTO findById(UUID id) {
         return usuarioMapper.toDto(findEntityById(id));
     }
 
     @Override
-    public Usuario findEntityById(Long id) {
+    public Usuario findEntityById(UUID id) {
         return usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
     }
 

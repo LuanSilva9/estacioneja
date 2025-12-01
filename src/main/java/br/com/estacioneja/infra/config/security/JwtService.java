@@ -2,7 +2,6 @@ package br.com.estacioneja.infra.config.security;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,15 +20,15 @@ public class JwtService {
     private String SECRET;
 
     public String generateToken(Usuario user) {
+        String userId = user.getId().toString();
+
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .addClaims(Map.of("id", user.getId(), "nome", user.getName()))
+                .setSubject(userId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -41,7 +40,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, Usuario user) {
         final String username = extractUsername(token);
-        return username.equals(user.getEmail()) && !isTokenExpired(token);
+        return username.equals(user.getId().toString()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

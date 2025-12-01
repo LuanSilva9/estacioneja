@@ -1,6 +1,8 @@
 package br.com.estacioneja.usecases.interfaces;
 
 
+import java.util.UUID;
+
 import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.UsuarioDTO;
@@ -11,10 +13,10 @@ public interface IUsuario {
 
     /* CRUD */
     UsuarioOutputDTO create(UsuarioDTO dto);
-    void update(Long id, UsuarioDTO dto);
-    void delete(Long id);
+    void update(UUID id, UsuarioDTO dto);
+    void delete(UUID id);
 
     /* Consultas */
-    Usuario findEntityById(Long id);
-    UsuarioOutputDTO findById(Long id);
+    Usuario findEntityById(UUID id);
+    UsuarioOutputDTO findById(UUID id);
 }

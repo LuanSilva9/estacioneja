@@ -74,7 +74,7 @@ public class VeiculoService implements IVeiculo {
     }
 
     @Override
-    public List<Veiculo> findByProprietarioId(Long proprietarioId) {
+    public List<Veiculo> findByProprietarioId(UUID proprietarioId) {
         Usuario proprietario = usuarioService.findEntityById(proprietarioId);
         return veiculoRepository.findByUsuario(proprietario);
     }

@@ -1,5 +1,7 @@
 package br.com.estacioneja.infra.config.security;
 
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +20,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com email: " + email));
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+    }
+
+    public UserDetails loadUserById(String id) throws UsernameNotFoundException {
+        return usuarioRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + id));
     }
 }
