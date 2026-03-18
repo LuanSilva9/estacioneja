@@ -11,6 +11,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.dto.update.UsuarioUpdateDTO;
 import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
@@ -44,16 +45,37 @@ public class UsuarioService implements IUsuario {
         return usuarioMapper.toDto(newUsuario);
     }
 
-    @Override @Transactional 
-    public void update(UUID id, UsuarioDTO dto) {
-        Usuario usuario = findEntityById(id);
+    @Transactional
+    public void update(UUID id, UsuarioUpdateDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        usuario.setName(dto.name());
-        usuario.setCpf(dto.cpf());
-        usuario.setEmail(dto.email());
+        if (dto.name() != null && !dto.name().isBlank()) {
+            usuario.setName(dto.name().trim());
+        }
+
+        if (dto.telefone() != null && !dto.telefone().isBlank()) {
+            usuario.setTelefone(dto.telefone().trim());
+        }
+
+        if(dto.cpf() != null && !dto.cpf().isBlank()) {
+            usuario.setCpf(dto.cpf());
+        }
+
+        if (dto.email() != null && !dto.email().isBlank()) {
+
+            boolean emailJaExiste = usuarioRepository.existsByEmailAndIdNot(dto.email().trim(), usuario.getId());
+
+            if (emailJaExiste) {
+                throw new DuplicateException("E-mail já está em uso");
+            }
+
+            usuario.setEmail(dto.email().trim());
+        }
+
 
         usuarioRepository.save(usuario);
     }
+
 
     @Override @Transactional
     public void delete(UUID id) {
@@ -61,8 +83,6 @@ public class UsuarioService implements IUsuario {
 
         usuarioRepository.delete(usuario);
     }
-
-    /* CONSULTAS */
 
     @Override
     public UsuarioOutputDTO findById(UUID id) {

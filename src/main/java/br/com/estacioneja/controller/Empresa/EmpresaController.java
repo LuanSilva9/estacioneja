@@ -1,5 +1,6 @@
 package br.com.estacioneja.controller.Empresa;
 
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
@@ -8,17 +9,17 @@ import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.GetMapping;
-
-
 @RestController
 @RequestMapping("/api/v1/empresas")
+@PreAuthorize("hasRole('ADMIN')")
 public class EmpresaController {
     private final EmpresaService empresaService;
     private final AcessoService acessoService;
@@ -27,19 +28,18 @@ public class EmpresaController {
         this.empresaService = empresaService;
         this.acessoService = acessoService;
     }
-
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<EmpresaOutputDTO> listarEmpresa(@PathVariable UUID id) {
+        return ResponseEntity.ok(empresaService.findById(id));
+    }
+    
     @PostMapping
     public ResponseEntity<EmpresaOutputDTO> criar(@RequestBody EmpresaDTO dto) {
         EmpresaOutputDTO criado = empresaService.create(dto);
         URI location = URI.create(String.format("/api/v1/empresas/%s", criado.id()));
         return ResponseEntity.created(location).body(criado);
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<EmpresaOutputDTO> listarEmpresa(@PathVariable UUID id) {
-        return ResponseEntity.ok(empresaService.findById(id));
-    }
-    
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EmpresaDTO dto) {
@@ -58,6 +58,15 @@ public class EmpresaController {
         return ResponseEntity.ok().body(acessoService.findAccessByEmpresa(empresaId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{empresaId}/meu-acesso")
+    public ResponseEntity<AcessoOutputDTO> acessoPorUsuario(@PathVariable UUID empresaId, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+
+        return ResponseEntity.ok().body(acessoService.findAccessByUserAndEmpresaId(usuario, empresaId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{empresaId}/acessos")
     public ResponseEntity<AcessoOutputDTO> criarAcesso(@PathVariable UUID empresaId, @RequestBody AcessoDTO dto) {
         AcessoOutputDTO acesso = acessoService.create(dto, empresaId);

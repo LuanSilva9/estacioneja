@@ -13,7 +13,6 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 import java.util.List;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 
-
 @Repository
 public interface AcessoRepository extends JpaRepository<Acesso, UUID> {
     @Query("SELECT a.usuario FROM Acesso a WHERE a.empresa.id = :empresaId")
@@ -22,4 +21,7 @@ public interface AcessoRepository extends JpaRepository<Acesso, UUID> {
     List<Acesso> findAllByEmpresa(Empresa empresa);
 
     Acesso findByUsuarioAndEmpresa(Usuario usuario, Empresa empresa);
+
+
+    List<Acesso> findAllByUsuario(Usuario usuario);
 }

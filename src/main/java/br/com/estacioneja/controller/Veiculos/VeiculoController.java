@@ -1,7 +1,9 @@
 package br.com.estacioneja.controller.Veiculos;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,14 @@ public class VeiculoController {
         Usuario user = (Usuario) authentication.getPrincipal();
         
         return ResponseEntity.ok().body(veiculoService.findById(id, user));
+    }
+
+    @PreAuthorize("authenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<List<VeiculoOutputDTO>> listarPorUsuario(Authentication authentication) {
+        Usuario user = (Usuario) authentication.getPrincipal();
+        
+        return ResponseEntity.ok().body(veiculoService.findByProprietarioId(user.getId()));
     }
     
     @PostMapping

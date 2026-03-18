@@ -55,6 +55,11 @@ public class Usuario implements UserDetails {
     @Column(unique = true)
     private String cpf;
 
+    @Column(unique = false)
+    private String telefone;
+
+
+
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
 
@@ -75,6 +80,7 @@ public class Usuario implements UserDetails {
         this.email = dto.email();
         this.senha = dto.senha();
         this.cpf = dto.cpf();
+        this.telefone = dto.telefone();
         this.tipoUsuario = dto.tipoUsuario();
     }
 

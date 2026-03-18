@@ -41,16 +41,13 @@ public class VinculoController {
     }
 
     @GetMapping("/estacionamento/{estacionamentoId}")
-    public ResponseEntity<Void> verificaVinculo(@PathVariable UUID estacionamentoId, @RequestParam(name = "placa") String placa) {
+    public ResponseEntity<Boolean> verificaVinculo(
+            @PathVariable UUID estacionamentoId,
+            @RequestParam String placa) {
+
         Boolean response = vinculoService.hasVincle(placa, estacionamentoId);
-
-        if(!response) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
-    
 
     @PostMapping
     public ResponseEntity<VinculoOutputDTO> criar(@RequestBody VinculoDTO dto) {

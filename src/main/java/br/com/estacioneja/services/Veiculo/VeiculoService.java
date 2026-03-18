@@ -74,9 +74,9 @@ public class VeiculoService implements IVeiculo {
     }
 
     @Override
-    public List<Veiculo> findByProprietarioId(UUID proprietarioId) {
+    public List<VeiculoOutputDTO> findByProprietarioId(UUID proprietarioId) {
         Usuario proprietario = usuarioService.findEntityById(proprietarioId);
-        return veiculoRepository.findByUsuario(proprietario);
+        return veiculoMapper.toDtoList(veiculoRepository.findByUsuario(proprietario));
     }
 
     /* Authorize */

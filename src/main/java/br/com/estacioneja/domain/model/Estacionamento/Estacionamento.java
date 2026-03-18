@@ -70,6 +70,7 @@ public class  Estacionamento {
         this.privacidade = dto.privacidade();
         this.descricao = dto.descricao();
         this.empresa = empresa;
+        this.regraEstacionamento = dto.regraEstacionamento();
         this.capacidade = dto.capacidade();
         this.capacidadeDisponivel = dto.capacidade();
     }

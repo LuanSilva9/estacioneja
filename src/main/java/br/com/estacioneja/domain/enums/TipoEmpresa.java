@@ -4,5 +4,6 @@ public enum TipoEmpresa {
     UNIVERSIDADE,
     COOPERATIVA,
     SHOPPING,
-    SUPERMERCADOS
+    SUPERMERCADOS,
+    EMPRESA_DEFAULT
 }

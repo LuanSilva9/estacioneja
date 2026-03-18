@@ -9,7 +9,7 @@ import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 
 public interface IVeiculo {
-    List<Veiculo> findByProprietarioId(UUID proprietarioId);
+    List<VeiculoOutputDTO> findByProprietarioId(UUID proprietarioId);
     Veiculo findByPlaca(String placa);
     
     

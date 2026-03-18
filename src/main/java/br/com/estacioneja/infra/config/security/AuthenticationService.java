@@ -12,20 +12,19 @@ import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
-    private final JwtService jwtService;
 
-    public AuthenticationService(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository, JwtService jwtService) {
+    public AuthenticationService(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
-        this.jwtService = jwtService;
     }
 
-    public String login(String email, String senha) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, senha));
+    public Usuario loginAndReturnUser(String email, String senha) {
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(email, senha)
+        );
 
-        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-
-        return jwtService.generateToken(usuario);
+        return usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
 }

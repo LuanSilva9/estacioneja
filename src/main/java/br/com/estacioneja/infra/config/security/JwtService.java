@@ -20,14 +20,13 @@ public class JwtService {
     private String SECRET;
 
     public String generateToken(Usuario user) {
-        String userId = user.getId().toString();
-
         return Jwts.builder()
-                .setSubject(userId)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+            .setSubject(user.getId().toString())
+            .claim("tipoUsuario", user.getTipoUsuario().name()) // 👈 AQUI
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
     }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

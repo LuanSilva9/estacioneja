@@ -1,9 +1,11 @@
 package br.com.estacioneja.services.Estacionamento;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.enums.Privacidade;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
@@ -67,7 +69,20 @@ public class EstacionamentoService implements IEstacionamento {
     }
 
     /* CONSULTAS */
-    
+
+    @Override
+    public List<EstacionamentoOutputDTO> findByPrivacidade(Privacidade privacidade) {
+        return estacionamentoMapper.toDtoList(estacionamentoRepository.findByPrivacidade(privacidade));
+    }
+
+    @Override
+    public List<EstacionamentoOutputDTO> findByEmpresa(UUID empresaId) {
+        Empresa empresa = empresaService.findEntityById(empresaId);
+        
+        return estacionamentoMapper.toDtoList(estacionamentoRepository.findAllByEmpresa(empresa));
+    }
+
+
     @Override
     public EstacionamentoOutputDTO findById(UUID idEstacionamento) {
         return estacionamentoMapper.toDto(findEntityById(idEstacionamento));

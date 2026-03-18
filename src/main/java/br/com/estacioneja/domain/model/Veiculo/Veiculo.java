@@ -53,12 +53,15 @@ public class Veiculo {
     @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference("relacao-vinculo-veiculo")
     private List<Vinculo> vinculos;
+
+    private String observacao;
     
     public Veiculo(VeiculoDTO dto, Usuario proprietario) {
         this.placa = dto.placa();
         this.modelo = dto.modelo();
         this.cor = dto.cor();
         this.tipoVeiculo = dto.tipoVeiculo();
+        this.observacao = dto.observacao();
         this.usuario = proprietario;
     }
 

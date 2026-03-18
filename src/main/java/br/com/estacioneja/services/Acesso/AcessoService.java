@@ -87,10 +87,17 @@ public class AcessoService implements IAcesso {
         return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
     }
 
+    @Override
+    public List<AcessoOutputDTO> findAccessByUser(Usuario usuario) {
+        return acessoMapper.toDtoList(this.acessoRepository.findAllByUsuario(usuario));
+    }
+
 
     @Override
-    public Optional<Acesso> findAccessByUserAndEmpresa(Usuario usuario, Empresa empresa) {
-        return Optional.ofNullable(acessoRepository.findByUsuarioAndEmpresa(usuario, empresa));
+    public AcessoOutputDTO findAccessByUserAndEmpresaId(Usuario usuario, UUID empresaId) {
+        Empresa empresa = empresaService.findEntityById(empresaId);
+
+        return  acessoMapper.toDto(acessoRepository.findByUsuarioAndEmpresa(usuario, empresa));
     }
 
     @Override
