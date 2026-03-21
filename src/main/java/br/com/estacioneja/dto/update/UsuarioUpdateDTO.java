@@ -1,5 +1,5 @@
 package br.com.estacioneja.dto.update;
 
-public record UsuarioUpdateDTO(String name, String email, String cpf, String telefone) {
+public record UsuarioUpdateDto(String name, String email, String cpf, String telefone) {
     
 }

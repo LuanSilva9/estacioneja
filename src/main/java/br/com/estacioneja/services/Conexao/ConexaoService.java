@@ -8,6 +8,7 @@ import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.repository.Conexao.ConexaoRepository;
 import br.com.estacioneja.dto.input.ConexaoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
+import br.com.estacioneja.dto.update.ConexaoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.ConexaoMapper;
 import br.com.estacioneja.usecases.interfaces.IConexao;
@@ -31,7 +32,7 @@ public class ConexaoService implements IConexao {
     }
 
     @Override
-    public void update(UUID id, ConexaoDTO dto) {
+    public void update(UUID id, ConexaoUpdateDto dto) {
         Conexao conexao = findEntityById(id);
 
         conexao.setEndereco(dto.endereco());

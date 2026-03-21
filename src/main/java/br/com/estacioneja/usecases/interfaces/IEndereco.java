@@ -4,6 +4,7 @@ import java.util.List;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.dto.input.EnderecoDTO;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
+import br.com.estacioneja.dto.update.EnderecoUpdateDto;
 
 public interface IEndereco {
     Endereco toEntity(EnderecoOutputDTO dto);
@@ -12,7 +13,7 @@ public interface IEndereco {
 
     /* CRUD */
     EnderecoOutputDTO create(EnderecoDTO dto);
-    void update(Long id, EnderecoDTO dto);
+    void update(Long id, EnderecoUpdateDto dto);
     void delete(Long id);
 
     /* Consultas */

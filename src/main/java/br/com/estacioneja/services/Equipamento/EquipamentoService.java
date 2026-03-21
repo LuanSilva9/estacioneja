@@ -11,6 +11,7 @@ import br.com.estacioneja.domain.repository.Equipamento.EquipamentoRepository;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
+import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
 import br.com.estacioneja.services.Conexao.ConexaoService;
@@ -44,7 +45,7 @@ public class EquipamentoService implements IEquipamento {
         return equipamentoMapper.toDto(equipamentoRepository.save(equipamento));
     }
     @Override
-    public void update(UUID id, EquipamentoDTO dto) {
+    public void update(UUID id, EquipamentoUpdateDto dto) {
         Equipamento equipamento = findEntityById(id);
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
         Conexao conexao = conexaoService.findEntityById(equipamento.getConexaoHardware().getId());

@@ -13,6 +13,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
+import br.com.estacioneja.dto.update.EmpresaUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.services.Endereco.EnderecoService;
@@ -63,7 +64,7 @@ public class EmpresaService implements IEmpresa {
     }
 
     @Override @Transactional
-    public void update(UUID id, EmpresaDTO dto) {
+    public void update(UUID id, EmpresaUpdateDto dto) {
         Empresa empresa = findEntityById(id);
 
         empresa.setNome(dto.nome());

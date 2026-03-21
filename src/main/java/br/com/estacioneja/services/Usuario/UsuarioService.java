@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.dto.update.UsuarioUpdateDTO;
+import br.com.estacioneja.dto.update.UsuarioUpdateDto;
 import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
@@ -46,7 +46,7 @@ public class UsuarioService implements IUsuario {
     }
 
     @Transactional
-    public void update(UUID id, UsuarioUpdateDTO dto) {
+    public void update(UUID id, UsuarioUpdateDto dto) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         if (dto.name() != null && !dto.name().isBlank()) {

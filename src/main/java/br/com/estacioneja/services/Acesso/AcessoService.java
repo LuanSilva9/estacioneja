@@ -1,7 +1,6 @@
 package br.com.estacioneja.services.Acesso;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.context.event.EventListener;
@@ -15,6 +14,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import br.com.estacioneja.dto.update.AcessoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
@@ -49,7 +49,7 @@ public class AcessoService implements IAcesso {
     }  
 
     @Override @Transactional
-    public void update(UUID id, AcessoDTO dto) {
+    public void update(UUID id, AcessoUpdateDto dto) {
         Acesso acesso = findEntityById(id);
 
         acesso.setTipoAcesso(dto.tipoAcesso());

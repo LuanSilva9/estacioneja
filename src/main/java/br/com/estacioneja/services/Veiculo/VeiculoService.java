@@ -10,6 +10,7 @@ import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Veiculo.VeiculoRepository;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
+import br.com.estacioneja.dto.update.VeiculoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.exceptions.custom.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.VeiculoMapper;
@@ -38,7 +39,7 @@ public class VeiculoService implements IVeiculo {
     }
 
     @Override @Transactional
-    public void update(UUID id, VeiculoDTO dto, Usuario proprietario) {
+    public void update(UUID id, VeiculoUpdateDto dto, Usuario proprietario) {
         Veiculo veiculo = findEntityById(id, proprietario);
 
         veiculo.setCor(dto.cor());

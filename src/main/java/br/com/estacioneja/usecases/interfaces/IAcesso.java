@@ -7,6 +7,7 @@ import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import br.com.estacioneja.dto.update.AcessoUpdateDto;
 
 public interface IAcesso {
     List<Usuario> findAllUsersByEmpresa(UUID empresaId);
@@ -17,7 +18,7 @@ public interface IAcesso {
 
     /* CRUD */
     AcessoOutputDTO create(AcessoDTO dto, UUID empresaId);
-    void update(UUID id, AcessoDTO dto);
+    void update(UUID id, AcessoUpdateDto dto);
     void delete(UUID id);
 
     /* Consultas */

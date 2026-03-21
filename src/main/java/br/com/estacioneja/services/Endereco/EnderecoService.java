@@ -8,6 +8,7 @@ import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.repository.Endereco.EnderecoRepository;
 import br.com.estacioneja.dto.input.EnderecoDTO;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
+import br.com.estacioneja.dto.update.EnderecoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EnderecoMapper;
 import br.com.estacioneja.usecases.interfaces.IEndereco;
@@ -33,7 +34,7 @@ public class EnderecoService implements IEndereco {
     }
 
     @Override @Transactional
-    public void update(Long id, EnderecoDTO dto) {
+    public void update(Long id, EnderecoUpdateDto dto) {
         Endereco endereco = findEntityById(id);
 
         endereco.setLogradouro(dto.logradouro());
@@ -48,7 +49,7 @@ public class EnderecoService implements IEndereco {
     }
 
     @Transactional
-    public EnderecoOutputDTO updateAndReturn(Long id, EnderecoDTO dto) {
+    public EnderecoOutputDTO updateAndReturn(Long id, EnderecoUpdateDto dto) {
         Endereco endereco = findEntityById(id);
 
         endereco.setLogradouro(dto.logradouro());

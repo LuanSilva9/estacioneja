@@ -17,7 +17,7 @@ import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.UsuarioDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.dto.update.UsuarioUpdateDTO;
+import br.com.estacioneja.dto.update.UsuarioUpdateDto;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 
@@ -68,7 +68,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody UsuarioUpdateDTO dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody UsuarioUpdateDto dto) {
         usuarioService.update(id, dto);
 
         return ResponseEntity.noContent().build();

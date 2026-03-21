@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.estacioneja.domain.enums.Privacidade;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
+import br.com.estacioneja.dto.update.EstacionamentoUpdateDto;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,7 +62,7 @@ public class EstacionamentoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EstacionamentoDTO dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EstacionamentoUpdateDto dto) {
         estacionamentoService.update(id, dto);
         return ResponseEntity.noContent().build();
     }

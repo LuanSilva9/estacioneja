@@ -5,6 +5,8 @@ import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
+import br.com.estacioneja.dto.update.AcessoUpdateDto;
+import br.com.estacioneja.dto.update.EmpresaUpdateDto;
 import br.com.estacioneja.services.Acesso.AcessoService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 
@@ -42,7 +44,7 @@ public class EmpresaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EmpresaDTO dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EmpresaUpdateDto dto) {
         empresaService.update(id, dto);
         return ResponseEntity.noContent().build();
     } 
@@ -77,7 +79,7 @@ public class EmpresaController {
     }
 
     @PutMapping("/{empresaId}/acessos/{id}")
-    public ResponseEntity<Void> atualizarAcesso(@PathVariable UUID empresaId, @PathVariable UUID id, @RequestBody AcessoDTO dto) {
+    public ResponseEntity<Void> atualizarAcesso(@PathVariable UUID empresaId, @PathVariable UUID id, @RequestBody AcessoUpdateDto dto) {
         acessoService.update(id, dto);
 
         return ResponseEntity.noContent().build();

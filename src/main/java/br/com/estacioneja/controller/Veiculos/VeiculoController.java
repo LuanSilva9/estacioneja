@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
+import br.com.estacioneja.dto.update.VeiculoUpdateDto;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -56,7 +57,7 @@ public class VeiculoController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody VeiculoDTO dto, Authentication authentication) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody VeiculoUpdateDto dto, Authentication authentication) {
         Usuario proprietario = (Usuario) authentication.getPrincipal();
         
         veiculoService.update(id, dto, proprietario);

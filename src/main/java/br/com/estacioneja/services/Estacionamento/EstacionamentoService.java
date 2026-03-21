@@ -11,6 +11,7 @@ import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.repository.Estacionamento.EstacionamentoRepository;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
+import br.com.estacioneja.dto.update.EstacionamentoUpdateDto;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.exceptions.custom.ParkSizeViolatedException;
 import br.com.estacioneja.infra.config.mapper.EstacionamentoMapper;
@@ -45,7 +46,7 @@ public class EstacionamentoService implements IEstacionamento {
     }
     
     @Override @Transactional
-    public void update(UUID id, EstacionamentoDTO dto) {
+    public void update(UUID id, EstacionamentoUpdateDto dto) {
         Estacionamento estacionamento = findEntityById(id);
  
         estacionamento.setPrivacidade(dto.privacidade());

@@ -7,11 +7,12 @@ import br.com.estacioneja.domain.enums.Privacidade;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
+import br.com.estacioneja.dto.update.EstacionamentoUpdateDto;
 
 public interface IEstacionamento {
     /* CRUD */
     EstacionamentoOutputDTO create(EstacionamentoDTO dto);
-    void update(UUID id, EstacionamentoDTO dto);
+    void update(UUID id, EstacionamentoUpdateDto dto);
     void delete(UUID id);
 
     /* Consultas */

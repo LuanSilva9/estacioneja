@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
+import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
 import br.com.estacioneja.services.Equipamento.EquipamentoService;
 
 @RestController
@@ -41,7 +42,7 @@ public class EquipamentosController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EquipamentoDTO dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EquipamentoUpdateDto dto) {
         equipamentoService.update(id, dto);
 
         return ResponseEntity.noContent().build();
