@@ -1,18 +1,13 @@
 package br.com.estacioneja.usecases.interfaces;
 
-import java.util.List;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.dto.input.EnderecoDTO;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
 import br.com.estacioneja.dto.update.EnderecoUpdateDto;
 
 public interface IEndereco {
-    Endereco toEntity(EnderecoOutputDTO dto);
-    List<Endereco> toEntityList(List<EnderecoOutputDTO> dtoList);
-    EnderecoOutputDTO toDto(Endereco entity);
-
     /* CRUD */
-    EnderecoOutputDTO create(EnderecoDTO dto);
+    Endereco create(EnderecoDTO dto);
     void update(Long id, EnderecoUpdateDto dto);
     void delete(Long id);
 

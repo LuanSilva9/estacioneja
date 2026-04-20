@@ -3,10 +3,9 @@ package br.com.estacioneja.services.Empresa;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.context.ApplicationEventPublisher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import br.com.estacioneja.domain.events.Empresa.EmpresaCriadaEvent;
+import org.springframework.transaction.annotation.Transactional;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
@@ -19,46 +18,46 @@ import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.services.Endereco.EnderecoService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IEmpresa;
-import jakarta.transaction.Transactional;
+
 
 @Service
+@RequiredArgsConstructor
 public class EmpresaService implements IEmpresa {
     private final EmpresaRepository empresaRepository;
     private final UsuarioService usuarioService;
     private final EnderecoService enderecoService;
-    private final ApplicationEventPublisher eventPublisher;
     private final EmpresaMapper empresaMapper;
 
-    public EmpresaService(EmpresaRepository empresaRepository, UsuarioService usuarioService, EnderecoService enderecoService, EmpresaMapper empresaMapper, ApplicationEventPublisher eventPublisher) {
-        this.empresaRepository = empresaRepository;
-        this.usuarioService = usuarioService;
-        this.enderecoService = enderecoService;
-        this.eventPublisher = eventPublisher;
-        this.empresaMapper = empresaMapper;
-    }
-
-    
     /* TRANSACOES */
     
-    @Override @Transactional 
+    @Override @Transactional
     public EmpresaOutputDTO create(EmpresaDTO dto) {
         Usuario representante = usuarioService.findEntityById(dto.representanteId());
-        Endereco endereco = enderecoService.toEntity(enderecoService.create(dto.endereco()));
+        Endereco endereco = enderecoService.create(dto.endereco());
+
+        Empresa empresaPai = null;
+    
+        if (dto.empresaId() != null) {
+            empresaPai = findEntityById(dto.empresaId());
+        }
 
         Empresa newEmpresa;
 
-        if(dto.empresaId() == null) {
-            /* EMPRESA */
-            newEmpresa = new Empresa(dto, representante, endereco, null);
+        if (empresaPai != null) {
+            newEmpresa = Empresa.criarFilial(
+                dto.nome(), endereco, dto.tipoEmpresa(),
+                dto.cnpj(), dto.prefixo(), dto.plano(),
+                empresaPai, representante
+            );
         } else {
-            /* FILIAL */
-            Empresa empresaPai = findEntityById(dto.empresaId());
-
-            newEmpresa = new Empresa(dto, representante, endereco, empresaPai);
+            newEmpresa = Empresa.criarMatriz(
+                representante, dto.nome(), endereco,
+                dto.tipoEmpresa(), dto.cnpj(),
+                dto.prefixo(), dto.plano()
+            );
         }
-        
+
         empresaRepository.save(newEmpresa);
-        eventPublisher.publishEvent(new EmpresaCriadaEvent(newEmpresa.getId(), representante.getId()));
 
         return empresaMapper.toDto(newEmpresa);
     }
@@ -80,18 +79,18 @@ public class EmpresaService implements IEmpresa {
     
     /* CONSULTAS */
     
-    @Override
+    @Override @Transactional(readOnly = true)
     public Empresa findEntityById(UUID empresaId) {
         return empresaRepository.findById(empresaId).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada")); 
     }
     
-    @Override
+    @Override @Transactional(readOnly = true)
     public EmpresaOutputDTO findById(UUID empresaId) {
        return empresaMapper.toDto(findEntityById(empresaId));
     }
     
     
-    @Override
+    @Override @Transactional(readOnly = true)
     public List<EmpresaOutputDTO> findAll() {
         return empresaMapper.toDtoList(empresaRepository.findAll());
     }

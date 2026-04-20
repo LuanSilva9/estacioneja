@@ -1,9 +1,7 @@
 package br.com.estacioneja.services.Endereco;
 
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.repository.Endereco.EnderecoRepository;
 import br.com.estacioneja.dto.input.EnderecoDTO;
@@ -15,22 +13,18 @@ import br.com.estacioneja.usecases.interfaces.IEndereco;
 import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class EnderecoService implements IEndereco {
     private final EnderecoRepository enderecoRepository;
     private final EnderecoMapper enderecoMapper;
-    
-    public EnderecoService(EnderecoRepository enderecoRepository, EnderecoMapper enderecoMapper) {
-        this.enderecoRepository = enderecoRepository;
-        this.enderecoMapper = enderecoMapper;
-    }
 
     /* TRANSACOES */
 
     @Override @Transactional
-    public EnderecoOutputDTO create(EnderecoDTO dto) {
-        Endereco newEndereco = new Endereco(dto);
+    public Endereco create(EnderecoDTO dto) {
+        Endereco newEndereco = new Endereco(dto.logradouro(), dto.bairro(), dto.cidade(), dto.uf(), dto.cep(), dto.latitude(), dto.longitude());
 
-        return enderecoMapper.toDto(enderecoRepository.save(newEndereco));
+        return enderecoRepository.save(newEndereco);
     }
 
     @Override @Transactional
@@ -44,23 +38,6 @@ public class EnderecoService implements IEndereco {
         endereco.setCep(dto.cep());
         endereco.setLatitude(dto.latitude());
         endereco.setLongitude(dto.longitude());
-
-        enderecoMapper.toDto(enderecoRepository.save(endereco));
-    }
-
-    @Transactional
-    public EnderecoOutputDTO updateAndReturn(Long id, EnderecoUpdateDto dto) {
-        Endereco endereco = findEntityById(id);
-
-        endereco.setLogradouro(dto.logradouro());
-        endereco.setBairro(dto.bairro());
-        endereco.setCidade(dto.cidade());
-        endereco.setUf(dto.uf());
-        endereco.setCep(dto.cep());
-        endereco.setLatitude(dto.latitude());
-        endereco.setLongitude(dto.longitude());
-
-        return enderecoMapper.toDto(enderecoRepository.save(endereco));
     }
 
     @Override @Transactional
@@ -81,22 +58,4 @@ public class EnderecoService implements IEndereco {
     public EnderecoOutputDTO findById(Long id) {
         return enderecoMapper.toDto(findEntityById(id));
     }
-
-    /* CONVERSAO */
-
-    @Override
-    public Endereco toEntity(EnderecoOutputDTO dto) {
-        return enderecoMapper.toEntity(dto);
-    }
-
-    @Override
-    public EnderecoOutputDTO toDto(Endereco entity) {
-        return enderecoMapper.toDto(entity);
-    }
-
-    @Override
-    public List<Endereco> toEntityList(List<EnderecoOutputDTO> dtoList) {
-        return enderecoMapper.toEntityList(dtoList);
-    }
-    
 }

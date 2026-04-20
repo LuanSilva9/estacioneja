@@ -10,7 +10,7 @@ import br.com.estacioneja.domain.enums.TipoEmpresa;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.input.EmpresaDTO;
+import br.com.estacioneja.exceptions.custom.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,8 +37,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
 public class Empresa {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String nome;
@@ -72,17 +71,40 @@ public class Empresa {
     @JsonManagedReference("relacao-empresa-estacionamento")
     private List<Estacionamento> estacionamento;
 
-
-    public Empresa(EmpresaDTO dto, Usuario representante, Endereco endereco, Empresa empresaPai) {
-        this.nome = dto.nome();
-        this.tipoEmpresa = dto.tipoEmpresa();
-
-        this.empresaPai = empresaPai;
-        this.endereco = endereco;
-        this.prefixo = dto.prefixo();
-        this.plano = dto.plano();
-        this.cnpj = dto.cnpj();
+    public static Empresa criarMatriz(Usuario representante, String nome, Endereco endereco, TipoEmpresa tipo, String cnpj, String prefixo, Plano plano ) {
+        Empresa e = new Empresa();
         
-        this.representante = representante;
+        e.representante = representante;
+        e.nome = nome;
+        e.endereco = endereco;
+        e.tipoEmpresa = tipo;
+        e.cnpj = cnpj;
+        e.prefixo = prefixo;
+        e.plano = plano;
+
+        return e;
+    }
+
+    public static Empresa criarFilial(String nome, Endereco endereco, TipoEmpresa tipo, String cnpj, String prefixo, Plano plano, Empresa empresaPai, Usuario representante) {
+        if (empresaPai != null && empresaPai.isFilial()) {
+            throw new BusinessException("Filial não pode ter filial");
+        }
+        
+        Empresa e = new Empresa();
+
+        e.nome = nome;
+        e.endereco = endereco;
+        e.tipoEmpresa = tipo;
+        e.cnpj = cnpj;
+        e.prefixo = prefixo;
+        e.plano = plano;
+        e.empresaPai = empresaPai;
+        e.representante = representante;
+
+        return e;
+    }
+
+    private boolean isFilial() {
+        return this.empresaPai != null;
     }
 }
