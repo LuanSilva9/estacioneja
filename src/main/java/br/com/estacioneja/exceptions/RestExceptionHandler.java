@@ -1,12 +1,17 @@
 package br.com.estacioneja.exceptions;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import br.com.estacioneja.dto.input.ErrorsExceptionDTO;
 import br.com.estacioneja.dto.output.ResponseExceptionDTO;
+import br.com.estacioneja.exceptions.custom.BusinessException;
 import br.com.estacioneja.exceptions.custom.ConectionIsDownException;
 import br.com.estacioneja.exceptions.custom.CustomMessageException;
 import br.com.estacioneja.exceptions.custom.DuplicateCompanyException;
@@ -30,9 +35,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({
         ParkSizeViolatedException.class,
-        ParkIsPrivateException.class
+        ParkIsPrivateException.class,
+        BusinessException.class
     })
-    private ResponseEntity<ResponseExceptionDTO> handleFull(RuntimeException exception) {
+    private ResponseEntity<ResponseExceptionDTO> handleBadRequest(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseExceptionDTO(exception.getMessage()));
     }
 
@@ -64,5 +70,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     })
     private ResponseEntity<ResponseExceptionDTO> handleForbidden(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseExceptionDTO(exception.getMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, 
+            org.springframework.http.HttpHeaders headers, 
+            org.springframework.http.HttpStatusCode status, 
+            org.springframework.web.context.request.WebRequest request) {
+
+        List<ErrorsExceptionDTO> erros = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(ErrorsExceptionDTO::new)
+                .toList();
+
+        return ResponseEntity.badRequest().body(erros);
     }
 }
