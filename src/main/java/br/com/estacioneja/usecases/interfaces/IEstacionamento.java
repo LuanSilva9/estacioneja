@@ -20,4 +20,5 @@ public interface IEstacionamento {
     List<EstacionamentoOutputDTO> findByEmpresa(UUID empresaId);
     Estacionamento findEntityById(UUID id);
     EstacionamentoOutputDTO findById(UUID id);
+    Estacionamento findEntityLocked(UUID idEstacionamento);
 }

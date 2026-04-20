@@ -12,6 +12,7 @@ import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
+import br.com.estacioneja.exceptions.custom.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -73,5 +74,16 @@ public class  Estacionamento {
         this.regraEstacionamento = dto.regraEstacionamento();
         this.capacidade = dto.capacidade();
         this.capacidadeDisponivel = dto.capacidade();
+    }
+
+    public void entrarVeiculo() {
+        if (capacidadeDisponivel <= 0) {
+            throw new BusinessException("Estacionamento lotado");
+        }
+        capacidadeDisponivel--;
+    }
+
+    public void sairVeiculo() {
+        capacidadeDisponivel++;
     }
 }

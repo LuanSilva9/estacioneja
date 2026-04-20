@@ -45,10 +45,10 @@ public class Registro {
 
     private LocalDateTime dataRegistro;
     
-    public Registro(Veiculo veiculo, Estacionamento estacionamento) {
+    public Registro(Veiculo veiculo, Estacionamento estacionamento, TipoRegistro tipoRegistro) {
         this.veiculo = veiculo;
         this.estacionamento = estacionamento;
-        this.tipoRegistro = TipoRegistro.ENTRADA;
+        this.tipoRegistro = tipoRegistro;
         this.dataRegistro = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 }

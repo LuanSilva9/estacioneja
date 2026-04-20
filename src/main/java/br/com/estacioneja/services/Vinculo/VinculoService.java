@@ -3,6 +3,7 @@ package br.com.estacioneja.services.Vinculo;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
@@ -16,86 +17,91 @@ import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
-import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.IVinculo;
 import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class VinculoService implements IVinculo {
+
     private final VinculoRepository vinculoRepository;
     private final EstacionamentoService estacionamentoService;
     private final VeiculoService veiculoService;
     private final VinculoMapper vinculoMapper;
 
-    public VinculoService(VinculoRepository vinculoRepository, UsuarioService usuarioService, EstacionamentoService estacionamentoService, VeiculoService veiculoService, VinculoMapper vinculoMapper) {
-        this.vinculoRepository = vinculoRepository;
-        this.estacionamentoService = estacionamentoService;
-        this.vinculoMapper = vinculoMapper;
-        this.veiculoService = veiculoService;
-    }
+    /* TRANSAÇÕES */
 
-    /* TRANSACOES */    
-    
     @Override
     @Transactional
     public VinculoOutputDTO create(VinculoDTO dto) {
-        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
-        Veiculo veiculo = veiculoService.findByPlaca(dto.placaVeiculo());
-        Usuario usuario = veiculo.getUsuario();
-        
-        if(existsByEstacionamentoAndVeiculo(veiculo, estacionamento)) {
-            throw new DuplicateException("Esse veiculo já está vinculado nesse estacionamento");
-        }
+        Veiculo veiculo = getVeiculo(dto.placaVeiculo());
+        Estacionamento estacionamento = getEstacionamento(dto.estacionamentoId());
 
-        Vinculo vinculo = new Vinculo(estacionamento, usuario, veiculo);
+        validateDuplicate(veiculo, estacionamento);
+
+        Vinculo vinculo = new Vinculo(
+                estacionamento,
+                veiculo.getUsuario(),
+                veiculo
+        );
+
         return vinculoMapper.toDto(vinculoRepository.save(vinculo));
     }
-    
-    @Override @Transactional
+
+    @Override
+    @Transactional
     public void update(UUID id, VinculoDTO dto) {
         Vinculo vinculo = findEntityById(id);
-        
-        vinculo.setEstacionamento(estacionamentoService.findEntityById(dto.estacionamentoId()));
-        
-        vinculoRepository.save(vinculo);
+
+        Estacionamento estacionamento = getEstacionamento(dto.estacionamentoId());
+
+        vinculo.setEstacionamento(estacionamento);
     }
-    
-    @Override @Transactional
+
+    @Override
+    @Transactional
     public void delete(UUID id) {
-        Vinculo vinculo = findEntityById(id);
-        
-        vinculoRepository.delete(vinculo);
+        vinculoRepository.delete(findEntityById(id));
     }
 
     /* CONSULTAS */
-    
+
     @Override
     public Vinculo findEntityById(UUID id) {
-        return vinculoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
+        return vinculoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
     }
-    
+
     @Override
     public VinculoOutputDTO findById(UUID id) {
         return vinculoMapper.toDto(findEntityById(id));
     }
-    
+
     @Override
     public List<VinculoOutputDTO> findVincleByUser(Usuario usuario) {
         return vinculoMapper.toDtoList(vinculoRepository.findAllByUsuario(usuario));
     }
-
-    @Override
-    public Boolean hasVincle(String placaVeiculo, UUID estacionamentoId) {
-        Veiculo veiculo = veiculoService.findByPlaca(placaVeiculo);
-        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
-
-        return existsByEstacionamentoAndVeiculo(veiculo, estacionamento);
-    }
     
-    @Override
-    public Boolean existsByEstacionamentoAndVeiculo(Veiculo veiculo, Estacionamento estacionamento) {
-        return this.vinculoRepository.existsByEstacionamentoAndVeiculo(estacionamento, veiculo);
+    /* VALIDAÇÕES */
+    
+    public Boolean existsVinculo(String placa, UUID estacionamentoId) {
+        return vinculoRepository.existsByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa);
     }
 
+    private void validateDuplicate(Veiculo veiculo, Estacionamento estacionamento) {
+        if (vinculoRepository.existsByEstacionamentoIdAndVeiculoPlaca(estacionamento.getId(), veiculo.getPlaca())) {
+            throw new DuplicateException("Esse veículo já está vinculado nesse estacionamento");
+        }
+    }
+
+    /* HELPERS */
+
+    private Veiculo getVeiculo(String placa) {
+        return veiculoService.findByPlaca(placa);
+    }
+
+    private Estacionamento getEstacionamento(UUID id) {
+        return estacionamentoService.findEntityById(id);
+    }
 }

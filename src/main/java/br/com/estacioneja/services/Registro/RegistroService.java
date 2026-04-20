@@ -1,8 +1,11 @@
 package br.com.estacioneja.services.Registro;
 
+import java.util.List;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.domain.enums.TipoRegistro;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
@@ -18,9 +21,9 @@ import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.services.Vinculo.VinculoService;
 import br.com.estacioneja.usecases.interfaces.IRegistro;
-import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RegistroService implements IRegistro {
     private final RegistroRepository registroRepository;
     private final RegistroMapper registroMapper;
@@ -28,67 +31,61 @@ public class RegistroService implements IRegistro {
     private final VeiculoService veiculoService;
     private final VinculoService vinculoService;
 
-    public RegistroService(RegistroRepository registroRepository, RegistroMapper registroMapper, EstacionamentoService estacionamentoService, VeiculoService veiculoService, VinculoService vinculoService) {
-        this.registroRepository = registroRepository;
-        this.registroMapper = registroMapper;
-        this.estacionamentoService = estacionamentoService;
-        this.veiculoService = veiculoService;
-        this.vinculoService = vinculoService;
-    }
-
     /* TRANSACOES */
 
     @Override @Transactional
     public RegistroOutputDTO create(RegistroDTO dto) {
         Veiculo veiculo = veiculoService.findByPlaca(dto.placa());
-        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
         
-        if(!vinculoService.existsByEstacionamentoAndVeiculo(veiculo, estacionamento)) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
-
-        Registro entradaExistente = registroRepository.findByVeiculoAndEstacionamentoAndTipoRegistro(veiculo, estacionamento, TipoRegistro.ENTRADA);
+        if(!vinculoService.existsVinculo(veiculo.getPlaca(), dto.estacionamentoId())) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
         
-        if(entradaExistente != null) {
-            return registrarSaida(entradaExistente);
-        } else {
-            Registro newRegistro = new Registro(veiculo, estacionamento);
+        Estacionamento estacionamento = estacionamentoService.findEntityLocked(dto.estacionamentoId());
+        
+        Registro ultimoRegistro = registroRepository.findTopByVeiculoAndEstacionamentoOrderByDataRegistroDesc(veiculo, estacionamento);
 
-            estacionamentoService.atualizarCapacidadeDisponivel(estacionamento.getId(), estacionamento.getCapacidadeDisponivel() - 1);
-
-            return registroMapper.toDto(registroRepository.save(newRegistro));
-        }
-    }
-
-    @Override @Transactional
-    public void update(UUID id, RegistroDTO dto) {
-        throw new UnsupportedOperationException("Unimplemented method cvupdate");
-    }
-
-    @Override @Transactional
-    public void delete(UUID id) {
-        Registro registro = findEntityById(id);
-
-        registroRepository.delete(registro);
-    }
-    
-    @Override @Transactional
-    public RegistroOutputDTO registrarSaida(Registro registro) {
-        registro.setTipoRegistro(TipoRegistro.SAIDA);
-        estacionamentoService.atualizarCapacidadeDisponivel(registro.getEstacionamento().getId(), registro.getEstacionamento().getCapacidadeDisponivel() + 1);
-
-        return registroMapper.toDto(registroRepository.save(registro));
+        if (ultimoRegistro != null && ultimoRegistro.getTipoRegistro() == TipoRegistro.ENTRADA) 
+            return registrarSaida(veiculo, estacionamento);
+        else 
+            return registrarEntrada(veiculo, estacionamento);
     }
 
     /* CONSULTAS */
 
-    @Override
+    @Override @Transactional(readOnly = true)
     public Registro findEntityById(UUID id) {
         return registroRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Registro não encontrado"));
     }
 
-    @Override
+    @Override @Transactional(readOnly = true)
     public RegistroOutputDTO findById(UUID id) {
         return registroMapper.toDto(findEntityById(id));
     }
 
+    @Transactional(readOnly = true)
+    public List<RegistroOutputDTO> findByUsuario(UUID usuarioId) {
+        return registroMapper.toDtoList(registroRepository.findByVeiculoUsuarioIdOrderByDataRegistroDesc(usuarioId));
+    }
 
+    @Transactional(readOnly = true)
+    public List<RegistroOutputDTO> findByEstacionamento(UUID estacionamentoId) {
+        return registroMapper.toDtoList(registroRepository.findByEstacionamentoIdOrderByDataRegistroDesc(estacionamentoId));
+    }
+
+    /* HELPERS */
+
+    private RegistroOutputDTO registrarEntrada(Veiculo veiculo, Estacionamento estacionamento) {
+        Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.ENTRADA);
+
+        estacionamento.entrarVeiculo();
+        
+        return registroMapper.toDto(registroRepository.save(newRegistro));
+    }
+
+    private RegistroOutputDTO registrarSaida(Veiculo veiculo, Estacionamento estacionamento) {
+        Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.SAIDA);
+
+        estacionamento.sairVeiculo();
+
+        return registroMapper.toDto(registroRepository.save(newRegistro));
+    }
 }
