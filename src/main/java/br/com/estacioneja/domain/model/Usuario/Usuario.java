@@ -10,12 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.dto.input.UsuarioDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,8 +56,6 @@ public class Usuario implements UserDetails {
     @Column(unique = false)
     private String telefone;
 
-
-
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
 
@@ -71,20 +67,31 @@ public class Usuario implements UserDetails {
     @JsonBackReference("relacao-vinculo-usuario")
     private List<Vinculo> vinculos;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonBackReference("relacao-acesso-usuario")
     private List<Acesso> acessos;
 
-    public Usuario(UsuarioDTO dto) {
-        this.name = dto.name();
-        this.email = dto.email();
-        this.senha = dto.senha();
-        this.cpf = dto.cpf();
-        this.telefone = dto.telefone();
-        this.tipoUsuario = dto.tipoUsuario();
+    public Usuario(String name, String email, String cpf, String telefone, TipoUsuario tipoUsuario) {
+        this.name = name;
+        this.email = email;
+        this.cpf = new CPF(cpf).getCpf();
+        this.telefone = telefone;
+        this.tipoUsuario = tipoUsuario;
     }
 
-     @Override
+    public void updateData(String name, String telefone, String cpf, String email) {
+        this.name = name.trim();
+        this.telefone = telefone.trim();
+        this.cpf = new CPF(cpf).getCpf();
+        this.email = email.trim();
+
+    }
+
+    /*
+        Spring-Security Domain
+    */
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String role = switch(this.tipoUsuario) {
             case COMUM -> "ROLE_USER";
