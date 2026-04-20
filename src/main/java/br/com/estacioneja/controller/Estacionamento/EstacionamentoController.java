@@ -14,6 +14,9 @@ import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
 import br.com.estacioneja.dto.update.EstacionamentoUpdateDto;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,47 +25,49 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import java.net.URI;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 @RestController
 @RequestMapping("/api/v1/estacionamentos")
+@RequiredArgsConstructor
 public class EstacionamentoController {
 
     private final EstacionamentoService estacionamentoService;
 
-    public EstacionamentoController(EstacionamentoService estacionamentoService) {
-        this.estacionamentoService = estacionamentoService;
-    }
-    
     @PreAuthorize("authenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<EstacionamentoOutputDTO> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(estacionamentoService.findById(id));
     }
-    
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/empresa/{id}")
     public ResponseEntity<List<EstacionamentoOutputDTO>> obterPorEmpresa(@PathVariable UUID id) {
         return ResponseEntity.ok(estacionamentoService.findByEmpresa(id));
     }
 
-
-    @PreAuthorize("authenticated()")
     @GetMapping("/privacidade/{privacidade}")
-    public ResponseEntity<List<EstacionamentoOutputDTO>> obterPorId(@PathVariable(name = "privacidade") Privacidade privacidade) {
+    public ResponseEntity<List<EstacionamentoOutputDTO>> obterPorPrivacidade(@PathVariable Privacidade privacidade) {
         return ResponseEntity.ok(estacionamentoService.findByPrivacidade(privacidade));
     }
 
+    
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<EstacionamentoOutputDTO> criar(@RequestBody EstacionamentoDTO dto) {
+    public ResponseEntity<EstacionamentoOutputDTO> criar(@Valid @RequestBody EstacionamentoDTO dto) {
         EstacionamentoOutputDTO criado = estacionamentoService.create(dto);
-        URI location = URI.create(String.format("/api/v1/estacionamentos/%s", criado.id()));
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(criado.id())
+                .toUri();
         return ResponseEntity.created(location).body(criado);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EstacionamentoUpdateDto dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @Valid @RequestBody EstacionamentoUpdateDto dto) {
         estacionamentoService.update(id, dto);
         return ResponseEntity.noContent().build();
     }

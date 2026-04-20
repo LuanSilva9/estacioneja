@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import br.com.estacioneja.domain.enums.TipoComunicacao;
 import br.com.estacioneja.domain.enums.TipoProtocolo;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
-import br.com.estacioneja.dto.input.ConexaoDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -48,12 +47,12 @@ public class Conexao {
     @JsonBackReference("relacao-conexao-equipamento")
     private Equipamento equipamento;
 
-    public Conexao(ConexaoDTO conexaoDTO) {
-        this.tipoComunicacao = conexaoDTO.tipoComunicacao();
-        this.tipoProtocolo = conexaoDTO.tipoProtocolo();
-        this.endereco = conexaoDTO.endereco();
-        this.porta = conexaoDTO.porta();
-        this.credenciais = conexaoDTO.credenciais();
-        this.enderecoMac = conexaoDTO.enderecoMac();
+    public Conexao(TipoComunicacao tipoComunicacao, TipoProtocolo tipoProtocolo, String endereco, Integer porta, String credenciais, String enderecoMac) {
+        this.tipoComunicacao = tipoComunicacao;
+        this.tipoProtocolo = tipoProtocolo;
+        this.endereco = endereco;
+        this.porta = porta;
+        this.credenciais = credenciais;
+        this.enderecoMac = enderecoMac;
     }
 }

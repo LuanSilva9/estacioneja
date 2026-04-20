@@ -22,7 +22,4 @@ public interface IVeiculo {
     /* Consultas */
     Veiculo findEntityById(UUID id, Usuario proprietario);
     VeiculoOutputDTO findById(UUID id, Usuario proprietario);
-    
-    /* Authorize */
-    void authorizeUser(Veiculo veiculo, Usuario proprietario);
 }

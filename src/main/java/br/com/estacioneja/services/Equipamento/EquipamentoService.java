@@ -2,7 +2,9 @@ package br.com.estacioneja.services.Equipamento;
 
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
@@ -19,21 +21,15 @@ import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.usecases.interfaces.IEquipamento;
 
 @Service
+@RequiredArgsConstructor
 public class EquipamentoService implements IEquipamento {
     private final EquipamentoRepository equipamentoRepository;
     private final ConexaoService conexaoService;
     private final EstacionamentoService estacionamentoService;
     private final EquipamentoMapper equipamentoMapper;
 
-    public EquipamentoService(EquipamentoRepository equipamentoRepository, ConexaoService conexaoService, EstacionamentoService estacionamentoService, EquipamentoMapper equipamentoMapper) {
-        this.equipamentoRepository = equipamentoRepository;
-        this.conexaoService = conexaoService;
-        this.estacionamentoService = estacionamentoService;
-        this.equipamentoMapper = equipamentoMapper;
-    }
-
     /* TRANSACOES */
-    @Override
+    @Override @Transactional
     public EquipamentoOutputDTO create(EquipamentoDTO dto) {
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
         ConexaoOutputDTO conexaoCriada = conexaoService.create(dto.conexao());
@@ -44,7 +40,7 @@ public class EquipamentoService implements IEquipamento {
 
         return equipamentoMapper.toDto(equipamentoRepository.save(equipamento));
     }
-    @Override
+    @Override @Transactional
     public void update(UUID id, EquipamentoUpdateDto dto) {
         Equipamento equipamento = findEntityById(id);
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
@@ -61,7 +57,7 @@ public class EquipamentoService implements IEquipamento {
 
         equipamentoRepository.save(equipamento);
     }
-    @Override
+    @Override @Transactional
     public void delete(UUID id) {
         Equipamento equipamento = findEntityById(id);
 
@@ -70,11 +66,11 @@ public class EquipamentoService implements IEquipamento {
     }
 
     /* CONSULTAS */
-    @Override
+    @Override @Transactional(readOnly = true)
     public Equipamento findEntityById(UUID id) {
         return equipamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
     }
-    @Override
+    @Override @Transactional(readOnly = true)
     public EquipamentoOutputDTO findById(UUID id) {
         return equipamentoMapper.toDto(findEntityById(id));
     }

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,40 +19,45 @@ import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
 import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
 import br.com.estacioneja.services.Equipamento.EquipamentoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/v1/equipamentos")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 public class EquipamentosController {
     private final EquipamentoService equipamentoService;
 
-    public EquipamentosController(EquipamentoService equipamentoService) {
-        this.equipamentoService = equipamentoService;
-    }
-    
     @GetMapping("/{id}")
     public ResponseEntity<EquipamentoOutputDTO> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(equipamentoService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<EquipamentoOutputDTO> criar(@RequestBody EquipamentoDTO dto) {
+    public ResponseEntity<EquipamentoOutputDTO> criar(@Valid @RequestBody EquipamentoDTO dto) {
         EquipamentoOutputDTO criado = equipamentoService.create(dto);
-        URI location = URI.create(String.format("/api/v1/equipamentos/%s", criado.id()));
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(criado.id())
+                .toUri();
         return ResponseEntity.created(location).body(criado);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @RequestBody EquipamentoUpdateDto dto) {
+    public ResponseEntity<Void> atualizar(
+            @PathVariable UUID id,
+  
+            @Valid @RequestBody EquipamentoUpdateDto dto) {
         equipamentoService.update(id, dto);
-
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         equipamentoService.delete(id);
-        
         return ResponseEntity.noContent().build();
     }
 }
