@@ -1,18 +1,25 @@
 package br.com.estacioneja.infra.config.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
+import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
 
-@Mapper(componentModel = "spring")
-public interface EnderecoMapper {
-    EnderecoOutputDTO toDto(Endereco endereco);
-    List<EnderecoOutputDTO> toDtoList(List<Endereco> enderecos);
+@Component
+public class EnderecoMapper extends AbstractMapper<Endereco, EnderecoOutputDTO> {
 
-    Endereco toEntity(EnderecoOutputDTO dto);
-    List<Endereco> toEntityList(List<EnderecoOutputDTO> dtoList);
+    @Override
+    public EnderecoOutputDTO toDto(Endereco endereco) {
+        if (endereco == null) return null;
+        return new EnderecoOutputDTO(
+                endereco.getId(),
+                endereco.getLogradouro(),
+                endereco.getBairro(),
+                endereco.getCidade(),
+                endereco.getUf(),
+                endereco.getCep(),
+                endereco.getLatitude(),
+                endereco.getLongitude()
+        );
+    }
 }

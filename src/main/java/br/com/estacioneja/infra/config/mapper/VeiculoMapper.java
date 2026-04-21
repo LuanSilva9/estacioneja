@@ -1,15 +1,28 @@
 package br.com.estacioneja.infra.config.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
+import lombok.RequiredArgsConstructor;
 
-@Mapper(componentModel = "spring")
-public interface VeiculoMapper {
-    VeiculoOutputDTO toDto(Veiculo veiculo);
+@Component
+@RequiredArgsConstructor
+public class VeiculoMapper extends AbstractMapper<Veiculo, VeiculoOutputDTO> {
 
-    List<VeiculoOutputDTO> toDtoList(List<Veiculo> veiculos);
+    private final UsuarioMapper usuarioMapper;
+
+    @Override
+    public VeiculoOutputDTO toDto(Veiculo veiculo) {
+        if (veiculo == null) return null;
+        return new VeiculoOutputDTO(
+                veiculo.getId(),
+                veiculo.getPlaca(),
+                veiculo.getModelo(),
+                veiculo.getCor(),
+                veiculo.getTipoVeiculo(),
+                veiculo.getObservacao(),
+                usuarioMapper.toDto(veiculo.getUsuario())
+        );
+    }
 }

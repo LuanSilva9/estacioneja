@@ -1,15 +1,22 @@
 package br.com.estacioneja.infra.config.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
 
-@Mapper(componentModel = "spring")
-public interface ConexaoMapper {
-    ConexaoOutputDTO toDto(Conexao conexao);
+@Component
+public class ConexaoMapper extends AbstractMapper<Conexao, ConexaoOutputDTO> {
 
-    List<ConexaoOutputDTO> toDtoList(List<Conexao> conexoes);
+    @Override
+    public ConexaoOutputDTO toDto(Conexao conexao) {
+        if (conexao == null) return null;
+        return new ConexaoOutputDTO(
+                conexao.getId(),
+                conexao.getTipoComunicacao(),
+                conexao.getTipoProtocolo(),
+                conexao.getEndereco(),
+                conexao.getPorta()
+        );
+    }
 }

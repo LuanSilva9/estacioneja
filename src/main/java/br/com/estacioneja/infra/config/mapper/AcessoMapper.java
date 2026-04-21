@@ -1,15 +1,26 @@
 package br.com.estacioneja.infra.config.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import lombok.RequiredArgsConstructor;
 
-@Mapper(componentModel = "spring", uses = { UsuarioMapper.class, EmpresaMapper.class })
-public interface AcessoMapper {
-    AcessoOutputDTO toDto(Acesso acesso);
+@Component
+@RequiredArgsConstructor
+public class AcessoMapper extends AbstractMapper<Acesso, AcessoOutputDTO> {
 
-    List<AcessoOutputDTO> toDtoList(List<Acesso> accessos);
+    private final UsuarioMapper usuarioMapper;
+    private final EmpresaMapper empresaMapper;
+
+    @Override
+    public AcessoOutputDTO toDto(Acesso acesso) {
+        if (acesso == null) return null;
+        return new AcessoOutputDTO(
+                acesso.getId(),
+                acesso.getTipoAcesso(),
+                usuarioMapper.toDto(acesso.getUsuario()),
+                empresaMapper.toDto(acesso.getEmpresa())
+        );
+    }
 }
