@@ -17,7 +17,8 @@ public class UsuarioMapper extends AbstractMapper<Usuario, UsuarioOutputDTO> {
                 usuario.getCpf(),
                 usuario.getTelefone(),
                 usuario.getEmail(),
-                usuario.getTipoUsuario()
+                usuario.getTipoUsuario(),
+                usuario.getFotoPerfilKey() != null && !usuario.getFotoPerfilKey().isBlank()
         );
     }
 }

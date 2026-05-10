@@ -59,6 +59,9 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
 
+    @Column(name = "foto_perfil_key", length = 512)
+    private String fotoPerfilKey;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-veiculo-usuario")
     private List<Veiculo> veiculos;
