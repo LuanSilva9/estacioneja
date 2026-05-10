@@ -1,11 +1,13 @@
 package br.com.estacioneja.services.Equipamento;
 
+import java.util.List;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.estacioneja.domain.enums.TipoEquipamento;
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
@@ -14,6 +16,7 @@ import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
 import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
+import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
 import br.com.estacioneja.services.Conexao.ConexaoService;
@@ -31,7 +34,10 @@ public class EquipamentoService implements IEquipamento {
     /* TRANSACOES */
     @Override @Transactional
     public EquipamentoOutputDTO create(EquipamentoDTO dto) {
+        verificarDuplicidade(dto.tipoEquipamento(), dto.estacionamentoId());
+
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
+
         ConexaoOutputDTO conexaoCriada = conexaoService.create(dto.conexao());
 
         Conexao conexao = conexaoService.findEntityById(conexaoCriada.id());
@@ -73,5 +79,21 @@ public class EquipamentoService implements IEquipamento {
     @Override @Transactional(readOnly = true)
     public EquipamentoOutputDTO findById(UUID id) {
         return equipamentoMapper.toDto(findEntityById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<EquipamentoOutputDTO> findByEmpresa(UUID empresaId) {        
+        List<Equipamento> equipamentos = equipamentoRepository.findByEmpresa(empresaId);
+        
+        return equipamentoMapper.toDtoList(equipamentos);
+    }
+
+
+    /* VALIDACOES */
+
+    private void verificarDuplicidade(TipoEquipamento tipoEquipamento, UUID estacionamentoId) {        
+        if(equipamentoRepository.countEquipamentosWhereTipoAndEstacionamento(tipoEquipamento, estacionamentoId) > 0) {
+            throw new DuplicateException("Já existe um equipamento para essas configurações!");
+        }
     }
 }

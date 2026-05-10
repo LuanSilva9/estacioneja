@@ -1,6 +1,7 @@
 package br.com.estacioneja.controller.Equipamentos;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,6 @@ import br.com.estacioneja.services.Equipamento.EquipamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("/api/v1/equipamentos")
 @PreAuthorize("hasRole('ADMIN')")
@@ -34,6 +34,12 @@ public class EquipamentosController {
     public ResponseEntity<EquipamentoOutputDTO> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(equipamentoService.findById(id));
     }
+
+    @GetMapping("/empresa/{empresaId}")
+    public ResponseEntity<List<EquipamentoOutputDTO>> listarPorEmpresa(@PathVariable UUID empresaId) {
+        return ResponseEntity.ok(equipamentoService.findByEmpresa(empresaId));
+    }
+    
 
     @PostMapping
     public ResponseEntity<EquipamentoOutputDTO> criar(@Valid @RequestBody EquipamentoDTO dto) {
