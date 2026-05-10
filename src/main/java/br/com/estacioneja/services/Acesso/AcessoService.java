@@ -7,13 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
+import br.com.estacioneja.domain.model.Acesso.Actor;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.update.AcessoUpdateDto;
+import br.com.estacioneja.exceptions.custom.BusinessException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
@@ -30,15 +33,28 @@ public class AcessoService implements IAcesso {
 
     /* TRANSACOES */
 
-    @Override @Transactional
-    public AcessoOutputDTO create(AcessoDTO dto, UUID empresaId)  {
+    @Override
+    @Transactional
+    public AcessoOutputDTO create(Actor actor, AcessoDTO dto, UUID empresaId) {
+
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
+
+        if (!actor.isSistema()) {
+            if (usuario.getId().equals(actor.getUsuarioId())) {
+                throw new BusinessException("Você não pode criar suas próprias permissões!");
+            }
+        }
+
+        if(usuario.getTipoUsuario() == TipoUsuario.COMUM) {
+            throw new BusinessException("Usuário beneficiado deve ser administrativo.");
+        }
+
         Empresa empresa = empresaService.findEntityById(empresaId);
 
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
 
         return acessoMapper.toDto(acessoRepository.save(newAcesso));
-    }  
+    } 
 
     @Override @Transactional
     public void update(UUID id, AcessoUpdateDto dto) {

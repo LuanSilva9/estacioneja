@@ -6,11 +6,13 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.com.estacioneja.domain.model.Acesso.Actor;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
@@ -41,8 +43,10 @@ public class EmpresaAcessoController {
     }
 
     @PostMapping
-    public ResponseEntity<AcessoOutputDTO> criar(@PathVariable UUID empresaId, @Valid @RequestBody AcessoDTO dto) {
-        AcessoOutputDTO acesso = acessoService.create(dto, empresaId);
+    public ResponseEntity<AcessoOutputDTO> criar(Authentication auth, @PathVariable UUID empresaId, @Valid @RequestBody AcessoDTO dto) {
+        Usuario usuarioResponsavel = (Usuario) auth.getPrincipal();
+
+        AcessoOutputDTO acesso = acessoService.create(Actor.usuario(usuarioResponsavel.getId()), dto, empresaId);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

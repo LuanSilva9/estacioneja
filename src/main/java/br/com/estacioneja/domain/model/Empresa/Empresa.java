@@ -67,6 +67,12 @@ public class Empresa {
     @Column(unique = true)
     private String cnpj;
 
+    @Column(name = "logotipo_empresa", length = 512)
+    private String logotipoEmpresa;
+
+    @Column(name = "banner_empresa", length = 512)
+    private String bannerEmpresa;
+
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("relacao-empresa-estacionamento")
     private List<Estacionamento> estacionamento;
