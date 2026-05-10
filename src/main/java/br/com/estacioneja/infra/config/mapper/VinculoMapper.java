@@ -11,12 +11,14 @@ import lombok.RequiredArgsConstructor;
 public class VinculoMapper extends AbstractMapper<Vinculo, VinculoOutputDTO> {
 
     private final EstacionamentoMapper estacionamentoMapper;
+    private final VeiculoMapper veiculoMapper;
 
     @Override
     public VinculoOutputDTO toDto(Vinculo vinculo) {
         if (vinculo == null) return null;
         return new VinculoOutputDTO(
                 vinculo.getId(),
+                veiculoMapper.toDto(vinculo.getVeiculo()),
                 estacionamentoMapper.toDto(vinculo.getEstacionamento())
         );
     }

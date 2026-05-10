@@ -19,4 +19,5 @@ public interface IVinculo {
     /* Consultas */
     Vinculo findEntityById(UUID id);
     VinculoOutputDTO findById(UUID id);
+    List<VinculoOutputDTO> findVincleByEmpresa(UUID empresaId);
 }

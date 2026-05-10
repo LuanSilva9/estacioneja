@@ -38,11 +38,18 @@ public class VinculoController {
         return ResponseEntity.ok(vinculoService.findVincleByUser(user));
     }
 
+    @GetMapping("/empresa/{empresaId}")
+    public ResponseEntity<List<VinculoOutputDTO>> listarPorEmpresa(@PathVariable UUID empresaId) {
+        List<VinculoOutputDTO> vinculos = vinculoService.findVincleByEmpresa(empresaId);
+        
+        return ResponseEntity.ok(vinculos);
+    }
+    
+
    
     @GetMapping("/estacionamento/{estacionamentoId}")
-    public ResponseEntity<Boolean> verificaVinculo(@PathVariable UUID estacionamentoId, @RequestParam String placa) {
-        Boolean response = vinculoService.existsVinculo(placa, estacionamentoId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<VinculoOutputDTO> verificaVinculoERetorna(@PathVariable UUID estacionamentoId, @RequestParam String placa) {
+        return ResponseEntity.ok(vinculoService.findVincleByPlacaAndEstacionamentoId(placa, estacionamentoId));
     }
 
     @PostMapping
