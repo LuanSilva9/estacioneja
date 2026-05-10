@@ -82,6 +82,17 @@ public class VinculoService implements IVinculo {
     public List<VinculoOutputDTO> findVincleByUser(Usuario usuario) {
         return vinculoMapper.toDtoList(vinculoRepository.findAllByUsuario(usuario));
     }
+
+    @Override
+    public List<VinculoOutputDTO> findVincleByEmpresa(UUID empresaId) {
+        return vinculoMapper.toDtoList(vinculoRepository.findByEmpresaId(empresaId));
+    }
+
+    public VinculoOutputDTO findVincleByPlacaAndEstacionamentoId(String placa, UUID estacionamentoId) {
+        Vinculo vinculo = vinculoRepository.findByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa).orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
+        
+        return vinculoMapper.toDto(vinculo);
+    }
     
     /* VALIDAÇÕES */
     

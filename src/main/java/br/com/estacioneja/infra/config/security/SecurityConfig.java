@@ -19,9 +19,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final InternalSignatureAuthenticationFilter internalSignatureAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, InternalSignatureAuthenticationFilter internalSignatureAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.internalSignatureAuthenticationFilter = internalSignatureAuthenticationFilter;
     }
 
     @Bean
@@ -31,9 +33,10 @@ public class SecurityConfig {
                 .csrf(crsf -> crsf.disable())
                 .sessionManagement(sf -> sf.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/api/v1/auth/**").permitAll();
+                    req.requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/api/v1/auth/**", "/api/v1/planos").permitAll();
                     req.anyRequest().authenticated();
                 })
+                .addFilterBefore(internalSignatureAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
