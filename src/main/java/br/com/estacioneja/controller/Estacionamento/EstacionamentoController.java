@@ -35,7 +35,7 @@ public class EstacionamentoController {
 
     private final EstacionamentoService estacionamentoService;
 
-    @PreAuthorize("authenticated()")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<EstacionamentoOutputDTO> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(estacionamentoService.findById(id));

@@ -45,6 +45,7 @@ public class  Estacionamento {
 
     private String descricao;
 
+    @Enumerated(EnumType.STRING)
     private Privacidade privacidade;
 
     @ElementCollection
