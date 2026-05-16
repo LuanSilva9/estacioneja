@@ -1,15 +1,24 @@
 package br.com.estacioneja.infra.config.mapper;
 
-import java.util.List;
+import org.springframework.stereotype.Component;
 
-import org.mapstruct.Mapper;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 
-@Mapper(componentModel = "spring")
-public interface UsuarioMapper {
-    UsuarioOutputDTO toDto(Usuario usuario);
+@Component
+public class UsuarioMapper extends AbstractMapper<Usuario, UsuarioOutputDTO> {
 
-    List<UsuarioOutputDTO> toDtoList(List<Usuario> usuarios);
-
+    @Override
+    public UsuarioOutputDTO toDto(Usuario usuario) {
+        if (usuario == null) return null;
+        return new UsuarioOutputDTO(
+                usuario.getId(),
+                usuario.getName(),
+                usuario.getCpf(),
+                usuario.getTelefone(),
+                usuario.getEmail(),
+                usuario.getTipoUsuario(),
+                usuario.getFotoPerfilKey() != null && !usuario.getFotoPerfilKey().isBlank()
+        );
+    }
 }

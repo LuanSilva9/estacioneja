@@ -1,7 +1,10 @@
 package br.com.estacioneja.dto.output;
 
-import br.com.estacioneja.domain.model.Empresa.TipoEmpresa;
+import java.util.UUID;
 
-public record EmpresaOutputDTO(Long id, String nome, String endereco, TipoEmpresa tipoEmpresa, String cnpj, String prefixo, UsuarioOutputDTO representante) {
+import br.com.estacioneja.domain.enums.Plano;
+import br.com.estacioneja.domain.enums.TipoEmpresa;
+
+public record EmpresaOutputDTO(UUID id, String nome, TipoEmpresa tipoEmpresa, UsuarioOutputDTO representante, String cnpj, String prefixo, Plano plano, EnderecoOutputDTO endereco) {
     
 }

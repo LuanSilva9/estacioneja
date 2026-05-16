@@ -3,58 +3,66 @@ package br.com.estacioneja.services.Acesso;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.context.event.EventListener;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import br.com.estacioneja.domain.events.EmpresaCriada.EmpresaCriadaEvent;
+import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
-import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
+import br.com.estacioneja.domain.model.Acesso.Actor;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.exceptions.custom.AccessNotFoundException;
+import br.com.estacioneja.dto.update.AcessoUpdateDto;
+import br.com.estacioneja.exceptions.custom.BusinessException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IAcesso;
-import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AcessoService implements IAcesso {
     private final AcessoRepository acessoRepository;
     private final UsuarioService usuarioService;
     private final EmpresaService empresaService;
     private final AcessoMapper acessoMapper;
 
-    public AcessoService(AcessoRepository acessoRepository, UsuarioService usuarioService, EmpresaService empresaService, AcessoMapper acessoMapper) {
-        this.acessoRepository = acessoRepository;
-        this.usuarioService = usuarioService;
-        this.empresaService = empresaService;
-        this.acessoMapper = acessoMapper;
-    }
-
     /* TRANSACOES */
 
+    @Override
     @Transactional
-    public AcessoOutputDTO create(AcessoDTO dto)  {
+    public AcessoOutputDTO create(Actor actor, AcessoDTO dto, UUID empresaId) {
+
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
-        Empresa empresa = empresaService.findEntityById(dto.empresaId());
+
+        if (!actor.isSistema()) {
+            if (usuario.getId().equals(actor.getUsuarioId())) {
+                throw new BusinessException("Você não pode criar suas próprias permissões!");
+            }
+        }
+
+        if(usuario.getTipoUsuario() == TipoUsuario.COMUM) {
+            throw new BusinessException("Usuário beneficiado deve ser administrativo.");
+        }
+
+        Empresa empresa = empresaService.findEntityById(empresaId);
 
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
 
         return acessoMapper.toDto(acessoRepository.save(newAcesso));
-    }  
+    } 
 
     @Override @Transactional
-    public AcessoOutputDTO update(UUID id, AcessoDTO dto) {
+    public void update(UUID id, AcessoUpdateDto dto) {
         Acesso acesso = findEntityById(id);
 
         acesso.setTipoAcesso(dto.tipoAcesso());
-
-        return acessoMapper.toDto(acessoRepository.save(acesso));
+        
+        acessoRepository.save(acesso);
     }
 
     @Override @Transactional
@@ -62,41 +70,41 @@ public class AcessoService implements IAcesso {
         acessoRepository.deleteById(id);
     }
 
-    @EventListener
-    public void handleEventEmpresaCriada(EmpresaCriadaEvent empresaCriadaEvent) {
-        create(new AcessoDTO(TipoAcesso.MASTER, empresaCriadaEvent.representanteId(), empresaCriadaEvent.empresaId()));
-    }
-
     /* CONSULTAS */
 
-    @Override
+    @Override @Transactional(readOnly = true)
     public Acesso findEntityById(UUID id) {
-        return acessoRepository.findById(id).orElseThrow(AccessNotFoundException::new);
+        return acessoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Acesso não encontrado"));
     }
 
-    @Override @Transactional
+    @Override @Transactional(readOnly = true)
     public AcessoOutputDTO findById(UUID id) {
         return acessoMapper.toDto(findEntityById(id));
     }
 
-    @Override
-    public List<AcessoOutputDTO> findAccessByCompany(Long empresaId) {
+    @Override @Transactional(readOnly = true)
+    public List<AcessoOutputDTO> findAccessByEmpresa(UUID empresaId) {
         Empresa empresa = empresaService.findEntityById(empresaId);
 
         return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
     }
 
-    @Override
-    public Acesso findAccessByUserAndCompany(Usuario usuario, Empresa empresa) {
-        Acesso acesso = this.acessoRepository.findByUsuarioAndEmpresa(usuario, empresa);
-
-        if(acesso == null) throw new AccessNotFoundException();
-
-        return acesso;
+    @Override @Transactional(readOnly = true)
+    public List<AcessoOutputDTO> findAccessByUser(Usuario usuario) {
+        return acessoMapper.toDtoList(this.acessoRepository.findAllByUsuario(usuario));
     }
 
-    @Override
-    public List<UsuarioOutputDTO> findAllUsersByEmpresa(Long empresaId) {
-        return this.usuarioService.toDtoList(this.acessoRepository.findAllUsersByEmpresa(empresaId));
+ 
+    @Override @Transactional(readOnly = true)
+    public AcessoOutputDTO findAccessByUserAndEmpresaId(Usuario usuario, UUID empresaId) {
+        Empresa empresa = empresaService.findEntityById(empresaId);
+
+        return  acessoMapper.toDto(acessoRepository.findByUsuarioAndEmpresa(usuario, empresa));
     }
+
+    @Override @Transactional(readOnly = true)
+    public List<Usuario> findAllUsersByEmpresa(UUID empresaId) {
+        return this.acessoRepository.findAllUsersByEmpresa(empresaId);
+    }
+
 }

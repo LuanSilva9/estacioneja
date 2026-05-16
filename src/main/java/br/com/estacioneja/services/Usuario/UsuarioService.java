@@ -1,86 +1,201 @@
 package br.com.estacioneja.services.Usuario;
 
-import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
 import br.com.estacioneja.dto.input.UsuarioDTO;
+import br.com.estacioneja.dto.output.URLImagemOutputDTO;
 import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.exceptions.custom.DuplicateUserException;
-import br.com.estacioneja.exceptions.custom.UserNotFoundException;
+import br.com.estacioneja.dto.update.UsuarioUpdateDto;
+import br.com.estacioneja.exceptions.custom.BusinessException;
+import br.com.estacioneja.exceptions.custom.DuplicateException;
+import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.exceptions.custom.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
+import br.com.estacioneja.services.Storage.R2StorageService;
 import br.com.estacioneja.usecases.interfaces.IUsuario;
-import jakarta.transaction.Transactional;
+
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService implements IUsuario {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final R2StorageService r2StorageService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
-        this.usuarioRepository = usuarioRepository;
-        this.usuarioMapper = usuarioMapper;
-    }
+    private static final long MAX_FOTO_SIZE_BYTES = 5L * 1024 * 1024;
+    private static final Set<String> CONTENT_TYPES_PERMITIDOS = Set.of(
+            "image/jpeg", "image/png", "image/webp"
+    );
+    private static final Duration FOTO_PERFIL_URL_TTL = Duration.ofMinutes(10);
 
     /* TRANSACOES */
 
     @Override @Transactional
     public UsuarioOutputDTO create(UsuarioDTO dto) {
-        existsEmailOrCpf(dto.email(), dto.cpf());
+        if(isEmailInUse(dto.email(), null))
+            throw new DuplicateException("Email já está sendo Usado");
 
-        Usuario newUsuario = new Usuario(dto);
+        if(isCpfInUse(dto.cpf(), null))
+            throw new DuplicateException("CPF já está sendo Usado");
+
+        Usuario newUsuario = new Usuario(dto.name(), dto.email(), dto.cpf(), dto.telefone(), dto.tipoUsuario());
+
+        newUsuario.setSenha(passwordEncoder.encode(dto.senha()));
 
         this.usuarioRepository.save(newUsuario);
 
         return usuarioMapper.toDto(newUsuario);
     }
 
-    @Override @Transactional 
-    public UsuarioOutputDTO update(Long id, UsuarioDTO dto) {
-        // existsEmailOrCpf(dto.email(), dto.cpf());
-
+    @Override @Transactional
+    public void update(UUID id, UsuarioUpdateDto dto) {
         Usuario usuario = findEntityById(id);
 
-        usuario.setName(dto.name());
-        usuario.setCpf(dto.cpf());
-        usuario.setEmail(dto.email());
+        if(isEmailInUse(dto.email(), id))
+            throw new DuplicateException("Email já está sendo usado");
+        if(isCpfInUse(dto.cpf(), id))
+            throw new DuplicateException("CPF já está sendo usado");
 
-        return usuarioMapper.toDto(usuarioRepository.save(usuario));
+
+        usuario.updateData(dto.name(), dto.telefone(), dto.cpf(), dto.email());
     }
 
+
     @Override @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         Usuario usuario = findEntityById(id);
 
+        String fotoKey = usuario.getFotoPerfilKey();
         usuarioRepository.delete(usuario);
+
+        if (fotoKey != null && !fotoKey.isBlank()) {
+            r2StorageService.delete(fotoKey);
+        }
     }
 
     /* CONSULTAS */
 
-    @Override
-    public UsuarioOutputDTO findById(Long id) {
+    @Override @Transactional(readOnly=true)
+    public UsuarioOutputDTO findById(UUID id) {
         return usuarioMapper.toDto(findEntityById(id));
     }
 
-    @Override
-    public Usuario findEntityById(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    @Override @Transactional(readOnly = true)
+    public Usuario findEntityById(UUID id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
     }
 
-    @Override
-    public void existsEmailOrCpf(String email, String cpf) {
-        if(this.usuarioRepository.existsByCpf(cpf) || this.usuarioRepository.existsByEmail(email)) throw new DuplicateUserException();
+    @Override @Transactional(readOnly = true)
+    public UsuarioOutputDTO findByEmail(String email) {
+        Usuario usuarioEncontrado =  usuarioRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
+
+        return usuarioMapper.toDto(usuarioEncontrado);
     }
 
-    /* Mappers */
+    /* FOTO DE PERFIL */
 
-    public UsuarioOutputDTO toDto(Usuario usuario) {
-        return usuarioMapper.toDto(usuario);
+    @Override @Transactional
+    public URLImagemOutputDTO uploadFotoPerfil(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+        Usuario usuario = findEntityById(id);
+        ensureCanManagePhoto(usuario, usuarioAutenticado);
+        validarArquivoImagem(file);
+
+        String extensao = resolverExtensao(file.getContentType());
+        String novaKey = "usuarios/%s/perfil/%s.%s".formatted(usuario.getId(), UUID.randomUUID(), extensao);
+        String keyAntiga = usuario.getFotoPerfilKey();
+
+        r2StorageService.upload(novaKey, file);
+
+        try {
+            usuario.setFotoPerfilKey(novaKey);
+            usuarioRepository.save(usuario);
+        } catch (RuntimeException ex) {
+            r2StorageService.delete(novaKey);
+            throw ex;
+        }
+
+        if (keyAntiga != null && !keyAntiga.isBlank() && !keyAntiga.equals(novaKey)) {
+            r2StorageService.delete(keyAntiga);
+        }
+
+        String url = r2StorageService.generatePresignedUrl(novaKey, FOTO_PERFIL_URL_TTL);
+        return new URLImagemOutputDTO(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
     }
 
-    public List<UsuarioOutputDTO> toDtoList(List<Usuario> usuarios) {
-        return usuarioMapper.toDtoList(usuarios);
+    @Override @Transactional(readOnly = true)
+    public URLImagemOutputDTO getFotoPerfil(UUID id) {
+        Usuario usuario = findEntityById(id);
+        String key = usuario.getFotoPerfilKey();
+
+        if (key == null || key.isBlank()) {
+            return new URLImagemOutputDTO(null, null);
+        }
+
+        String url = r2StorageService.generatePresignedUrl(key, FOTO_PERFIL_URL_TTL);
+        return new URLImagemOutputDTO(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
+    }
+
+    @Override @Transactional
+    public void deleteFotoPerfil(UUID id, Usuario usuarioAutenticado) {
+        Usuario usuario = findEntityById(id);
+        ensureCanManagePhoto(usuario, usuarioAutenticado);
+
+        String key = usuario.getFotoPerfilKey();
+        if (key == null || key.isBlank()) return;
+
+        usuario.setFotoPerfilKey(null);
+        usuarioRepository.save(usuario);
+
+        r2StorageService.delete(key);
+    }
+
+    /* VALIDAÇÕES */
+
+    private void ensureCanManagePhoto(Usuario alvo, Usuario autenticado) {
+        if (autenticado == null || !alvo.getId().equals(autenticado.getId())) {
+            throw new ForbiddenException("Você não tem permissão para alterar a foto deste usuário");
+        }
+    }
+
+    private void validarArquivoImagem(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException("Arquivo de imagem é obrigatório");
+        }
+        if (file.getSize() > MAX_FOTO_SIZE_BYTES) {
+            throw new BusinessException("Arquivo excede o tamanho máximo de 5MB");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !CONTENT_TYPES_PERMITIDOS.contains(contentType.toLowerCase())) {
+            throw new BusinessException("Formato inválido. Use JPEG, PNG ou WEBP");
+        }
+    }
+
+    private String resolverExtensao(String contentType) {
+        return switch (contentType.toLowerCase()) {
+            case "image/jpeg" -> "jpg";
+            case "image/png" -> "png";
+            case "image/webp" -> "webp";
+            default -> throw new BusinessException("Formato inválido. Use JPEG, PNG ou WEBP");
+        };
+    }
+
+    private boolean isEmailInUse(String email, UUID id) {
+        return (id == null) ? usuarioRepository.existsByEmail(email) : usuarioRepository.existsByEmailAndIdNot(email, id);
+    }
+
+    private boolean isCpfInUse(String cpf, UUID id) {
+        return (id == null) ? usuarioRepository.existsByCpf(cpf) : usuarioRepository.existsByCpfAndIdNot(cpf, id);
     }
 }

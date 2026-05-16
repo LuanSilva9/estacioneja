@@ -2,8 +2,9 @@ package br.com.estacioneja.dto.output;
 
 import java.util.UUID;
 
-import br.com.estacioneja.domain.model.Estacionamento.StatusEstacionamento;
+import br.com.estacioneja.domain.enums.Privacidade;
 
-public record EstacionamentoOutputDTO(UUID id, StatusEstacionamento statusEstacionamento, Long capacidade, String prefixo, EmpresaOutputDTO empresa) {
+
+public record EstacionamentoOutputDTO(UUID id, String descricao, Privacidade privacidade, Long capacidade, Long capacidadeDisponivel, EmpresaOutputDTO empresa) {
 
 }

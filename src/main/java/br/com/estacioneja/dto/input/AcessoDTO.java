@@ -1,7 +1,13 @@
 package br.com.estacioneja.dto.input;
 
-import br.com.estacioneja.domain.model.Acesso.TipoAcesso;
+import java.util.UUID;
 
-public record AcessoDTO(TipoAcesso tipoAcesso, Long usuarioId, Long empresaId) {
-    
+import br.com.estacioneja.domain.enums.TipoAcesso;
+import jakarta.validation.constraints.NotNull;
+
+public record AcessoDTO(
+    @NotNull(message = "Tipo de Acesso não pode estar vazio.") TipoAcesso tipoAcesso,
+    @NotNull(message = "ID do Usuário não pode estar vazio.") UUID usuarioId
+) {
+
 }

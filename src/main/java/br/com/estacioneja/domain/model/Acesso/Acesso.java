@@ -5,9 +5,12 @@ import java.util.UUID;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,6 +36,7 @@ public class Acesso {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     private TipoAcesso tipoAcesso;
 
     @ManyToOne
@@ -41,7 +45,7 @@ public class Acesso {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "empresaId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "empresaId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Empresa empresa;
 

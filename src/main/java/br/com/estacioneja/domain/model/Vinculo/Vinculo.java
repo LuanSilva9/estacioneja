@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,17 +33,23 @@ public class Vinculo {
     private UUID id;
 
     @ManyToOne
+    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
+    @JsonManagedReference("relacao-vinculo-estacionamento")
+    private Estacionamento estacionamento;
+
+    @ManyToOne
     @JoinColumn(name = "usuarioId", referencedColumnName = "id")
     @JsonManagedReference("relacao-vinculo-usuario")
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
-    @JsonManagedReference("relacao-vinculo-estacionamento")
-    private Estacionamento estacionamento;
+    @JoinColumn(name = "veiculoId", referencedColumnName = "id")
+    @JsonManagedReference("relacao-vinculo-veiculo")
+    private Veiculo veiculo;
 
-    public Vinculo(Usuario usuario, Estacionamento estacionamento) {
-        this.usuario = usuario;
+    public Vinculo(Estacionamento estacionamento, Usuario usuario, Veiculo veiculo) {
         this.estacionamento = estacionamento;
+        this.usuario = usuario;
+        this.veiculo = veiculo;
     }
 }

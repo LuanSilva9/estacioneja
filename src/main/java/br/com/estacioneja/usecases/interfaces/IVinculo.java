@@ -3,13 +3,21 @@ package br.com.estacioneja.usecases.interfaces;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.VinculoDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
-import br.com.estacioneja.usecases.adapter.IBase;
 
-public interface IVinculo extends IBase<Vinculo, UUID, VinculoDTO, VinculoOutputDTO> {
-    void createAll(List<UsuarioOutputDTO> usuarios, UUID estacionamentoId);
-    List<VinculoOutputDTO> findVincleByUserId(Long userId);
+public interface IVinculo {
+    List<VinculoOutputDTO> findVincleByUser(Usuario usuario);
+
+    // CRUD
+    VinculoOutputDTO create(VinculoDTO dto);
+    void update(UUID id, VinculoDTO dto);
+    void delete(UUID id);
+
+    /* Consultas */
+    Vinculo findEntityById(UUID id);
+    VinculoOutputDTO findById(UUID id);
+    List<VinculoOutputDTO> findVincleByEmpresa(UUID empresaId);
 }

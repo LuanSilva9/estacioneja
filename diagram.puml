@@ -1,0 +1,624 @@
+@startuml EstacioneJa_Architecture
+
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam groupInheritance 2
+
+skinparam class {
+  BackgroundColor<<Entity>>      #DDEEFF
+  BackgroundColor<<Service>>     #DDFFDD
+  BackgroundColor<<Controller>>  #FFE8CC
+  BackgroundColor<<Repository>>  #F5F5DC
+  BackgroundColor<<DTO>>         #FFEFEF
+  BackgroundColor<<Security>>    #EEE0FF
+  BackgroundColor<<Mapper>>      #FFFACD
+  BackgroundColor<<Exception>>   #FFD0D0
+  BackgroundColor<<Event>>       #E0FFE0
+  BackgroundColor<<Enum>>        #F0F0F0
+}
+
+' ─────────────────────────────────────────
+' ENUMS
+' ─────────────────────────────────────────
+package "br.com.estacioneja.domain.enums" {
+  enum Plano <<Enum>> { INICIAL; MEDIO; AVANCADO }
+  enum Privacidade <<Enum>> { PRIVADO; PUBLICO }
+  enum Situacao <<Enum>> { REJEITADO; APROVADO; PENDENTE }
+  enum TipoAcesso <<Enum>> { MASTER; AUDITORIA; GUARITA; EMBARCADO }
+  enum TipoEmpresa <<Enum>> { UNIVERSIDADE; COOPERATIVA; SHOPPING; SUPERMERCADOS; EMPRESA_DEFAULT }
+  enum TipoEquipamento <<Enum>> { ENTRADA_SAIDA; AUTENTICADOR }
+  enum TipoRegistro <<Enum>> { ENTRADA; SAIDA }
+  enum TipoUsuario <<Enum>> { COMUM; ADMINISTRATIVO }
+  enum TipoVeiculo <<Enum>> { CARRO; MOTO; ONIBUS; CAMINHAO; TRATOR }
+  enum TipoComunicacao <<Enum>> { WIFI; ETHERNET; SERIAL; BLUETOOTH; ZIGBEE; DRY_CONTACT }
+  enum TipoProtocolo <<Enum>> { MQTT; HTTP; HTTPS; MODBUS; RS485; WIEGAND; PROPRIETARIO }
+}
+
+' ─────────────────────────────────────────
+' ENTITIES
+' ─────────────────────────────────────────
+package "br.com.estacioneja.domain.model" {
+
+  class Usuario <<Entity>> {
+    @Entity @Table("usuarios")
+    --
+    + id : UUID
+    + name : String
+    + email : String
+    + senha : String
+    + cpf : String
+    + telefone : String
+    + tipoUsuario : TipoUsuario
+    --
+    + getAuthorities() : Collection<GrantedAuthority>
+    + getUsername() : String
+    + getPassword() : String
+  }
+
+  class Empresa <<Entity>> {
+    @Entity @Table("empresas")
+    --
+    + id : UUID
+    + nome : String
+    + tipoEmpresa : TipoEmpresa
+    + prefixo : String
+    + plano : Plano
+    + cnpj : String
+  }
+
+  class Estacionamento <<Entity>> {
+    @Entity @Table("estacionamentos")
+    --
+    + id : UUID
+    + descricao : String
+    + privacidade : Privacidade
+    + capacidade : Long
+    + capacidadeDisponivel : Long
+    + regraEstacionamento : List<TipoVeiculo>
+  }
+
+  class Veiculo <<Entity>> {
+    @Entity @Table("veiculos")
+    --
+    + id : UUID
+    + placa : String
+    + modelo : String
+    + cor : String
+    + tipoVeiculo : TipoVeiculo
+    + observacao : String
+  }
+
+  class Vinculo <<Entity>> {
+    @Entity @Table("vinculos")
+    --
+    + id : UUID
+  }
+
+  class Acesso <<Entity>> {
+    @Entity @Table("acessos")
+    --
+    + id : UUID
+    + tipoAcesso : TipoAcesso
+  }
+
+  class Equipamento <<Entity>> {
+    @Entity @Table("equipamentos")
+    --
+    + id : UUID
+    + nome : String
+    + descricao : String
+    + modelo : String
+    + tipoEquipamento : TipoEquipamento
+    + ativo : Boolean
+  }
+
+  class Conexao <<Entity>> {
+    @Entity @Table("conexoes_equipamentos")
+    --
+    + id : UUID
+    + tipoComunicacao : TipoComunicacao
+    + tipoProtocolo : TipoProtocolo
+    + endereco : String
+    + porta : Integer
+    + credenciais : String
+    + enderecoMac : String
+  }
+
+  class Endereco <<Entity>> {
+    @Entity @Table("enderecos")
+    --
+    + id : Long
+    + logradouro : String
+    + bairro : String
+    + cidade : String
+    + uf : String
+    + cep : String
+    + latitude : Double
+    + longitude : Double
+  }
+
+  class Registro <<Entity>> {
+    @Entity @Table("registro_entrada_saida")
+    --
+    + id : UUID
+    + tipoRegistro : TipoRegistro
+    + dataRegistro : LocalDateTime
+  }
+}
+
+' ─────────────────────────────────────────
+' ENTITY RELATIONSHIPS
+' ─────────────────────────────────────────
+Empresa "1" --> "0..1" Empresa : empresaPai\n@ManyToOne
+Empresa "1" *-- "0..*" Estacionamento : @OneToMany\ncascade+orphan
+Empresa "1" --> "1" Endereco : @ManyToOne
+Empresa "1" --> "1" Usuario : representante
+
+Usuario "1" *-- "0..*" Veiculo : @OneToMany
+Usuario "1" *-- "0..*" Vinculo : @OneToMany
+Usuario "1" *-- "0..*" Acesso : @OneToMany EAGER
+
+Estacionamento "1" *-- "0..*" Vinculo : @OneToMany
+Estacionamento "1" *-- "0..*" Equipamento : @OneToMany
+
+Vinculo "0..*" --> "1" Usuario : @ManyToOne
+Vinculo "0..*" --> "1" Veiculo : @ManyToOne
+Vinculo "0..*" --> "1" Estacionamento : @ManyToOne
+
+Acesso "0..*" --> "1" Usuario : @ManyToOne
+Acesso "0..*" --> "1" Empresa : @ManyToOne
+
+Equipamento "1" --> "1" Conexao : @OneToOne\n@JsonManagedRef
+Equipamento "0..*" --> "1" Estacionamento : @ManyToOne
+Conexao "1" --> "1" Equipamento : @OneToOne\nmappedBy\n@JsonBackRef
+
+Veiculo "0..*" --> "1" Usuario : @ManyToOne
+Veiculo "1" *-- "0..*" Vinculo : @OneToMany
+
+Registro "0..*" --> "1" Veiculo : @ManyToOne
+Registro "0..*" --> "1" Estacionamento : @ManyToOne
+
+Usuario ..|> "UserDetails" : implements
+
+' ─────────────────────────────────────────
+' REPOSITORIES
+' ─────────────────────────────────────────
+package "br.com.estacioneja.domain.repository" {
+
+  interface UsuarioRepository <<Repository>> {
+    findByEmail(email) : Optional<Usuario>
+    existsByEmailAndTipoUsuario(email, tipo) : Boolean
+    existsByCpfAndTipoUsuario(cpf, tipo) : Boolean
+    existsByEmailAndIdNot(email, id) : Boolean
+  }
+
+  interface EmpresaRepository <<Repository>> {
+  }
+
+  interface EstacionamentoRepository <<Repository>> {
+    findByPrivacidade(privacidade) : List<Estacionamento>
+    findAllByEmpresa(empresa) : List<Estacionamento>
+  }
+
+  interface AcessoRepository <<Repository>> {
+    findAllUsersByEmpresa(empresaId) : List<Usuario>
+    findAllByEmpresa(empresa) : List<Acesso>
+    findByUsuarioAndEmpresa(usuario, empresa) : Acesso
+    findAllByUsuario(usuario) : List<Acesso>
+  }
+
+  interface VeiculoRepository <<Repository>> {
+    findByUsuario(usuario) : List<Veiculo>
+    findByPlaca(placa) : Optional<Veiculo>
+  }
+
+  interface VinculoRepository <<Repository>> {
+    findAllByUsuario(usuario) : List<Vinculo>
+    existsByEstacionamentoAndVeiculo(est, vei) : Boolean
+  }
+
+  interface EquipamentoRepository <<Repository>> {
+  }
+
+  interface ConexaoRepository <<Repository>> {
+  }
+
+  interface EnderecoRepository <<Repository>> {
+  }
+
+  interface RegistroRepository <<Repository>> {
+    findByVeiculoAndEstacionamentoAndTipoRegistro(...) : Registro
+  }
+}
+
+UsuarioRepository --|> "JpaRepository<Usuario,UUID>"
+EmpresaRepository --|> "JpaRepository<Empresa,UUID>"
+EstacionamentoRepository --|> "JpaRepository<Estacionamento,UUID>"
+AcessoRepository --|> "JpaRepository<Acesso,UUID>"
+VeiculoRepository --|> "JpaRepository<Veiculo,UUID>"
+VinculoRepository --|> "JpaRepository<Vinculo,UUID>"
+EquipamentoRepository --|> "JpaRepository<Equipamento,UUID>"
+ConexaoRepository --|> "JpaRepository<Conexao,UUID>"
+EnderecoRepository --|> "JpaRepository<Endereco,Long>"
+RegistroRepository --|> "JpaRepository<Registro,UUID>"
+
+' ─────────────────────────────────────────
+' SERVICES
+' ─────────────────────────────────────────
+package "br.com.estacioneja.services" {
+
+  class UsuarioService <<Service>> {
+    @Service
+    --
+    + create(dto) : UsuarioOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : UsuarioOutputDTO
+    + findEntityById(id) : Usuario
+    + existsEmailOrCpf(email, cpf, tipo) : void
+  }
+
+  class EmpresaService <<Service>> {
+    @Service
+    --
+    + create(dto) : EmpresaOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : EmpresaOutputDTO
+    + findEntityById(id) : Empresa
+    + findAll() : List<EmpresaOutputDTO>
+  }
+
+  class EstacionamentoService <<Service>> {
+    @Service
+    --
+    + create(dto) : EstacionamentoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : EstacionamentoOutputDTO
+    + findEntityById(id) : Estacionamento
+    + findByPrivacidade(priv) : List<EstacionamentoOutputDTO>
+    + findByEmpresa(empresaId) : List<EstacionamentoOutputDTO>
+    + atualizarCapacidadeDisponivel(id, cap) : void
+  }
+
+  class AcessoService <<Service>> {
+    @Service
+    --
+    + create(dto, empresaId) : AcessoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : AcessoOutputDTO
+    + findEntityById(id) : Acesso
+    + findAccessByEmpresa(empresaId) : List<AcessoOutputDTO>
+    + findAccessByUser(usuario) : List<AcessoOutputDTO>
+    + handleEventEmpresaCriada(event) : void
+  }
+
+  class VeiculoService <<Service>> {
+    @Service
+    --
+    + create(dto, proprietario) : VeiculoOutputDTO
+    + update(id, dto, proprietario) : void
+    + delete(id, proprietario) : void
+    + findById(id, proprietario) : VeiculoOutputDTO
+    + findEntityById(id, proprietario) : Veiculo
+    + findByPlaca(placa) : Veiculo
+    + findByProprietarioId(id) : List<VeiculoOutputDTO>
+    + authorizeUser(veiculo, usuario) : void
+  }
+
+  class VinculoService <<Service>> {
+    @Service
+    --
+    + create(dto) : VinculoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : VinculoOutputDTO
+    + findEntityById(id) : Vinculo
+    + findVincleByUser(usuario) : List<VinculoOutputDTO>
+    + hasVincle(placa, estId) : Boolean
+    + existsByEstacionamentoAndVeiculo(...) : Boolean
+  }
+
+  class EquipamentoService <<Service>> {
+    @Service
+    --
+    + create(dto) : EquipamentoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : EquipamentoOutputDTO
+    + findEntityById(id) : Equipamento
+  }
+
+  class ConexaoService <<Service>> {
+    @Service
+    --
+    + create(dto) : ConexaoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : ConexaoOutputDTO
+    + findEntityById(id) : Conexao
+  }
+
+  class EnderecoService <<Service>> {
+    @Service
+    --
+    + create(dto) : EnderecoOutputDTO
+    + update(id, dto) : void
+    + delete(id) : void
+    + findById(id) : EnderecoOutputDTO
+    + findEntityById(id) : Endereco
+  }
+
+  class RegistroService <<Service>> {
+    @Service
+    --
+    + create(dto) : RegistroOutputDTO
+    + delete(id) : void
+    + registrarSaida(registro) : RegistroOutputDTO
+    + findById(id) : RegistroOutputDTO
+    + findEntityById(id) : Registro
+  }
+}
+
+' Service → Repository dependencies
+UsuarioService --> UsuarioRepository
+UsuarioService --> "UsuarioMapper"
+
+EmpresaService --> EmpresaRepository
+EmpresaService --> UsuarioService
+EmpresaService --> EnderecoService
+EmpresaService --> "ApplicationEventPublisher"
+EmpresaService --> "EmpresaMapper"
+
+EstacionamentoService --> EstacionamentoRepository
+EstacionamentoService --> EmpresaService
+EstacionamentoService --> "EstacionamentoMapper"
+
+AcessoService --> AcessoRepository
+AcessoService --> UsuarioService
+AcessoService --> EmpresaService
+AcessoService --> "AcessoMapper"
+
+VeiculoService --> VeiculoRepository
+VeiculoService --> UsuarioService
+VeiculoService --> "VeiculoMapper"
+
+VinculoService --> VinculoRepository
+VinculoService --> EstacionamentoService
+VinculoService --> VeiculoService
+VinculoService --> "VinculoMapper"
+
+EquipamentoService --> EquipamentoRepository
+EquipamentoService --> ConexaoService
+EquipamentoService --> EstacionamentoService
+EquipamentoService --> "EquipamentoMapper"
+
+ConexaoService --> ConexaoRepository
+ConexaoService --> "ConexaoMapper"
+
+EnderecoService --> EnderecoRepository
+EnderecoService --> "EnderecoMapper"
+
+RegistroService --> RegistroRepository
+RegistroService --> EstacionamentoService
+RegistroService --> VeiculoService
+RegistroService --> VinculoService
+RegistroService --> "RegistroMapper"
+
+' ─────────────────────────────────────────
+' CONTROLLERS
+' ─────────────────────────────────────────
+package "br.com.estacioneja.controller" {
+
+  class UsuarioController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/usuarios")
+    --
+    + GET  /{id}
+    + GET  /me
+    + GET  /my-workspaces  [ADMIN]
+    + POST /
+    + PUT  /{id}
+    + DELETE /{id}
+  }
+
+  class EmpresaController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/empresas")
+    @PreAuthorize("hasRole('ADMIN')")
+    --
+    + GET    /{id}
+    + POST   /
+    + PUT    /{id}
+    + DELETE /{id}
+    + GET    /{empresaId}/acessos
+    + GET    /{empresaId}/meu-acesso
+    + POST   /{empresaId}/acessos
+    + PUT    /{empresaId}/acessos/{id}
+    + DELETE /{empresaId}/acessos/{id}
+  }
+
+  class EstacionamentoController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/estacionamentos")
+    --
+    + GET    /{id}           [authenticated]
+    + GET    /empresa/{id}   [ADMIN]
+    + GET    /privacidade/{p}[authenticated]
+    + POST   /               [ADMIN]
+    + PUT    /{id}           [ADMIN]
+    + DELETE /{id}           [ADMIN]
+  }
+
+  class VeiculoController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/veiculos")
+    --
+    + GET    /{id}
+    + GET    /me    [authenticated]
+    + POST   /
+    + PUT    /{id}
+    + DELETE /{id}
+  }
+
+  class VinculoController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/vinculos")
+    --
+    + GET    /
+    + GET    /estacionamento/{id}?placa=X
+    + POST   /
+    + DELETE /{id}
+  }
+
+  class RegistroController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/registro")
+    @PreAuthorize("hasRole('ADMIN')")
+    --
+    + GET  /{id}
+    + POST /
+  }
+
+  class EquipamentosController <<Controller>> {
+    @RestController
+    @RequestMapping("/api/v1/equipamentos")
+    @PreAuthorize("hasRole('ADMIN')")
+    --
+    + GET    /{id}
+    + POST   /
+    + PUT    /{id}
+    + DELETE /{id}
+  }
+}
+
+' Controller → Service dependencies
+UsuarioController --> UsuarioService
+UsuarioController --> AcessoService
+
+EmpresaController --> EmpresaService
+EmpresaController --> AcessoService
+
+EstacionamentoController --> EstacionamentoService
+
+VeiculoController --> VeiculoService
+
+VinculoController --> VinculoService
+
+RegistroController --> RegistroService
+
+EquipamentosController --> EquipamentoService
+
+' ─────────────────────────────────────────
+' SECURITY
+' ─────────────────────────────────────────
+package "br.com.estacioneja.infra.config.security" {
+
+  class JwtService <<Security>> {
+    @Service
+    --
+    - SECRET : String
+    --
+    + generateToken(user) : String
+    + extractUsername(token) : String
+    + isTokenValid(token, user) : boolean
+    + isTokenExpired(token) : boolean
+  }
+
+  class AuthenticationService <<Security>> {
+    @Service
+    --
+    + loginAndReturnUser(email, senha) : Usuario
+  }
+
+  class CustomUserDetailsService <<Security>> {
+    @Service implements UserDetailsService
+    --
+    + loadUserByUsername(email) : UserDetails
+    + loadUserById(id) : UserDetails
+  }
+
+  class JwtAuthenticationFilter <<Security>> {
+    @Component extends OncePerRequestFilter
+    --
+    + doFilterInternal(...) : void
+  }
+
+  class CorsConfig <<Security>> {
+    @Configuration
+    --
+    + corsFilter() : CorsFilter
+  }
+}
+
+AuthenticationService --> UsuarioRepository
+CustomUserDetailsService --> UsuarioRepository
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> CustomUserDetailsService
+
+' ─────────────────────────────────────────
+' EVENTS
+' ─────────────────────────────────────────
+package "br.com.estacioneja.domain.events" {
+  class EmpresaCriadaEvent <<Event>> {
+    empresaId : UUID
+    representanteId : UUID
+  }
+  class FilialCriadaEvent <<Event>> {
+    filialId : UUID
+    representanteId : Long
+  }
+}
+
+EmpresaService ..> EmpresaCriadaEvent : publishes
+AcessoService ..> EmpresaCriadaEvent : @EventListener
+
+' ─────────────────────────────────────────
+' EXCEPTION HANDLING
+' ─────────────────────────────────────────
+package "br.com.estacioneja.exceptions" {
+
+  class RestExceptionHandler <<Exception>> {
+    @ControllerAdvice
+    --
+    + handleEntityNotFound()     → 404
+    + handleParkViolations()     → 400
+    + handleDuplicates()         → 409
+    + handleConnectionDown()     → 503
+    + handleCustomMessage()      → 303
+    + handleForbidden()          → 403
+  }
+
+  class EntityNotFoundException <<Exception>> { }
+  class DuplicateException <<Exception>> { }
+  class DuplicateCompanyException <<Exception>> { }
+  class DuplicatePlateException <<Exception>> { }
+  class ForbiddenException <<Exception>> { }
+  class ParkSizeViolatedException <<Exception>> { }
+  class ParkIsPrivateException <<Exception>> { }
+  class ConectionIsDownException <<Exception>> { }
+  class CustomMessageException <<Exception>> { }
+
+  EntityNotFoundException --|> RuntimeException
+  DuplicateException --|> RuntimeException
+  DuplicateCompanyException --|> RuntimeException
+  DuplicatePlateException --|> RuntimeException
+  ForbiddenException --|> RuntimeException
+  ParkSizeViolatedException --|> RuntimeException
+  ParkIsPrivateException --|> RuntimeException
+  ConectionIsDownException --|> RuntimeException
+  CustomMessageException --|> RuntimeException
+}
+
+RestExceptionHandler --> EntityNotFoundException
+RestExceptionHandler --> DuplicateException
+RestExceptionHandler --> ForbiddenException
+RestExceptionHandler --> ParkSizeViolatedException
+RestExceptionHandler --> ParkIsPrivateException
+RestExceptionHandler --> ConectionIsDownException
+RestExceptionHandler --> CustomMessageException
+
+@enduml
