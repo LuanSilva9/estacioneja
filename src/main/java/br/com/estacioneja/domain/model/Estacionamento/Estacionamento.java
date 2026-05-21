@@ -6,13 +6,13 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.enums.TipoVeiculo;
+import br.com.estacioneja.shared.enums.Privacidade;
+import br.com.estacioneja.shared.enums.TipoVeiculo;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
-import br.com.estacioneja.exceptions.custom.BusinessException;
+import br.com.estacioneja.errors.exceptions.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

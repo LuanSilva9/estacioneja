@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.TipoRegistro;
+import br.com.estacioneja.shared.enums.TipoRegistro;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import jakarta.persistence.Entity;

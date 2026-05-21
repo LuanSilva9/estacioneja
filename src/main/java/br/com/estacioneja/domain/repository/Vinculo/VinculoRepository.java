@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 
 @Repository
 public interface VinculoRepository extends JpaRepository<Vinculo, UUID> {

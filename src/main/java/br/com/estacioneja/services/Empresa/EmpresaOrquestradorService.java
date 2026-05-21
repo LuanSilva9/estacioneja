@@ -3,7 +3,7 @@ package br.com.estacioneja.services.Empresa;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.estacioneja.domain.enums.TipoAcesso;
+import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Acesso.Actor;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.input.EmpresaDTO;

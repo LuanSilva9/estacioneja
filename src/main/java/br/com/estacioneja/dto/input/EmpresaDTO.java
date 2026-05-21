@@ -2,8 +2,8 @@ package br.com.estacioneja.dto.input;
 
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.Plano;
-import br.com.estacioneja.domain.enums.TipoEmpresa;
+import br.com.estacioneja.shared.enums.Plano;
+import br.com.estacioneja.shared.enums.TipoEmpresa;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

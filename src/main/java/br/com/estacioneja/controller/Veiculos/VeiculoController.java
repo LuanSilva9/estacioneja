@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 import br.com.estacioneja.dto.update.VeiculoUpdateDto;

@@ -3,7 +3,7 @@ package br.com.estacioneja.controller.Registro;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.RegistroDTO;
 import br.com.estacioneja.dto.output.RegistroOutputDTO;
 import br.com.estacioneja.services.Registro.RegistroService;

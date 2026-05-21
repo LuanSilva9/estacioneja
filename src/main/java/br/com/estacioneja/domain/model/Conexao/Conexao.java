@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import br.com.estacioneja.domain.enums.TipoComunicacao;
-import br.com.estacioneja.domain.enums.TipoProtocolo;
+import br.com.estacioneja.shared.enums.TipoComunicacao;
+import br.com.estacioneja.shared.enums.TipoProtocolo;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

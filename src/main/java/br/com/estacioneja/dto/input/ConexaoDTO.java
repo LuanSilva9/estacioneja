@@ -1,7 +1,7 @@
 package br.com.estacioneja.dto.input;
 
-import br.com.estacioneja.domain.enums.TipoComunicacao;
-import br.com.estacioneja.domain.enums.TipoProtocolo;
+import br.com.estacioneja.shared.enums.TipoComunicacao;
+import br.com.estacioneja.shared.enums.TipoProtocolo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

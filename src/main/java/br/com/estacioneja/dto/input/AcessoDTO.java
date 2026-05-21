@@ -2,7 +2,7 @@ package br.com.estacioneja.dto.input;
 
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.TipoAcesso;
+import br.com.estacioneja.shared.enums.TipoAcesso;
 import jakarta.validation.constraints.NotNull;
 
 public record AcessoDTO(

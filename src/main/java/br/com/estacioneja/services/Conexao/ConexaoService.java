@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.repository.Conexao.ConexaoRepository;
 import br.com.estacioneja.dto.input.ConexaoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
 import br.com.estacioneja.dto.update.ConexaoUpdateDto;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.ConexaoMapper;
 import br.com.estacioneja.usecases.interfaces.IConexao;
 

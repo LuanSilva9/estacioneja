@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Acesso.Actor;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.update.AcessoUpdateDto;

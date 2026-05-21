@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.enums.Privacidade;
+import br.com.estacioneja.shared.enums.Privacidade;
 import br.com.estacioneja.dto.input.EstacionamentoDTO;
 import br.com.estacioneja.dto.output.EstacionamentoOutputDTO;
 import br.com.estacioneja.dto.update.EstacionamentoUpdateDto;

@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.repository.Usuario;
+package br.com.estacioneja.modules.usuario;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,8 +6,6 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import br.com.estacioneja.domain.model.Usuario.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
@@ -19,10 +17,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     Boolean existsByEmailAndIdNot(String email, UUID id);
     Boolean existsByCpfAndIdNot(String email, UUID id);
 
-
     /* Spring Security */
     @Query("""
-    SELECT DISTINCT u
+        SELECT DISTINCT u
         FROM Usuario u
         LEFT JOIN FETCH u.acessos a
         LEFT JOIN FETCH a.empresa

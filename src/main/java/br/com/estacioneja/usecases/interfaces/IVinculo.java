@@ -3,7 +3,7 @@ package br.com.estacioneja.usecases.interfaces;
 import java.util.List;
 import java.util.UUID;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.VinculoDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;

@@ -1,17 +1,17 @@
-package br.com.estacioneja.infra.config.mapper;
+package br.com.estacioneja.modules.usuario;
 
 import org.springframework.stereotype.Component;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
+import br.com.estacioneja.shared.mapper.AbstractMapper;
 
 @Component
-public class UsuarioMapper extends AbstractMapper<Usuario, UsuarioOutputDTO> {
+public class UsuarioMapper extends AbstractMapper<Usuario, ReadUsuarioDto> {
 
     @Override
-    public UsuarioOutputDTO toDto(Usuario usuario) {
+    public ReadUsuarioDto toDto(Usuario usuario) {
         if (usuario == null) return null;
-        return new UsuarioOutputDTO(
+        return new ReadUsuarioDto(
                 usuario.getId(),
                 usuario.getName(),
                 usuario.getCpf(),

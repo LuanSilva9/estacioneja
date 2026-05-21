@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import br.com.estacioneja.domain.enums.TipoVeiculo;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.shared.enums.TipoVeiculo;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import jakarta.persistence.CascadeType;

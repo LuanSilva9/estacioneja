@@ -3,8 +3,8 @@ package br.com.estacioneja.dto.input;
 import java.util.List;
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.Privacidade;
-import br.com.estacioneja.domain.enums.TipoVeiculo;
+import br.com.estacioneja.shared.enums.Privacidade;
+import br.com.estacioneja.shared.enums.TipoVeiculo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

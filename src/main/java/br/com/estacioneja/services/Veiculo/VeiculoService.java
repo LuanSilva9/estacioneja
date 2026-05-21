@@ -6,15 +6,15 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Veiculo.VeiculoRepository;
 import br.com.estacioneja.dto.input.VeiculoDTO;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
 import br.com.estacioneja.dto.update.VeiculoUpdateDto;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VeiculoMapper;
-import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.modules.usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IVeiculo;
 import jakarta.transaction.Transactional;
 

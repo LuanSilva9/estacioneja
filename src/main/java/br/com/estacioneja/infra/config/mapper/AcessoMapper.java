@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import br.com.estacioneja.modules.usuario.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
 
 @Component

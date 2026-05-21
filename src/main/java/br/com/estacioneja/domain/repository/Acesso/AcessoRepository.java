@@ -11,7 +11,7 @@ import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 
 import java.util.List;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 
 @Repository
 public interface AcessoRepository extends JpaRepository<Acesso, UUID> {

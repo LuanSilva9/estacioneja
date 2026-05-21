@@ -3,7 +3,7 @@ package br.com.estacioneja.controller.Planos;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.enums.Plano;
+import br.com.estacioneja.shared.enums.Plano;
 import br.com.estacioneja.dto.output.PlanoDTO;
 
 import java.util.Arrays;

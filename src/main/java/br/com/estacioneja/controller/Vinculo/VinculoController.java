@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.VinculoDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
 import br.com.estacioneja.services.Vinculo.VinculoService;

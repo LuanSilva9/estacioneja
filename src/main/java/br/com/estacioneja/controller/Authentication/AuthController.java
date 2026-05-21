@@ -4,14 +4,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.AuthDTO;
-import br.com.estacioneja.dto.input.UsuarioDTO;
+import br.com.estacioneja.modules.usuario.dto.CreateUsuarioDto;
 import br.com.estacioneja.dto.output.JWTOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
+import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
 import br.com.estacioneja.infra.config.security.AuthenticationService;
 import br.com.estacioneja.infra.config.security.JwtService;
-import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.modules.usuario.UsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,8 +46,8 @@ public class AuthController {
 
     @SecurityRequirements
     @PostMapping("/register")
-    public ResponseEntity<UsuarioOutputDTO> register(@Valid @RequestBody UsuarioDTO dto) {
-        UsuarioOutputDTO userCreated = usuarioService.create(dto);
+    public ResponseEntity<ReadUsuarioDto> register(@Valid @RequestBody CreateUsuarioDto dto) {
+        ReadUsuarioDto userCreated = usuarioService.create(dto);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()

@@ -1,34 +1,30 @@
-package br.com.estacioneja.controller.Usuario;
+package br.com.estacioneja.modules.usuario;
 
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
-import br.com.estacioneja.dto.output.URLImagemOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.dto.update.UsuarioUpdateDto;
+import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
+import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
+import br.com.estacioneja.modules.usuario.dto.UpdateUsuarioDto;
 import br.com.estacioneja.services.Acesso.AcessoService;
-import br.com.estacioneja.services.Usuario.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -37,21 +33,20 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final AcessoService acessoService;
 
-
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioOutputDTO> obterPorId(@PathVariable UUID id) {
+    public ResponseEntity<ReadUsuarioDto> obterPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/email/{email}")
-    public ResponseEntity<UsuarioOutputDTO> obterPorEmail(@PathVariable String email) {
+    public ResponseEntity<ReadUsuarioDto> obterPorEmail(@PathVariable String email) {
         return ResponseEntity.ok(usuarioService.findByEmail(email));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioOutputDTO> obterUsuario(Authentication auth) {
+    public ResponseEntity<ReadUsuarioDto> obterUsuario(Authentication auth) {
         Usuario usuario = (Usuario) auth.getPrincipal();
         return ResponseEntity.ok(usuarioService.findById(usuario.getId()));
     }
@@ -64,9 +59,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @Valid @RequestBody UsuarioUpdateDto dto) {
+    public ResponseEntity<Void> atualizar(@PathVariable UUID id, @Valid @RequestBody UpdateUsuarioDto dto) {
         usuarioService.update(id, dto);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -77,7 +71,7 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/{id}/foto-perfil", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<URLImagemOutputDTO> uploadFotoPerfil(
+    public ResponseEntity<ReadFotoPerfilDto> uploadFotoPerfil(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
@@ -86,7 +80,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}/foto-perfil")
-    public ResponseEntity<URLImagemOutputDTO> obterFotoPerfil(@PathVariable UUID id) {
+    public ResponseEntity<ReadFotoPerfilDto> obterFotoPerfil(@PathVariable UUID id) {
         return ResponseEntity.ok(usuarioService.getFotoPerfil(id));
     }
 

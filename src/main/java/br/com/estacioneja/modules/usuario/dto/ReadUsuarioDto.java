@@ -1,10 +1,10 @@
-package br.com.estacioneja.dto.output;
+package br.com.estacioneja.modules.usuario.dto;
 
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.TipoUsuario;
+import br.com.estacioneja.shared.enums.TipoUsuario;
 
-public record UsuarioOutputDTO(
+public record ReadUsuarioDto(
         UUID id,
         String name,
         String cpf,
@@ -12,5 +12,4 @@ public record UsuarioOutputDTO(
         String email,
         TipoUsuario tipoUsuario,
         boolean temFotoPerfil
-) {
-}
+) { }

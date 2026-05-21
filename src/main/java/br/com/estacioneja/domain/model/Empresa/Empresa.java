@@ -5,12 +5,12 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.enums.Plano;
-import br.com.estacioneja.domain.enums.TipoEmpresa;
+import br.com.estacioneja.shared.enums.Plano;
+import br.com.estacioneja.shared.enums.TipoEmpresa;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.exceptions.custom.BusinessException;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.errors.exceptions.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

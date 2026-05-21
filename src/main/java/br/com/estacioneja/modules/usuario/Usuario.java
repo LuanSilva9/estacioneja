@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.model.Usuario;
+package br.com.estacioneja.modules.usuario;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,10 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import br.com.estacioneja.domain.enums.TipoUsuario;
+
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.shared.enums.TipoUsuario;
+import br.com.estacioneja.shared.vo.CPF;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,12 +34,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="usuarios")
+@Table(name = "usuarios")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,7 +51,7 @@ public class Usuario implements UserDetails {
     private String email;
 
     private String senha;
-    
+
     @Column(unique = true)
     private String cpf;
 
@@ -87,7 +89,6 @@ public class Usuario implements UserDetails {
         this.telefone = telefone.trim();
         this.cpf = new CPF(cpf).getCpf();
         this.email = email.trim();
-
     }
 
     /*
@@ -96,7 +97,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = switch(this.tipoUsuario) {
+        String role = switch (this.tipoUsuario) {
             case COMUM -> "ROLE_USER";
             case ADMINISTRATIVO -> "ROLE_ADMIN";
         };

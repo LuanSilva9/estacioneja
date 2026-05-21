@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.enums.TipoEquipamento;
+import br.com.estacioneja.shared.enums.TipoEquipamento;
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.dto.input.EquipamentoDTO;

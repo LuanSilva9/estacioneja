@@ -7,7 +7,7 @@ import br.com.estacioneja.domain.repository.Endereco.EnderecoRepository;
 import br.com.estacioneja.dto.input.EnderecoDTO;
 import br.com.estacioneja.dto.output.EnderecoOutputDTO;
 import br.com.estacioneja.dto.update.EnderecoUpdateDto;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EnderecoMapper;
 import br.com.estacioneja.usecases.interfaces.IEndereco;
 import jakarta.transaction.Transactional;

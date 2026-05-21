@@ -1,34 +1,29 @@
-package br.com.estacioneja.services.Usuario;
+package br.com.estacioneja.modules.usuario;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.dto.input.UsuarioDTO;
-import br.com.estacioneja.dto.output.URLImagemOutputDTO;
-import br.com.estacioneja.dto.output.UsuarioOutputDTO;
-import br.com.estacioneja.dto.update.UsuarioUpdateDto;
-import br.com.estacioneja.exceptions.custom.BusinessException;
-import br.com.estacioneja.exceptions.custom.DuplicateException;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
-import br.com.estacioneja.exceptions.custom.ForbiddenException;
-import br.com.estacioneja.infra.config.mapper.UsuarioMapper;
-import br.com.estacioneja.services.Storage.R2StorageService;
-import br.com.estacioneja.usecases.interfaces.IUsuario;
-
+import br.com.estacioneja.errors.exceptions.BusinessException;
+import br.com.estacioneja.errors.exceptions.DuplicateException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.ForbiddenException;
+import br.com.estacioneja.modules.usuario.dto.CreateUsuarioDto;
+import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
+import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
+import br.com.estacioneja.modules.usuario.dto.UpdateUsuarioDto;
+import br.com.estacioneja.shared.storage.R2StorageService;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService implements IUsuario {
+public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
@@ -42,12 +37,12 @@ public class UsuarioService implements IUsuario {
 
     /* TRANSACOES */
 
-    @Override @Transactional
-    public UsuarioOutputDTO create(UsuarioDTO dto) {
-        if(isEmailInUse(dto.email(), null))
+    @Transactional
+    public ReadUsuarioDto create(CreateUsuarioDto dto) {
+        if (isEmailInUse(dto.email(), null))
             throw new DuplicateException("Email já está sendo Usado");
 
-        if(isCpfInUse(dto.cpf(), null))
+        if (isCpfInUse(dto.cpf(), null))
             throw new DuplicateException("CPF já está sendo Usado");
 
         Usuario newUsuario = new Usuario(dto.name(), dto.email(), dto.cpf(), dto.telefone(), dto.tipoUsuario());
@@ -59,21 +54,19 @@ public class UsuarioService implements IUsuario {
         return usuarioMapper.toDto(newUsuario);
     }
 
-    @Override @Transactional
-    public void update(UUID id, UsuarioUpdateDto dto) {
+    @Transactional
+    public void update(UUID id, UpdateUsuarioDto dto) {
         Usuario usuario = findEntityById(id);
 
-        if(isEmailInUse(dto.email(), id))
+        if (isEmailInUse(dto.email(), id))
             throw new DuplicateException("Email já está sendo usado");
-        if(isCpfInUse(dto.cpf(), id))
+        if (isCpfInUse(dto.cpf(), id))
             throw new DuplicateException("CPF já está sendo usado");
-
 
         usuario.updateData(dto.name(), dto.telefone(), dto.cpf(), dto.email());
     }
 
-
-    @Override @Transactional
+    @Transactional
     public void delete(UUID id) {
         Usuario usuario = findEntityById(id);
 
@@ -87,27 +80,27 @@ public class UsuarioService implements IUsuario {
 
     /* CONSULTAS */
 
-    @Override @Transactional(readOnly=true)
-    public UsuarioOutputDTO findById(UUID id) {
+    @Transactional(readOnly = true)
+    public ReadUsuarioDto findById(UUID id) {
         return usuarioMapper.toDto(findEntityById(id));
     }
 
-    @Override @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Usuario findEntityById(UUID id) {
         return usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
     }
 
-    @Override @Transactional(readOnly = true)
-    public UsuarioOutputDTO findByEmail(String email) {
-        Usuario usuarioEncontrado =  usuarioRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
+    @Transactional(readOnly = true)
+    public ReadUsuarioDto findByEmail(String email) {
+        Usuario usuarioEncontrado = usuarioRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
 
         return usuarioMapper.toDto(usuarioEncontrado);
     }
 
     /* FOTO DE PERFIL */
 
-    @Override @Transactional
-    public URLImagemOutputDTO uploadFotoPerfil(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+    @Transactional
+    public ReadFotoPerfilDto uploadFotoPerfil(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
         Usuario usuario = findEntityById(id);
         ensureCanManagePhoto(usuario, usuarioAutenticado);
         validarArquivoImagem(file);
@@ -131,23 +124,23 @@ public class UsuarioService implements IUsuario {
         }
 
         String url = r2StorageService.generatePresignedUrl(novaKey, FOTO_PERFIL_URL_TTL);
-        return new URLImagemOutputDTO(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
+        return new ReadFotoPerfilDto(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
     }
 
-    @Override @Transactional(readOnly = true)
-    public URLImagemOutputDTO getFotoPerfil(UUID id) {
+    @Transactional(readOnly = true)
+    public ReadFotoPerfilDto getFotoPerfil(UUID id) {
         Usuario usuario = findEntityById(id);
         String key = usuario.getFotoPerfilKey();
 
         if (key == null || key.isBlank()) {
-            return new URLImagemOutputDTO(null, null);
+            return new ReadFotoPerfilDto(null, null);
         }
 
         String url = r2StorageService.generatePresignedUrl(key, FOTO_PERFIL_URL_TTL);
-        return new URLImagemOutputDTO(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
+        return new ReadFotoPerfilDto(url, Instant.now().plus(FOTO_PERFIL_URL_TTL));
     }
 
-    @Override @Transactional
+    @Transactional
     public void deleteFotoPerfil(UUID id, Usuario usuarioAutenticado) {
         Usuario usuario = findEntityById(id);
         ensureCanManagePhoto(usuario, usuarioAutenticado);

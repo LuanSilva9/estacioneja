@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.dto.output.VeiculoOutputDTO;
+import br.com.estacioneja.modules.usuario.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
 
 @Component

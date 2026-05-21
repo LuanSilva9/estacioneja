@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.modules.usuario.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

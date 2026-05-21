@@ -2,9 +2,10 @@ package br.com.estacioneja.dto.output;
 
 import java.util.UUID;
 
-import br.com.estacioneja.domain.enums.Plano;
-import br.com.estacioneja.domain.enums.TipoEmpresa;
+import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
+import br.com.estacioneja.shared.enums.Plano;
+import br.com.estacioneja.shared.enums.TipoEmpresa;
 
-public record EmpresaOutputDTO(UUID id, String nome, TipoEmpresa tipoEmpresa, UsuarioOutputDTO representante, String cnpj, String prefixo, Plano plano, EnderecoOutputDTO endereco) {
+public record EmpresaOutputDTO(UUID id, String nome, TipoEmpresa tipoEmpresa, ReadUsuarioDto representante, String cnpj, String prefixo, Plano plano, EnderecoOutputDTO endereco) {
     
 }

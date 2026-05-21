@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.com.estacioneja.domain.enums.TipoEquipamento;
+import br.com.estacioneja.shared.enums.TipoEquipamento;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 
 @Repository

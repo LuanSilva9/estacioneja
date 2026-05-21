@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import jakarta.persistence.LockModeType;
-import br.com.estacioneja.domain.enums.Privacidade;
+import br.com.estacioneja.shared.enums.Privacidade;
 import java.util.List;
 import java.util.Optional;
 

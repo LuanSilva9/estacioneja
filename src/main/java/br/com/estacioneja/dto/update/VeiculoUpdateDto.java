@@ -1,6 +1,6 @@
 package br.com.estacioneja.dto.update;
 
-import br.com.estacioneja.domain.enums.TipoVeiculo;
+import br.com.estacioneja.shared.enums.TipoVeiculo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

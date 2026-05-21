@@ -11,22 +11,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.estacioneja.domain.enums.TipoAcesso;
+import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
-import br.com.estacioneja.dto.output.URLImagemOutputDTO;
+import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
 import br.com.estacioneja.dto.update.EmpresaUpdateDto;
-import br.com.estacioneja.exceptions.custom.BusinessException;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.BusinessException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Endereco.EnderecoService;
-import br.com.estacioneja.services.Storage.R2StorageService;
-import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.shared.storage.R2StorageService;
+import br.com.estacioneja.modules.usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IEmpresa;
 
 
@@ -122,7 +122,7 @@ public class EmpresaService implements IEmpresa {
     /* LOGO */
 
     @Override @Transactional
-    public URLImagemOutputDTO uploadLogo(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+    public ReadFotoPerfilDto uploadLogo(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
         authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
         validarArquivoImagem(file);
@@ -149,7 +149,7 @@ public class EmpresaService implements IEmpresa {
     }
 
     @Override @Transactional(readOnly = true)
-    public URLImagemOutputDTO getLogo(UUID id) {
+    public ReadFotoPerfilDto getLogo(UUID id) {
         return presignedUrlOrEmpty(findEntityById(id).getLogotipoEmpresa());
     }
 
@@ -170,7 +170,7 @@ public class EmpresaService implements IEmpresa {
     /* BANNER */
 
     @Override @Transactional
-    public URLImagemOutputDTO uploadBanner(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+    public ReadFotoPerfilDto uploadBanner(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
         authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
         validarArquivoImagem(file);
@@ -197,7 +197,7 @@ public class EmpresaService implements IEmpresa {
     }
 
     @Override @Transactional(readOnly = true)
-    public URLImagemOutputDTO getBanner(UUID id) {
+    public ReadFotoPerfilDto getBanner(UUID id) {
         return presignedUrlOrEmpty(findEntityById(id).getBannerEmpresa());
     }
 
@@ -239,14 +239,14 @@ public class EmpresaService implements IEmpresa {
         };
     }
 
-    private URLImagemOutputDTO presignedUrl(String key) {
+    private ReadFotoPerfilDto presignedUrl(String key) {
         String url = r2StorageService.generatePresignedUrl(key, IMAGE_URL_TTL);
-        return new URLImagemOutputDTO(url, Instant.now().plus(IMAGE_URL_TTL));
+        return new ReadFotoPerfilDto(url, Instant.now().plus(IMAGE_URL_TTL));
     }
 
-    private URLImagemOutputDTO presignedUrlOrEmpty(String key) {
+    private ReadFotoPerfilDto presignedUrlOrEmpty(String key) {
         if (key == null || key.isBlank()) {
-            return new URLImagemOutputDTO(null, null);
+            return new ReadFotoPerfilDto(null, null);
         }
         return presignedUrl(key);
     }

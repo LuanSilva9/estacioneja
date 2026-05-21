@@ -4,9 +4,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.domain.repository.Usuario.UsuarioRepository;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.modules.usuario.UsuarioRepository;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 
 @Service
 public class AuthenticationService {

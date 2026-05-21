@@ -7,22 +7,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.estacioneja.domain.enums.TipoAcesso;
-import br.com.estacioneja.domain.enums.TipoUsuario;
+import br.com.estacioneja.shared.enums.TipoAcesso;
+import br.com.estacioneja.shared.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Acesso.Actor;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.dto.input.AcessoDTO;
 import br.com.estacioneja.dto.output.AcessoOutputDTO;
 import br.com.estacioneja.dto.update.AcessoUpdateDto;
-import br.com.estacioneja.exceptions.custom.BusinessException;
-import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
+import br.com.estacioneja.errors.exceptions.BusinessException;
+import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
-import br.com.estacioneja.services.Usuario.UsuarioService;
+import br.com.estacioneja.modules.usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IAcesso;
 
 @Service

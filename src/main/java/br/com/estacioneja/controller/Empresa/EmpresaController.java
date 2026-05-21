@@ -1,9 +1,9 @@
 package br.com.estacioneja.controller.Empresa;
 
-import br.com.estacioneja.domain.model.Usuario.Usuario;
+import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
-import br.com.estacioneja.dto.output.URLImagemOutputDTO;
+import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
 import br.com.estacioneja.dto.update.EmpresaUpdateDto;
 import br.com.estacioneja.services.Empresa.EmpresaOrquestradorService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
@@ -69,7 +69,7 @@ public class EmpresaController {
 
     @PostMapping(value = "/{id}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<URLImagemOutputDTO> uploadLogo(
+    public ResponseEntity<ReadFotoPerfilDto> uploadLogo(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
@@ -78,7 +78,7 @@ public class EmpresaController {
     }
 
     @GetMapping("/{id}/logo")
-    public ResponseEntity<URLImagemOutputDTO> obterLogo(@PathVariable UUID id) {
+    public ResponseEntity<ReadFotoPerfilDto> obterLogo(@PathVariable UUID id) {
         return ResponseEntity.ok(empresaService.getLogo(id));
     }
 
@@ -93,7 +93,7 @@ public class EmpresaController {
 
     @PostMapping(value = "/{id}/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<URLImagemOutputDTO> uploadBanner(
+    public ResponseEntity<ReadFotoPerfilDto> uploadBanner(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
             Authentication auth) {
@@ -102,7 +102,7 @@ public class EmpresaController {
     }
 
     @GetMapping("/{id}/banner")
-    public ResponseEntity<URLImagemOutputDTO> obterBanner(@PathVariable UUID id) {
+    public ResponseEntity<ReadFotoPerfilDto> obterBanner(@PathVariable UUID id) {
         return ResponseEntity.ok(empresaService.getBanner(id));
     }
 
