@@ -15,13 +15,15 @@ public class EstacionamentoMapper extends AbstractMapper<Estacionamento, Estacio
     @Override
     public EstacionamentoOutputDTO toDto(Estacionamento estacionamento) {
         if (estacionamento == null) return null;
+        
         return new EstacionamentoOutputDTO(
                 estacionamento.getId(),
                 estacionamento.getDescricao(),
                 estacionamento.getPrivacidade(),
                 estacionamento.getCapacidade(),
                 estacionamento.getCapacidadeDisponivel(),
-                empresaMapper.toDto(estacionamento.getEmpresa())
+                empresaMapper.toDto(estacionamento.getEmpresa()),
+                estacionamento.getRegraEstacionamento()
         );
     }
 }

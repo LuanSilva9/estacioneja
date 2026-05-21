@@ -30,20 +30,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RegistroController {
     private final RegistroService registroService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<RegistroOutputDTO> criar(@Valid @RequestBody RegistroDTO dto) {
         RegistroOutputDTO registro = registroService.create(dto);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(registro.id())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(registro.id()).toUri();
 
         return ResponseEntity.created(location).body(registro);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/historico/estacionamento/{estacionamentoId}")
     public ResponseEntity<List<RegistroOutputDTO>> verHistoricoEstacionamento(@PathVariable UUID estacionamentoId) {
         List<RegistroOutputDTO> historicoEstacionamento = registroService.findByEstacionamento(estacionamentoId);
@@ -51,6 +48,7 @@ public class RegistroController {
         return ResponseEntity.ok().body(historicoEstacionamento);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/historico/usuario")
     public ResponseEntity<List<RegistroOutputDTO>> verHistoricoUsuario(Authentication auth) {
         Usuario usuarioAutenticado = (Usuario) auth.getPrincipal();

@@ -19,12 +19,9 @@ public class AuthenticationService {
     }
 
     public Usuario loginAndReturnUser(String email, String senha) {
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(email, senha)
-        );
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, senha));
 
-        return usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        return usuarioRepository.findByEmailWithAcessos(email).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
 }

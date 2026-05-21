@@ -41,7 +41,7 @@ public class EstacionamentoController {
         return ResponseEntity.ok(estacionamentoService.findById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/empresa/{id}")
     public ResponseEntity<List<EstacionamentoOutputDTO>> obterPorEmpresa(@PathVariable UUID id) {
         return ResponseEntity.ok(estacionamentoService.findByEmpresa(id));
@@ -53,7 +53,7 @@ public class EstacionamentoController {
     }
 
     
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<EstacionamentoOutputDTO> criar(@Valid @RequestBody EstacionamentoDTO dto) {
         EstacionamentoOutputDTO criado = estacionamentoService.create(dto);
@@ -65,14 +65,14 @@ public class EstacionamentoController {
         return ResponseEntity.created(location).body(criado);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizar(@PathVariable UUID id, @Valid @RequestBody EstacionamentoUpdateDto dto) {
         estacionamentoService.update(id, dto);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         estacionamentoService.delete(id);

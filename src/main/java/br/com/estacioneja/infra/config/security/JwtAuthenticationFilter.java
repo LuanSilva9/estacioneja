@@ -27,11 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -44,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            Usuario user = usuarioRepository.findById(UUID.fromString(userId)).orElse(null);
+            Usuario user = usuarioRepository.findByIdWithAcessos(UUID.fromString(userId)).orElse(null);
 
             if (user != null && jwtService.isTokenValid(token, user)) {
 
@@ -52,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 user,
                                 null,
-                                user.getAuthorities() // precisa implementar isso
+                                user.getAuthorities()
                         );
 
                 authToken.setDetails(

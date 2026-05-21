@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.enums.TipoRegistro;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Registro.Registro;
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Registro.RegistroRepository;
 import br.com.estacioneja.dto.input.RegistroDTO;
@@ -17,6 +19,7 @@ import br.com.estacioneja.dto.output.RegistroOutputDTO;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.exceptions.custom.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.RegistroMapper;
+import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.services.Vinculo.VinculoService;
@@ -30,22 +33,29 @@ public class RegistroService implements IRegistro {
     private final EstacionamentoService estacionamentoService;
     private final VeiculoService veiculoService;
     private final VinculoService vinculoService;
+    private final AuthorizationService authorizationService;
+
+    private static final TipoAcesso[] CARGOS_OPERACAO = { TipoAcesso.MASTER, TipoAcesso.GUARITA };
 
     /* TRANSACOES */
 
     @Override @Transactional
     public RegistroOutputDTO create(RegistroDTO dto) {
-        Veiculo veiculo = veiculoService.findByPlaca(dto.placa());
-        
-        if(!vinculoService.existsVinculo(veiculo.getPlaca(), dto.estacionamentoId())) throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
-        
         Estacionamento estacionamento = estacionamentoService.findEntityLocked(dto.estacionamentoId());
-        
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(estacionamento), CARGOS_OPERACAO);
+
+        Veiculo veiculo = veiculoService.findByPlaca(dto.placa());
+        if (!vinculoService.existsVinculo(veiculo.getPlaca(), dto.estacionamentoId())) {
+            throw new ForbiddenException("Esse veiculo não está autorizado a entrar pois não possui vinculo com o estacionamento");
+        }
+
         Registro ultimoRegistro = registroRepository.findTopByVeiculoAndEstacionamentoOrderByDataRegistroDesc(veiculo, estacionamento);
 
-        if (ultimoRegistro != null && ultimoRegistro.getTipoRegistro() == TipoRegistro.ENTRADA) 
+        if (ultimoRegistro != null && ultimoRegistro.getTipoRegistro() == TipoRegistro.ENTRADA)
             return registrarSaida(veiculo, estacionamento);
-        else 
+        else
             return registrarEntrada(veiculo, estacionamento);
     }
 
@@ -63,12 +73,26 @@ public class RegistroService implements IRegistro {
 
     @Transactional(readOnly = true)
     public List<RegistroOutputDTO> findByUsuario(UUID usuarioId) {
+        Usuario autenticado = authorizationService.getCurrentUser();
+        if (!autenticado.getId().equals(usuarioId)) {
+            throw new ForbiddenException("Você só pode consultar seu próprio histórico");
+        }
         return registroMapper.toDtoList(registroRepository.findByVeiculoUsuarioIdOrderByDataRegistroDesc(usuarioId));
     }
 
     @Transactional(readOnly = true)
     public List<RegistroOutputDTO> findByEstacionamento(UUID estacionamentoId) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(estacionamento), CARGOS_OPERACAO);
+
         return registroMapper.toDtoList(registroRepository.findByEstacionamentoIdOrderByDataRegistroDesc(estacionamentoId));
+    }
+
+    private UUID empresaIdOf(Estacionamento e) {
+        if (e == null || e.getEmpresa() == null) return null;
+        return e.getEmpresa().getId();
     }
 
     /* HELPERS */

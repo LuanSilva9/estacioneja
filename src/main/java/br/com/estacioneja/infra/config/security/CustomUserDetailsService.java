@@ -20,12 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+        return usuarioRepository.findByEmailWithAcessos(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
     }
 
     public UserDetails loadUserById(String id) throws UsernameNotFoundException {
-        return usuarioRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + id));
+        return usuarioRepository.findByIdWithAcessos(UUID.fromString(id)).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + id));
     }
 }

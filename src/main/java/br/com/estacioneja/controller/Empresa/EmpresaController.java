@@ -30,7 +30,7 @@ public class EmpresaController {
 
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<EmpresaOutputDTO> listarEmpresa(@PathVariable UUID id) {
         return ResponseEntity.ok(empresaService.findById(id));
     }
@@ -52,7 +52,7 @@ public class EmpresaController {
 
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> atualizar(@PathVariable UUID id, @Valid @RequestBody EmpresaUpdateDto dto) {
         empresaService.update(id, dto);
         return ResponseEntity.noContent().build();
@@ -60,7 +60,7 @@ public class EmpresaController {
 
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         empresaService.delete(id);
         return ResponseEntity.noContent().build();
@@ -68,7 +68,7 @@ public class EmpresaController {
 
 
     @PostMapping(value = "/{id}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<URLImagemOutputDTO> uploadLogo(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
@@ -83,7 +83,7 @@ public class EmpresaController {
     }
 
     @DeleteMapping("/{id}/logo")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deletarLogo(@PathVariable UUID id, Authentication auth) {
         Usuario autenticado = (Usuario) auth.getPrincipal();
         empresaService.deleteLogo(id, autenticado);
@@ -92,7 +92,7 @@ public class EmpresaController {
 
 
     @PostMapping(value = "/{id}/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<URLImagemOutputDTO> uploadBanner(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
@@ -107,7 +107,7 @@ public class EmpresaController {
     }
 
     @DeleteMapping("/{id}/banner")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deletarBanner(@PathVariable UUID id, Authentication auth) {
         Usuario autenticado = (Usuario) auth.getPrincipal();
         empresaService.deleteBanner(id, autenticado);

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.enums.TipoUsuario;
 import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Acesso.Actor;
@@ -19,6 +20,7 @@ import br.com.estacioneja.dto.update.AcessoUpdateDto;
 import br.com.estacioneja.exceptions.custom.BusinessException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.AcessoMapper;
+import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Empresa.EmpresaService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
 import br.com.estacioneja.usecases.interfaces.IAcesso;
@@ -30,44 +32,65 @@ public class AcessoService implements IAcesso {
     private final UsuarioService usuarioService;
     private final EmpresaService empresaService;
     private final AcessoMapper acessoMapper;
+    private final AuthorizationService authorizationService;
 
     /* TRANSACOES */
 
     @Override
     @Transactional
     public AcessoOutputDTO create(Actor actor, AcessoDTO dto, UUID empresaId) {
-
         Usuario usuario = usuarioService.findEntityById(dto.usuarioId());
 
         if (!actor.isSistema()) {
+            Usuario autenticado = authorizationService.getCurrentUser();
+            if (!autenticado.getId().equals(actor.getUsuarioId())) {
+                throw new BusinessException("Actor inconsistente com usuário autenticado.");
+            }
+            authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
+
             if (usuario.getId().equals(actor.getUsuarioId())) {
                 throw new BusinessException("Você não pode criar suas próprias permissões!");
             }
         }
 
-        if(usuario.getTipoUsuario() == TipoUsuario.COMUM) {
+        if (usuario.getTipoUsuario() == TipoUsuario.COMUM) {
             throw new BusinessException("Usuário beneficiado deve ser administrativo.");
         }
 
         Empresa empresa = empresaService.findEntityById(empresaId);
-
         Acesso newAcesso = new Acesso(dto.tipoAcesso(), usuario, empresa);
-
         return acessoMapper.toDto(acessoRepository.save(newAcesso));
-    } 
+    }
 
     @Override @Transactional
     public void update(UUID id, AcessoUpdateDto dto) {
         Acesso acesso = findEntityById(id);
+        UUID empresaId = acesso.getEmpresa() == null ? null : acesso.getEmpresa().getId();
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
+
+        if (acesso.getUsuario() != null && acesso.getUsuario().getId().equals(autenticado.getId())) {
+            throw new BusinessException("Você não pode alterar o seu próprio acesso.");
+        }
 
         acesso.setTipoAcesso(dto.tipoAcesso());
-        
         acessoRepository.save(acesso);
     }
 
     @Override @Transactional
     public void delete(UUID id) {
-        acessoRepository.deleteById(id);
+        Acesso acesso = findEntityById(id);
+        UUID empresaId = acesso.getEmpresa() == null ? null : acesso.getEmpresa().getId();
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
+
+        if (acesso.getUsuario() != null && acesso.getUsuario().getId().equals(autenticado.getId())) {
+            throw new BusinessException("Você não pode revogar o seu próprio acesso.");
+        }
+
+        acessoRepository.delete(acesso);
     }
 
     /* CONSULTAS */
@@ -84,8 +107,10 @@ public class AcessoService implements IAcesso {
 
     @Override @Transactional(readOnly = true)
     public List<AcessoOutputDTO> findAccessByEmpresa(UUID empresaId) {
-        Empresa empresa = empresaService.findEntityById(empresaId);
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
 
+        Empresa empresa = empresaService.findEntityById(empresaId);
         return acessoMapper.toDtoList(this.acessoRepository.findAllByEmpresa(empresa));
     }
 

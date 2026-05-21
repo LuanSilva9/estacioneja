@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/equipamentos")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 public class EquipamentosController {
     private final EquipamentoService equipamentoService;

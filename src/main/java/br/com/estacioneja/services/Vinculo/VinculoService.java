@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
@@ -13,9 +14,11 @@ import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
 import br.com.estacioneja.dto.input.VinculoDTO;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
+import br.com.estacioneja.exceptions.custom.BusinessException;
 import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
+import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.IVinculo;
@@ -29,23 +32,29 @@ public class VinculoService implements IVinculo {
     private final EstacionamentoService estacionamentoService;
     private final VeiculoService veiculoService;
     private final VinculoMapper vinculoMapper;
+    private final AuthorizationService authorizationService;
 
     /* TRANSAÇÕES */
 
     @Override
     @Transactional
     public VinculoOutputDTO create(VinculoDTO dto) {
-        Veiculo veiculo = getVeiculo(dto.placaVeiculo());
         Estacionamento estacionamento = getEstacionamento(dto.estacionamentoId());
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+
+        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(estacionamento), TipoAcesso.MASTER);
+        
+        Veiculo veiculo = getVeiculo(dto.placaVeiculo());
+        
+        if(!estacionamento.getRegraEstacionamento().contains(veiculo.getTipoVeiculo())) {
+            throw new BusinessException("Esse veiculo viola a regra do estacionamento");
+        }
 
         validateDuplicate(veiculo, estacionamento);
 
-        Vinculo vinculo = new Vinculo(
-                estacionamento,
-                veiculo.getUsuario(),
-                veiculo
-        );
-
+        Vinculo vinculo = new Vinculo(estacionamento, veiculo.getUsuario(), veiculo);
+        
         return vinculoMapper.toDto(vinculoRepository.save(vinculo));
     }
 
@@ -53,16 +62,29 @@ public class VinculoService implements IVinculo {
     @Transactional
     public void update(UUID id, VinculoDTO dto) {
         Vinculo vinculo = findEntityById(id);
+        Estacionamento destino = getEstacionamento(dto.estacionamentoId());
 
-        Estacionamento estacionamento = getEstacionamento(dto.estacionamentoId());
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(vinculo.getEstacionamento()), TipoAcesso.MASTER);
+        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(destino), TipoAcesso.MASTER);
 
-        vinculo.setEstacionamento(estacionamento);
+        vinculo.setEstacionamento(destino);
     }
 
     @Override
     @Transactional
     public void delete(UUID id) {
-        vinculoRepository.delete(findEntityById(id));
+        Vinculo vinculo = findEntityById(id);
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(vinculo.getEstacionamento()), TipoAcesso.MASTER);
+
+        vinculoRepository.delete(vinculo);
+    }
+
+    private UUID empresaIdOf(Estacionamento e) {
+        if (e == null || e.getEmpresa() == null) return null;
+        return e.getEmpresa().getId();
     }
 
     /* CONSULTAS */
@@ -85,12 +107,20 @@ public class VinculoService implements IVinculo {
 
     @Override
     public List<VinculoOutputDTO> findVincleByEmpresa(UUID empresaId) {
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
+
         return vinculoMapper.toDtoList(vinculoRepository.findByEmpresaId(empresaId));
     }
 
     public VinculoOutputDTO findVincleByPlacaAndEstacionamentoId(String placa, UUID estacionamentoId) {
-        Vinculo vinculo = vinculoRepository.findByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa).orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
-        
+        Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(estacionamento), TipoAcesso.MASTER, TipoAcesso.GUARITA);
+
+        Vinculo vinculo = vinculoRepository.findByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa)
+                .orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
         return vinculoMapper.toDto(vinculo);
     }
     

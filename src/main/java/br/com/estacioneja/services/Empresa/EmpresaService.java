@@ -12,11 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.estacioneja.domain.enums.TipoAcesso;
-import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Empresa.Empresa;
 import br.com.estacioneja.domain.model.Endereco.Endereco;
 import br.com.estacioneja.domain.model.Usuario.Usuario;
-import br.com.estacioneja.domain.repository.Acesso.AcessoRepository;
 import br.com.estacioneja.domain.repository.Empresa.EmpresaRepository;
 import br.com.estacioneja.dto.input.EmpresaDTO;
 import br.com.estacioneja.dto.output.EmpresaOutputDTO;
@@ -24,8 +22,8 @@ import br.com.estacioneja.dto.output.URLImagemOutputDTO;
 import br.com.estacioneja.dto.update.EmpresaUpdateDto;
 import br.com.estacioneja.exceptions.custom.BusinessException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
-import br.com.estacioneja.exceptions.custom.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.EmpresaMapper;
+import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Endereco.EnderecoService;
 import br.com.estacioneja.services.Storage.R2StorageService;
 import br.com.estacioneja.services.Usuario.UsuarioService;
@@ -39,8 +37,8 @@ public class EmpresaService implements IEmpresa {
     private final UsuarioService usuarioService;
     private final EnderecoService enderecoService;
     private final EmpresaMapper empresaMapper;
-    private final AcessoRepository acessoRepository;
     private final R2StorageService r2StorageService;
+    private final AuthorizationService authorizationService;
 
     private static final long MAX_IMAGE_SIZE_BYTES = 5L * 1024 * 1024;
     private static final Set<String> CONTENT_TYPES_PERMITIDOS = Set.of(
@@ -84,16 +82,20 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public void update(UUID id, EmpresaUpdateDto dto) {
-        Empresa empresa = findEntityById(id);
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, id, TipoAcesso.MASTER);
 
+        Empresa empresa = findEntityById(id);
         empresa.setNome(dto.nome());
-        empresa.setTipoEmpresa(dto.tipoEmpresa());        
+        empresa.setTipoEmpresa(dto.tipoEmpresa());
     }
-    
+
     @Override @Transactional
     public void delete(UUID id) {
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaRole(autenticado, id, TipoAcesso.MASTER);
+
         Empresa empresa = findEntityById(id);
-        
         empresaRepository.delete(empresa);
     }
     
@@ -106,7 +108,9 @@ public class EmpresaService implements IEmpresa {
     
     @Override @Transactional(readOnly = true)
     public EmpresaOutputDTO findById(UUID empresaId) {
-       return empresaMapper.toDto(findEntityById(empresaId));
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaAccess(autenticado, empresaId);
+        return empresaMapper.toDto(findEntityById(empresaId));
     }
     
     
@@ -119,8 +123,8 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public URLImagemOutputDTO uploadLogo(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+        authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
-        ensureCanManageEmpresa(empresa, usuarioAutenticado);
         validarArquivoImagem(file);
 
         String extensao = resolverExtensao(file.getContentType());
@@ -151,8 +155,8 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public void deleteLogo(UUID id, Usuario usuarioAutenticado) {
+        authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
-        ensureCanManageEmpresa(empresa, usuarioAutenticado);
 
         String key = empresa.getLogotipoEmpresa();
         if (key == null || key.isBlank()) return;
@@ -167,8 +171,8 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public URLImagemOutputDTO uploadBanner(UUID id, MultipartFile file, Usuario usuarioAutenticado) {
+        authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
-        ensureCanManageEmpresa(empresa, usuarioAutenticado);
         validarArquivoImagem(file);
 
         String extensao = resolverExtensao(file.getContentType());
@@ -199,8 +203,8 @@ public class EmpresaService implements IEmpresa {
 
     @Override @Transactional
     public void deleteBanner(UUID id, Usuario usuarioAutenticado) {
+        authorizationService.requireEmpresaRole(usuarioAutenticado, id, TipoAcesso.MASTER);
         Empresa empresa = findEntityById(id);
-        ensureCanManageEmpresa(empresa, usuarioAutenticado);
 
         String key = empresa.getBannerEmpresa();
         if (key == null || key.isBlank()) return;
@@ -212,15 +216,6 @@ public class EmpresaService implements IEmpresa {
     }
 
     /* VALIDAÇÕES */
-
-    private void ensureCanManageEmpresa(Empresa empresa, Usuario autenticado) {
-        if (autenticado == null) throw new ForbiddenException();
-
-        Acesso acesso = acessoRepository.findByUsuarioAndEmpresa(autenticado, empresa);
-        if (acesso == null || acesso.getTipoAcesso() != TipoAcesso.MASTER) {
-            throw new ForbiddenException("Apenas o MASTER da empresa pode alterar suas imagens");
-        }
-    }
 
     private void validarArquivoImagem(MultipartFile file) {
         if (file == null || file.isEmpty()) {

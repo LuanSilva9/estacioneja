@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.estacioneja.domain.enums.TipoAcesso;
 import br.com.estacioneja.domain.enums.TipoEquipamento;
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.domain.model.Usuario.Usuario;
 import br.com.estacioneja.domain.repository.Equipamento.EquipamentoRepository;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
 import br.com.estacioneja.dto.output.ConexaoOutputDTO;
@@ -19,6 +21,7 @@ import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
 import br.com.estacioneja.exceptions.custom.DuplicateException;
 import br.com.estacioneja.exceptions.custom.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
+import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Conexao.ConexaoService;
 import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
 import br.com.estacioneja.usecases.interfaces.IEquipamento;
@@ -30,6 +33,9 @@ public class EquipamentoService implements IEquipamento {
     private final ConexaoService conexaoService;
     private final EstacionamentoService estacionamentoService;
     private final EquipamentoMapper equipamentoMapper;
+    private final AuthorizationService authorizationService;
+
+    private static final TipoAcesso[] CARGOS_GESTAO = { TipoAcesso.MASTER, TipoAcesso.CADASTRO_GESTAO };
 
     /* TRANSACOES */
     @Override @Transactional
@@ -38,37 +44,52 @@ public class EquipamentoService implements IEquipamento {
 
         Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(estacionamento), CARGOS_GESTAO);
+
         ConexaoOutputDTO conexaoCriada = conexaoService.create(dto.conexao());
-
         Conexao conexao = conexaoService.findEntityById(conexaoCriada.id());
-        
-        Equipamento equipamento = new Equipamento(dto, estacionamento, conexao);
 
+        Equipamento equipamento = new Equipamento(dto, estacionamento, conexao);
         return equipamentoMapper.toDto(equipamentoRepository.save(equipamento));
     }
+
     @Override @Transactional
     public void update(UUID id, EquipamentoUpdateDto dto) {
         Equipamento equipamento = findEntityById(id);
-        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
-        Conexao conexao = conexaoService.findEntityById(equipamento.getConexaoHardware().getId());
+        Estacionamento destino = estacionamentoService.findEntityById(dto.estacionamentoId());
 
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(equipamento.getEstacionamento()), CARGOS_GESTAO);
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(destino), CARGOS_GESTAO);
+
+        Conexao conexao = conexaoService.findEntityById(equipamento.getConexaoHardware().getId());
         conexaoService.update(conexao.getId(), dto.conexao());
 
         equipamento.setNome(dto.nome());
         equipamento.setDescricao(dto.descricao());
         equipamento.setModelo(dto.modelo());
         equipamento.setTipoEquipamento(dto.tipoEquipamento());
-        equipamento.setEstacionamento(estacionamento);
+        equipamento.setEstacionamento(destino);
         equipamento.setConexaoHardware(conexao);
 
         equipamentoRepository.save(equipamento);
     }
+
     @Override @Transactional
     public void delete(UUID id) {
         Equipamento equipamento = findEntityById(id);
 
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(equipamento.getEstacionamento()), CARGOS_GESTAO);
+
         conexaoService.delete(equipamento.getConexaoHardware().getId());
         equipamentoRepository.delete(equipamento);
+    }
+
+    private UUID empresaIdOf(Estacionamento e) {
+        if (e == null || e.getEmpresa() == null) return null;
+        return e.getEmpresa().getId();
     }
 
     /* CONSULTAS */
@@ -78,13 +99,20 @@ public class EquipamentoService implements IEquipamento {
     }
     @Override @Transactional(readOnly = true)
     public EquipamentoOutputDTO findById(UUID id) {
-        return equipamentoMapper.toDto(findEntityById(id));
+        Equipamento equipamento = findEntityById(id);
+
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaAccess(autenticado, empresaIdOf(equipamento.getEstacionamento()));
+
+        return equipamentoMapper.toDto(equipamento);
     }
 
     @Transactional(readOnly = true)
-    public List<EquipamentoOutputDTO> findByEmpresa(UUID empresaId) {        
+    public List<EquipamentoOutputDTO> findByEmpresa(UUID empresaId) {
+        Usuario autenticado = authorizationService.getCurrentUser();
+        authorizationService.requireEmpresaAccess(autenticado, empresaId);
+
         List<Equipamento> equipamentos = equipamentoRepository.findByEmpresa(empresaId);
-        
         return equipamentoMapper.toDtoList(equipamentos);
     }
 
