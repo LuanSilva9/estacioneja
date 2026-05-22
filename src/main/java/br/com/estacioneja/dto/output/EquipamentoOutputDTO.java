@@ -2,7 +2,7 @@ package br.com.estacioneja.dto.output;
 
 import java.util.UUID;
 
-import br.com.estacioneja.dto.input.ConexaoDTO;
+import br.com.estacioneja.modules.conexao.dto.ConexaoDTO;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoOutputDTO;
 import br.com.estacioneja.shared.enums.TipoEquipamento;
 

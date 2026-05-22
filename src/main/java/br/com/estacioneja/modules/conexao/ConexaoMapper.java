@@ -1,9 +1,9 @@
-package br.com.estacioneja.infra.config.mapper;
+package br.com.estacioneja.modules.conexao;
 
 import org.springframework.stereotype.Component;
 
-import br.com.estacioneja.domain.model.Conexao.Conexao;
-import br.com.estacioneja.dto.output.ConexaoOutputDTO;
+import br.com.estacioneja.modules.conexao.dto.ConexaoOutputDTO;
+import br.com.estacioneja.shared.mapper.AbstractMapper;
 
 @Component
 public class ConexaoMapper extends AbstractMapper<Conexao, ConexaoOutputDTO> {

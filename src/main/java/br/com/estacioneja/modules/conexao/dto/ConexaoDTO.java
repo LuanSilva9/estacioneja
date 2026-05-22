@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.input;
+package br.com.estacioneja.modules.conexao.dto;
 
 import br.com.estacioneja.shared.enums.TipoComunicacao;
 import br.com.estacioneja.shared.enums.TipoProtocolo;
@@ -12,6 +12,4 @@ public record ConexaoDTO(
     @NotNull(message = "Porta não pode estar vazia.") Integer porta,
     @NotBlank(message = "Credenciais não podem estar vazias.") String credenciais,
     @NotBlank(message = "Endereço MAC não pode estar vazio.") String enderecoMac
-) {
-
-}
+) { }

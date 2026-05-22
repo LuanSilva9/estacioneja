@@ -1,12 +1,12 @@
-package br.com.estacioneja.domain.model.Conexao;
+package br.com.estacioneja.modules.conexao;
 
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.shared.enums.TipoComunicacao;
 import br.com.estacioneja.shared.enums.TipoProtocolo;
-import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -33,14 +33,14 @@ public class Conexao {
 
     @Enumerated(EnumType.STRING)
     private TipoComunicacao tipoComunicacao;
-    
+
     @Enumerated(EnumType.STRING)
     private TipoProtocolo tipoProtocolo;
 
     private String endereco;
     private Integer porta;
     private String credenciais;
-    
+
     private String enderecoMac;
 
     @OneToOne(mappedBy = "conexaoHardware")

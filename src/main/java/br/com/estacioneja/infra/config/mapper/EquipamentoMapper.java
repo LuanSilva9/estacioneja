@@ -2,9 +2,9 @@ package br.com.estacioneja.infra.config.mapper;
 
 import org.springframework.stereotype.Component;
 
-import br.com.estacioneja.domain.model.Conexao.Conexao;
+import br.com.estacioneja.modules.conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
-import br.com.estacioneja.dto.input.ConexaoDTO;
+import br.com.estacioneja.modules.conexao.dto.ConexaoDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoMapper;
 import lombok.RequiredArgsConstructor;

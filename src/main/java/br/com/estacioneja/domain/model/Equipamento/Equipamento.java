@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.shared.enums.TipoEquipamento;
-import br.com.estacioneja.domain.model.Conexao.Conexao;
+import br.com.estacioneja.modules.conexao.Conexao;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
 import jakarta.persistence.Entity;

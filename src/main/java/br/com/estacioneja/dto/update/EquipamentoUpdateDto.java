@@ -2,6 +2,7 @@ package br.com.estacioneja.dto.update;
 
 import java.util.UUID;
 
+import br.com.estacioneja.modules.conexao.dto.ConexaoUpdateDto;
 import br.com.estacioneja.shared.enums.TipoEquipamento;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

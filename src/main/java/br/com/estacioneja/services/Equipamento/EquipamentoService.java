@@ -9,20 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.shared.enums.TipoEquipamento;
-import br.com.estacioneja.domain.model.Conexao.Conexao;
+import br.com.estacioneja.modules.conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.repository.Equipamento.EquipamentoRepository;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
-import br.com.estacioneja.dto.output.ConexaoOutputDTO;
+import br.com.estacioneja.modules.conexao.dto.ConexaoOutputDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
 import br.com.estacioneja.dto.update.EquipamentoUpdateDto;
 import br.com.estacioneja.errors.exceptions.DuplicateException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
-import br.com.estacioneja.services.Conexao.ConexaoService;
+import br.com.estacioneja.modules.conexao.ConexaoService;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
 import br.com.estacioneja.usecases.interfaces.IEquipamento;
 
