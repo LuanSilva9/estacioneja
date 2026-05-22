@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.estacioneja.shared.enums.TipoAcesso;
-import br.com.estacioneja.domain.model.Endereco.Endereco;
+import br.com.estacioneja.modules.endereco.Endereco;
 import br.com.estacioneja.modules.empresa.dto.EmpresaDTO;
 import br.com.estacioneja.modules.empresa.dto.EmpresaOutputDTO;
 import br.com.estacioneja.modules.empresa.dto.EmpresaUpdateDto;
@@ -23,7 +23,7 @@ import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
 import br.com.estacioneja.errors.exceptions.BusinessException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
-import br.com.estacioneja.services.Endereco.EnderecoService;
+import br.com.estacioneja.modules.endereco.EnderecoService;
 import br.com.estacioneja.shared.storage.R2StorageService;
 import br.com.estacioneja.modules.usuario.UsuarioService;
 

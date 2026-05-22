@@ -2,7 +2,7 @@ package br.com.estacioneja.modules.empresa;
 
 import org.springframework.stereotype.Component;
 
-import br.com.estacioneja.infra.config.mapper.EnderecoMapper;
+import br.com.estacioneja.modules.endereco.EnderecoMapper;
 import br.com.estacioneja.modules.empresa.dto.EmpresaOutputDTO;
 import br.com.estacioneja.modules.usuario.UsuarioMapper;
 import br.com.estacioneja.shared.mapper.AbstractMapper;

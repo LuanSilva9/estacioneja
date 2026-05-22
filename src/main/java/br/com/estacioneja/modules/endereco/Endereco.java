@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.model.Endereco;
+package br.com.estacioneja.modules.endereco;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

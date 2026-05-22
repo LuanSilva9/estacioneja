@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.shared.enums.Plano;
 import br.com.estacioneja.shared.enums.TipoEmpresa;
-import br.com.estacioneja.domain.model.Endereco.Endereco;
+import br.com.estacioneja.modules.endereco.Endereco;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.errors.exceptions.BusinessException;

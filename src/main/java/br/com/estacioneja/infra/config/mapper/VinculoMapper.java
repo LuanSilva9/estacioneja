@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.dto.output.VinculoOutputDTO;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoMapper;
+import br.com.estacioneja.modules.veiculo.VeiculoMapper;
 import lombok.RequiredArgsConstructor;
 
 @Component

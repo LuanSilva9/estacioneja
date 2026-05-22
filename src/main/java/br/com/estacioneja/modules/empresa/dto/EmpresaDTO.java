@@ -2,7 +2,7 @@ package br.com.estacioneja.modules.empresa.dto;
 
 import java.util.UUID;
 
-import br.com.estacioneja.dto.input.EnderecoDTO;
+import br.com.estacioneja.modules.endereco.dto.EnderecoDTO;
 import br.com.estacioneja.shared.enums.Plano;
 import br.com.estacioneja.shared.enums.TipoEmpresa;
 import jakarta.validation.Valid;

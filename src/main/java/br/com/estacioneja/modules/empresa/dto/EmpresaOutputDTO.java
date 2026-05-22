@@ -2,7 +2,7 @@ package br.com.estacioneja.modules.empresa.dto;
 
 import java.util.UUID;
 
-import br.com.estacioneja.dto.output.EnderecoOutputDTO;
+import br.com.estacioneja.modules.endereco.dto.EnderecoOutputDTO;
 import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
 import br.com.estacioneja.shared.enums.Plano;
 import br.com.estacioneja.shared.enums.TipoEmpresa;

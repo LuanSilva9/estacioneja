@@ -1,9 +1,9 @@
-package br.com.estacioneja.infra.config.mapper;
+package br.com.estacioneja.modules.endereco;
 
 import org.springframework.stereotype.Component;
 
-import br.com.estacioneja.domain.model.Endereco.Endereco;
-import br.com.estacioneja.dto.output.EnderecoOutputDTO;
+import br.com.estacioneja.modules.endereco.dto.EnderecoOutputDTO;
+import br.com.estacioneja.shared.mapper.AbstractMapper;
 
 @Component
 public class EnderecoMapper extends AbstractMapper<Endereco, EnderecoOutputDTO> {

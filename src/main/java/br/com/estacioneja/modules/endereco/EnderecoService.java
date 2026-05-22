@@ -1,33 +1,29 @@
-package br.com.estacioneja.services.Endereco;
+package br.com.estacioneja.modules.endereco;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import br.com.estacioneja.domain.model.Endereco.Endereco;
-import br.com.estacioneja.domain.repository.Endereco.EnderecoRepository;
-import br.com.estacioneja.dto.input.EnderecoDTO;
-import br.com.estacioneja.dto.output.EnderecoOutputDTO;
-import br.com.estacioneja.dto.update.EnderecoUpdateDto;
+
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
-import br.com.estacioneja.infra.config.mapper.EnderecoMapper;
-import br.com.estacioneja.usecases.interfaces.IEndereco;
+import br.com.estacioneja.modules.endereco.dto.EnderecoDTO;
+import br.com.estacioneja.modules.endereco.dto.EnderecoOutputDTO;
+import br.com.estacioneja.modules.endereco.dto.EnderecoUpdateDto;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EnderecoService implements IEndereco {
+public class EnderecoService {
     private final EnderecoRepository enderecoRepository;
     private final EnderecoMapper enderecoMapper;
 
     /* TRANSACOES */
 
-    @Override @Transactional
+    @Transactional
     public Endereco create(EnderecoDTO dto) {
         Endereco newEndereco = new Endereco(dto.logradouro(), dto.bairro(), dto.cidade(), dto.uf(), dto.cep(), dto.latitude(), dto.longitude());
-
         return enderecoRepository.save(newEndereco);
     }
 
-    @Override @Transactional
+    @Transactional
     public void update(Long id, EnderecoUpdateDto dto) {
         Endereco endereco = findEntityById(id);
 
@@ -40,21 +36,18 @@ public class EnderecoService implements IEndereco {
         endereco.setLongitude(dto.longitude());
     }
 
-    @Override @Transactional
+    @Transactional
     public void delete(Long id) {
         Endereco endereco = findEntityById(id);
-
         enderecoRepository.delete(endereco);
     }
 
     /* CONSULTAS */
 
-    @Override
     public Endereco findEntityById(Long id) {
         return enderecoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Endereço não encontrado"));
     }
 
-    @Override
     public EnderecoOutputDTO findById(Long id) {
         return enderecoMapper.toDto(findEntityById(id));
     }

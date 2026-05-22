@@ -1,9 +1,9 @@
-package br.com.estacioneja.dto.input;
+package br.com.estacioneja.modules.endereco.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record EnderecoDTO(
+public record EnderecoUpdateDto(
     @NotBlank(message = "Logradouro não pode estar vazio.") String logradouro,
     @NotBlank(message = "Bairro não pode estar vazio.") String bairro,
     @NotBlank(message = "Cidade não pode estar vazia.") String cidade,
@@ -11,6 +11,4 @@ public record EnderecoDTO(
     @NotBlank(message = "CEP não pode estar vazio.") String cep,
     @NotNull(message = "Latitude não pode estar vazia.") Double latitude,
     @NotNull(message = "Longitude não pode estar vazia.") Double longitude
-) {
-
-}
+) { }
