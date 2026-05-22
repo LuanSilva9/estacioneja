@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.errors.exceptions.DuplicateException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
-import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.modules.conexao.Conexao;
 import br.com.estacioneja.modules.conexao.ConexaoService;
 import br.com.estacioneja.modules.conexao.dto.ConexaoOutputDTO;
@@ -17,6 +16,7 @@ import br.com.estacioneja.modules.equipamento.dto.EquipamentoOutputDTO;
 import br.com.estacioneja.modules.equipamento.dto.EquipamentoUpdateDto;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.security.AuthorizationService;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.shared.enums.TipoEquipamento;

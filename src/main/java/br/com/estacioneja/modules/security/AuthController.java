@@ -1,16 +1,14 @@
-package br.com.estacioneja.controller.Authentication;
+package br.com.estacioneja.modules.security;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.com.estacioneja.modules.security.dto.AuthDTO;
+import br.com.estacioneja.modules.security.dto.JWTOutputDTO;
 import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.dto.input.AuthDTO;
 import br.com.estacioneja.modules.usuario.dto.CreateUsuarioDto;
-import br.com.estacioneja.dto.output.JWTOutputDTO;
 import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
-import br.com.estacioneja.infra.config.security.AuthenticationService;
-import br.com.estacioneja.infra.config.security.JwtService;
 import br.com.estacioneja.modules.usuario.UsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;

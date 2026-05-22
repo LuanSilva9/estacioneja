@@ -1,10 +1,10 @@
-package br.com.estacioneja.controller.Planos;
+package br.com.estacioneja.modules.empresa;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.estacioneja.modules.empresa.dto.PlanoDTO;
 import br.com.estacioneja.shared.enums.Plano;
-import br.com.estacioneja.dto.output.PlanoDTO;
 
 import java.util.Arrays;
 import java.util.List;

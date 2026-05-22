@@ -1,4 +1,4 @@
-package br.com.estacioneja.infra.config.security;
+package br.com.estacioneja.modules.security;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

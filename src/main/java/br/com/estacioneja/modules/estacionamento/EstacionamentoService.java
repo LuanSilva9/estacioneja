@@ -14,10 +14,10 @@ import br.com.estacioneja.modules.empresa.EmpresaService;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoDTO;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoOutputDTO;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoUpdateDto;
+import br.com.estacioneja.modules.security.AuthorizationService;
 import br.com.estacioneja.modules.usuario.Usuario;
 
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
-import br.com.estacioneja.infra.config.security.AuthorizationService;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.input;
+package br.com.estacioneja.modules.security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,4 +1,4 @@
-package br.com.estacioneja.infra.config.security;
+package br.com.estacioneja.modules.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ReadListener;

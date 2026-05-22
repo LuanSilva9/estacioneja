@@ -22,8 +22,8 @@ import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
 
 import br.com.estacioneja.errors.exceptions.BusinessException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
-import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.modules.endereco.EnderecoService;
+import br.com.estacioneja.modules.security.AuthorizationService;
 import br.com.estacioneja.shared.storage.R2StorageService;
 import br.com.estacioneja.modules.usuario.UsuarioService;
 

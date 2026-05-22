@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.output;
+package br.com.estacioneja.modules.empresa.dto;
 
 import java.util.List;
 
