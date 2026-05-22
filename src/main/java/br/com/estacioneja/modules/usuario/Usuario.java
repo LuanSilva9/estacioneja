@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.modules.veiculo.Veiculo;
-import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.modules.vinculo.Vinculo;
 import br.com.estacioneja.modules.acessos.Acesso;
 import br.com.estacioneja.shared.enums.TipoUsuario;
 import br.com.estacioneja.shared.vo.CPF;

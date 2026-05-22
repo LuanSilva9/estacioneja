@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.model.Vinculo;
+package br.com.estacioneja.modules.vinculo;
 
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Vinculo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

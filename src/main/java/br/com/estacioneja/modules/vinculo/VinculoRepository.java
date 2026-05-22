@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.repository.Vinculo;
+package br.com.estacioneja.modules.vinculo;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.modules.usuario.Usuario;
 
 @Repository

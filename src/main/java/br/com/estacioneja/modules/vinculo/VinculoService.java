@@ -1,32 +1,30 @@
-package br.com.estacioneja.services.Vinculo;
+package br.com.estacioneja.modules.vinculo;
 
 import java.util.List;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import br.com.estacioneja.shared.enums.TipoAcesso;
-import br.com.estacioneja.modules.estacionamento.Estacionamento;
-import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.modules.veiculo.Veiculo;
-import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
-import br.com.estacioneja.dto.input.VinculoDTO;
-import br.com.estacioneja.dto.output.VinculoOutputDTO;
 import br.com.estacioneja.errors.exceptions.BusinessException;
 import br.com.estacioneja.errors.exceptions.DuplicateException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
-import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.modules.veiculo.Veiculo;
 import br.com.estacioneja.modules.veiculo.VeiculoService;
-import br.com.estacioneja.usecases.interfaces.IVinculo;
+import br.com.estacioneja.modules.vinculo.dto.VinculoCardUsuarioDTO;
+import br.com.estacioneja.modules.vinculo.dto.VinculoConsultaGuaritaDTO;
+import br.com.estacioneja.modules.vinculo.dto.VinculoDTO;
+import br.com.estacioneja.modules.vinculo.dto.VinculoLinhaAdminDTO;
+import br.com.estacioneja.shared.enums.TipoAcesso;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class VinculoService implements IVinculo {
+public class VinculoService {
 
     private final VinculoRepository vinculoRepository;
     private final EstacionamentoService estacionamentoService;
@@ -36,42 +34,25 @@ public class VinculoService implements IVinculo {
 
     /* TRANSAÇÕES */
 
-    @Override
     @Transactional
-    public VinculoOutputDTO create(VinculoDTO dto) {
-        Estacionamento estacionamento = getEstacionamento(dto.estacionamentoId());
+    public VinculoLinhaAdminDTO create(VinculoDTO dto) {
+        Estacionamento estacionamento = estacionamentoService.findEntityById(dto.estacionamentoId());
 
         Usuario autenticado = authorizationService.getCurrentUser();
-
         authorizationService.requireEmpresaRole(autenticado, empresaIdOf(estacionamento), TipoAcesso.MASTER);
-        
-        Veiculo veiculo = getVeiculo(dto.placaVeiculo());
-        
-        if(!estacionamento.getRegraEstacionamento().contains(veiculo.getTipoVeiculo())) {
+
+        Veiculo veiculo = veiculoService.findByPlaca(dto.placaVeiculo());
+
+        if (!estacionamento.getRegraEstacionamento().contains(veiculo.getTipoVeiculo())) {
             throw new BusinessException("Esse veiculo viola a regra do estacionamento");
         }
 
         validateDuplicate(veiculo, estacionamento);
 
         Vinculo vinculo = new Vinculo(estacionamento, veiculo.getUsuario(), veiculo);
-        
-        return vinculoMapper.toDto(vinculoRepository.save(vinculo));
+        return vinculoMapper.toLinhaAdmin(vinculoRepository.save(vinculo));
     }
 
-    @Override
-    @Transactional
-    public void update(UUID id, VinculoDTO dto) {
-        Vinculo vinculo = findEntityById(id);
-        Estacionamento destino = getEstacionamento(dto.estacionamentoId());
-
-        Usuario autenticado = authorizationService.getCurrentUser();
-        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(vinculo.getEstacionamento()), TipoAcesso.MASTER);
-        authorizationService.requireEmpresaRole(autenticado, empresaIdOf(destino), TipoAcesso.MASTER);
-
-        vinculo.setEstacionamento(destino);
-    }
-
-    @Override
     @Transactional
     public void delete(UUID id) {
         Vinculo vinculo = findEntityById(id);
@@ -82,38 +63,25 @@ public class VinculoService implements IVinculo {
         vinculoRepository.delete(vinculo);
     }
 
-    private UUID empresaIdOf(Estacionamento e) {
-        if (e == null || e.getEmpresa() == null) return null;
-        return e.getEmpresa().getId();
-    }
-
     /* CONSULTAS */
 
-    @Override
     public Vinculo findEntityById(UUID id) {
         return vinculoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
     }
 
-    @Override
-    public VinculoOutputDTO findById(UUID id) {
-        return vinculoMapper.toDto(findEntityById(id));
+    public List<VinculoCardUsuarioDTO> findCardUsuarioByUsuario(Usuario usuario) {
+        return vinculoMapper.toCardUsuarioList(vinculoRepository.findAllByUsuario(usuario));
     }
 
-    @Override
-    public List<VinculoOutputDTO> findVincleByUser(Usuario usuario) {
-        return vinculoMapper.toDtoList(vinculoRepository.findAllByUsuario(usuario));
-    }
-
-    @Override
-    public List<VinculoOutputDTO> findVincleByEmpresa(UUID empresaId) {
+    public List<VinculoLinhaAdminDTO> findLinhaAdminByEmpresa(UUID empresaId) {
         Usuario autenticado = authorizationService.getCurrentUser();
         authorizationService.requireEmpresaRole(autenticado, empresaId, TipoAcesso.MASTER);
 
-        return vinculoMapper.toDtoList(vinculoRepository.findByEmpresaId(empresaId));
+        return vinculoMapper.toLinhaAdminList(vinculoRepository.findByEmpresaId(empresaId));
     }
 
-    public VinculoOutputDTO findVincleByPlacaAndEstacionamentoId(String placa, UUID estacionamentoId) {
+    public VinculoConsultaGuaritaDTO findConsultaGuarita(String placa, UUID estacionamentoId) {
         Estacionamento estacionamento = estacionamentoService.findEntityById(estacionamentoId);
 
         Usuario autenticado = authorizationService.getCurrentUser();
@@ -121,11 +89,11 @@ public class VinculoService implements IVinculo {
 
         Vinculo vinculo = vinculoRepository.findByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa)
                 .orElseThrow(() -> new EntityNotFoundException("Vinculo não encontrado"));
-        return vinculoMapper.toDto(vinculo);
+        return vinculoMapper.toConsultaGuarita(vinculo);
     }
-    
+
     /* VALIDAÇÕES */
-    
+
     public Boolean existsVinculo(String placa, UUID estacionamentoId) {
         return vinculoRepository.existsByEstacionamentoIdAndVeiculoPlaca(estacionamentoId, placa);
     }
@@ -138,11 +106,8 @@ public class VinculoService implements IVinculo {
 
     /* HELPERS */
 
-    private Veiculo getVeiculo(String placa) {
-        return veiculoService.findByPlaca(placa);
-    }
-
-    private Estacionamento getEstacionamento(UUID id) {
-        return estacionamentoService.findEntityById(id);
+    private UUID empresaIdOf(Estacionamento e) {
+        if (e == null || e.getEmpresa() == null) return null;
+        return e.getEmpresa().getId();
     }
 }

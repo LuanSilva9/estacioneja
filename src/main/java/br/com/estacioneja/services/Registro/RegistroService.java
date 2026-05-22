@@ -22,7 +22,7 @@ import br.com.estacioneja.infra.config.mapper.RegistroMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
 import br.com.estacioneja.modules.veiculo.VeiculoService;
-import br.com.estacioneja.services.Vinculo.VinculoService;
+import br.com.estacioneja.modules.vinculo.VinculoService;
 import br.com.estacioneja.usecases.interfaces.IRegistro;
 
 @Service

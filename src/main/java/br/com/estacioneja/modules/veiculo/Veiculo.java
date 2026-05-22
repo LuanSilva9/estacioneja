@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.modules.vinculo.Vinculo;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.modules.veiculo.dto.VeiculoDTO;
 import br.com.estacioneja.shared.enums.TipoVeiculo;
