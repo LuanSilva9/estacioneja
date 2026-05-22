@@ -1,4 +1,4 @@
-package br.com.estacioneja.domain.repository.Equipamento;
+package br.com.estacioneja.modules.equipamento;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import br.com.estacioneja.shared.enums.TipoEquipamento;
-import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 
 @Repository
 public interface EquipamentoRepository extends JpaRepository<Equipamento, UUID> {

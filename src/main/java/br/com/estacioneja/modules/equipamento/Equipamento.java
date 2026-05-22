@@ -1,13 +1,13 @@
-package br.com.estacioneja.domain.model.Equipamento;
+package br.com.estacioneja.modules.equipamento;
 
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.shared.enums.TipoEquipamento;
 import br.com.estacioneja.modules.conexao.Conexao;
+import br.com.estacioneja.modules.equipamento.dto.EquipamentoDTO;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
-import br.com.estacioneja.dto.input.EquipamentoDTO;
+import br.com.estacioneja.shared.enums.TipoEquipamento;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -33,14 +33,14 @@ public class Equipamento {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
+
     private String nome;
     private String descricao;
     private String modelo;
 
     @Enumerated(EnumType.STRING)
     private TipoEquipamento tipoEquipamento;
-    
+
     @ManyToOne
     @JoinColumn(name = "estacionamentoId", referencedColumnName = "id")
     private Estacionamento estacionamento;

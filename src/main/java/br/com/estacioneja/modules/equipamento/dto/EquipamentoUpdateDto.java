@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.update;
+package br.com.estacioneja.modules.equipamento.dto;
 
 import java.util.UUID;
 
@@ -15,6 +15,4 @@ public record EquipamentoUpdateDto(
     @NotNull(message = "Tipo de Equipamento não pode estar vazio.") TipoEquipamento tipoEquipamento,
     @NotNull(message = "ID do Estacionamento não pode estar vazio.") UUID estacionamentoId,
     @NotNull(message = "Conexão não pode estar vazia.") @Valid ConexaoUpdateDto conexao
-) {
-
-}
+) { }

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.estacioneja.shared.enums.Privacidade;
 import br.com.estacioneja.shared.enums.TipoVeiculo;
-import br.com.estacioneja.domain.model.Equipamento.Equipamento;
+import br.com.estacioneja.modules.equipamento.Equipamento;
 import br.com.estacioneja.modules.vinculo.Vinculo;
 import br.com.estacioneja.errors.exceptions.BusinessException;
 import br.com.estacioneja.modules.empresa.Empresa;
