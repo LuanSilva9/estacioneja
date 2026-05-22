@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import br.com.estacioneja.domain.model.Acesso.Acesso;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
+import br.com.estacioneja.modules.acessos.Acesso;
 import br.com.estacioneja.shared.enums.TipoUsuario;
 import br.com.estacioneja.shared.vo.CPF;
 import jakarta.persistence.CascadeType;

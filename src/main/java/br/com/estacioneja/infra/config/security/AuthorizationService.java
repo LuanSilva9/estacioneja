@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.shared.enums.TipoAcesso;
-import br.com.estacioneja.domain.model.Acesso.Acesso;
+
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.modules.usuario.UsuarioRepository;
 import br.com.estacioneja.errors.exceptions.ForbiddenException;

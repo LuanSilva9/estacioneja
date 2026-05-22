@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import br.com.estacioneja.shared.enums.TipoAcesso;
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
@@ -19,7 +19,7 @@ import br.com.estacioneja.errors.exceptions.DuplicateException;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
-import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.IVinculo;
 import jakarta.transaction.Transactional;

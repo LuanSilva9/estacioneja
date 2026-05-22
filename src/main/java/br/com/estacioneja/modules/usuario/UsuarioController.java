@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.estacioneja.dto.output.AcessoOutputDTO;
+import br.com.estacioneja.modules.acessos.AcessoService;
+import br.com.estacioneja.modules.acessos.dto.AcessoOutputDTO;
 import br.com.estacioneja.modules.usuario.dto.ReadFotoPerfilDto;
 import br.com.estacioneja.modules.usuario.dto.ReadUsuarioDto;
 import br.com.estacioneja.modules.usuario.dto.UpdateUsuarioDto;
-import br.com.estacioneja.services.Acesso.AcessoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

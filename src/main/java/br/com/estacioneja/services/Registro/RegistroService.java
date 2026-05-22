@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.shared.enums.TipoRegistro;
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Registro.Registro;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
@@ -20,7 +20,7 @@ import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.errors.exceptions.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.RegistroMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
-import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
 import br.com.estacioneja.services.Veiculo.VeiculoService;
 import br.com.estacioneja.services.Vinculo.VinculoService;
 import br.com.estacioneja.usecases.interfaces.IRegistro;

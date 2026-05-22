@@ -11,7 +11,7 @@ import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.shared.enums.TipoEquipamento;
 import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.repository.Equipamento.EquipamentoRepository;
 import br.com.estacioneja.dto.input.EquipamentoDTO;
@@ -23,7 +23,7 @@ import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.EquipamentoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.services.Conexao.ConexaoService;
-import br.com.estacioneja.services.Estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
 import br.com.estacioneja.usecases.interfaces.IEquipamento;
 
 @Service

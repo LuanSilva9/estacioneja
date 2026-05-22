@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.estacioneja.domain.model.Estacionamento.Estacionamento;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Registro.Registro;
 import br.com.estacioneja.domain.model.Veiculo.Veiculo;
 
