@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.input;
+package br.com.estacioneja.modules.veiculo.dto;
 
 import br.com.estacioneja.shared.enums.TipoVeiculo;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +10,4 @@ public record VeiculoDTO(
     @NotBlank(message = "Modelo não pode estar vazio.") String modelo,
     @NotNull(message = "Tipo de Veículo não pode estar vazio.") TipoVeiculo tipoVeiculo,
     String observacao
-) {
-
-}
+) { }

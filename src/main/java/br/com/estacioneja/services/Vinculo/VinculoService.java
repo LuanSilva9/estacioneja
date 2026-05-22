@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import br.com.estacioneja.shared.enums.TipoAcesso;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.domain.model.Veiculo.Veiculo;
+import br.com.estacioneja.modules.veiculo.Veiculo;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
 import br.com.estacioneja.domain.repository.Vinculo.VinculoRepository;
 import br.com.estacioneja.dto.input.VinculoDTO;
@@ -20,7 +20,7 @@ import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.infra.config.mapper.VinculoMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
-import br.com.estacioneja.services.Veiculo.VeiculoService;
+import br.com.estacioneja.modules.veiculo.VeiculoService;
 import br.com.estacioneja.usecases.interfaces.IVinculo;
 import jakarta.transaction.Transactional;
 

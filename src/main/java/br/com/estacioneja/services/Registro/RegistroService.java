@@ -12,7 +12,7 @@ import br.com.estacioneja.shared.enums.TipoRegistro;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.domain.model.Registro.Registro;
 import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.domain.model.Veiculo.Veiculo;
+import br.com.estacioneja.modules.veiculo.Veiculo;
 import br.com.estacioneja.domain.repository.Registro.RegistroRepository;
 import br.com.estacioneja.dto.input.RegistroDTO;
 import br.com.estacioneja.dto.output.RegistroOutputDTO;
@@ -21,7 +21,7 @@ import br.com.estacioneja.errors.exceptions.ForbiddenException;
 import br.com.estacioneja.infra.config.mapper.RegistroMapper;
 import br.com.estacioneja.infra.config.security.AuthorizationService;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
-import br.com.estacioneja.services.Veiculo.VeiculoService;
+import br.com.estacioneja.modules.veiculo.VeiculoService;
 import br.com.estacioneja.services.Vinculo.VinculoService;
 import br.com.estacioneja.usecases.interfaces.IRegistro;
 

@@ -1,14 +1,14 @@
-package br.com.estacioneja.domain.model.Veiculo;
+package br.com.estacioneja.modules.veiculo;
 
 import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import br.com.estacioneja.shared.enums.TipoVeiculo;
-import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.domain.model.Vinculo.Vinculo;
-import br.com.estacioneja.dto.input.VeiculoDTO;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.modules.veiculo.dto.VeiculoDTO;
+import br.com.estacioneja.shared.enums.TipoVeiculo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,7 +55,7 @@ public class Veiculo {
     private List<Vinculo> vinculos;
 
     private String observacao;
-    
+
     public Veiculo(VeiculoDTO dto, Usuario proprietario) {
         this.placa = dto.placa();
         this.modelo = dto.modelo();
@@ -64,5 +64,4 @@ public class Veiculo {
         this.observacao = dto.observacao();
         this.usuario = proprietario;
     }
-
 }

@@ -6,6 +6,7 @@ import br.com.estacioneja.domain.model.Conexao.Conexao;
 import br.com.estacioneja.domain.model.Equipamento.Equipamento;
 import br.com.estacioneja.dto.input.ConexaoDTO;
 import br.com.estacioneja.dto.output.EquipamentoOutputDTO;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoMapper;
 import lombok.RequiredArgsConstructor;
 
 @Component
