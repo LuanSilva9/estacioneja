@@ -1,20 +1,8 @@
-package br.com.estacioneja.controller.Registro;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.dto.input.RegistroDTO;
-import br.com.estacioneja.dto.output.RegistroOutputDTO;
-import br.com.estacioneja.services.Registro.RegistroService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+package br.com.estacioneja.modules.registro;
 
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import br.com.estacioneja.modules.registro.dto.RegistroDTO;
+import br.com.estacioneja.modules.registro.dto.RegistroOutputDTO;
+import br.com.estacioneja.modules.usuario.Usuario;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/registro")
@@ -43,19 +40,13 @@ public class RegistroController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/historico/estacionamento/{estacionamentoId}")
     public ResponseEntity<List<RegistroOutputDTO>> verHistoricoEstacionamento(@PathVariable UUID estacionamentoId) {
-        List<RegistroOutputDTO> historicoEstacionamento = registroService.findByEstacionamento(estacionamentoId);
-
-        return ResponseEntity.ok().body(historicoEstacionamento);
+        return ResponseEntity.ok(registroService.findByEstacionamento(estacionamentoId));
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/historico/usuario")
     public ResponseEntity<List<RegistroOutputDTO>> verHistoricoUsuario(Authentication auth) {
         Usuario usuarioAutenticado = (Usuario) auth.getPrincipal();
-        List<RegistroOutputDTO> historicoUsuario = registroService.findByUsuario(usuarioAutenticado.getId());
-
-        return ResponseEntity.ok().body(historicoUsuario);
+        return ResponseEntity.ok(registroService.findByUsuario(usuarioAutenticado.getId()));
     }
-    
-
 }

@@ -1,12 +1,12 @@
-package br.com.estacioneja.domain.model.Registro;
+package br.com.estacioneja.modules.registro;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
-import br.com.estacioneja.shared.enums.TipoRegistro;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.veiculo.Veiculo;
+import br.com.estacioneja.shared.enums.TipoRegistro;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Registro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,7 +44,7 @@ public class Registro {
     private TipoRegistro tipoRegistro;
 
     private LocalDateTime dataRegistro;
-    
+
     public Registro(Veiculo veiculo, Estacionamento estacionamento, TipoRegistro tipoRegistro) {
         this.veiculo = veiculo;
         this.estacionamento = estacionamento;

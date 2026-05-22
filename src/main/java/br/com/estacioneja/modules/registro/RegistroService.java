@@ -1,33 +1,29 @@
-package br.com.estacioneja.services.Registro;
+package br.com.estacioneja.modules.registro;
 
 import java.util.List;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.estacioneja.shared.enums.TipoAcesso;
-import br.com.estacioneja.shared.enums.TipoRegistro;
-import br.com.estacioneja.modules.estacionamento.Estacionamento;
-import br.com.estacioneja.domain.model.Registro.Registro;
-import br.com.estacioneja.modules.usuario.Usuario;
-import br.com.estacioneja.modules.veiculo.Veiculo;
-import br.com.estacioneja.domain.repository.Registro.RegistroRepository;
-import br.com.estacioneja.dto.input.RegistroDTO;
-import br.com.estacioneja.dto.output.RegistroOutputDTO;
 import br.com.estacioneja.errors.exceptions.EntityNotFoundException;
 import br.com.estacioneja.errors.exceptions.ForbiddenException;
-import br.com.estacioneja.infra.config.mapper.RegistroMapper;
-import br.com.estacioneja.infra.config.security.AuthorizationService;
+import br.com.estacioneja.modules.estacionamento.Estacionamento;
 import br.com.estacioneja.modules.estacionamento.EstacionamentoService;
+import br.com.estacioneja.modules.registro.dto.RegistroDTO;
+import br.com.estacioneja.modules.registro.dto.RegistroOutputDTO;
+import br.com.estacioneja.modules.security.AuthorizationService;
+import br.com.estacioneja.modules.usuario.Usuario;
+import br.com.estacioneja.modules.veiculo.Veiculo;
 import br.com.estacioneja.modules.veiculo.VeiculoService;
 import br.com.estacioneja.modules.vinculo.VinculoService;
-import br.com.estacioneja.usecases.interfaces.IRegistro;
+import br.com.estacioneja.shared.enums.TipoAcesso;
+import br.com.estacioneja.shared.enums.TipoRegistro;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RegistroService implements IRegistro {
+public class RegistroService {
     private final RegistroRepository registroRepository;
     private final RegistroMapper registroMapper;
     private final EstacionamentoService estacionamentoService;
@@ -39,7 +35,7 @@ public class RegistroService implements IRegistro {
 
     /* TRANSACOES */
 
-    @Override @Transactional
+    @Transactional
     public RegistroOutputDTO create(RegistroDTO dto) {
         Estacionamento estacionamento = estacionamentoService.findEntityLocked(dto.estacionamentoId());
 
@@ -61,12 +57,12 @@ public class RegistroService implements IRegistro {
 
     /* CONSULTAS */
 
-    @Override @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Registro findEntityById(UUID id) {
-        return registroRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Registro não encontrado"));
+        return registroRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Registro não encontrado"));
     }
 
-    @Override @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public RegistroOutputDTO findById(UUID id) {
         return registroMapper.toDto(findEntityById(id));
     }
@@ -90,26 +86,22 @@ public class RegistroService implements IRegistro {
         return registroMapper.toDtoList(registroRepository.findByEstacionamentoIdOrderByDataRegistroDesc(estacionamentoId));
     }
 
+    /* HELPERS */
+
     private UUID empresaIdOf(Estacionamento e) {
         if (e == null || e.getEmpresa() == null) return null;
         return e.getEmpresa().getId();
     }
 
-    /* HELPERS */
-
     private RegistroOutputDTO registrarEntrada(Veiculo veiculo, Estacionamento estacionamento) {
         Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.ENTRADA);
-
         estacionamento.entrarVeiculo();
-        
         return registroMapper.toDto(registroRepository.save(newRegistro));
     }
 
     private RegistroOutputDTO registrarSaida(Veiculo veiculo, Estacionamento estacionamento) {
         Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.SAIDA);
-
         estacionamento.sairVeiculo();
-
         return registroMapper.toDto(registroRepository.save(newRegistro));
     }
 }

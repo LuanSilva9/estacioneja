@@ -1,0 +1,16 @@
+package br.com.estacioneja.modules.registro.dto;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoOutputDTO;
+import br.com.estacioneja.modules.veiculo.dto.VeiculoOutputDTO;
+import br.com.estacioneja.shared.enums.TipoRegistro;
+
+public record RegistroOutputDTO(
+        UUID id,
+        VeiculoOutputDTO veiculo,
+        EstacionamentoOutputDTO estacionamento,
+        TipoRegistro tipoRegistro,
+        LocalDateTime dataRegistro
+) { }

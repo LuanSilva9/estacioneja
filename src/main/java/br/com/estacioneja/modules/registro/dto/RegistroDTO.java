@@ -1,4 +1,4 @@
-package br.com.estacioneja.dto.input;
+package br.com.estacioneja.modules.registro.dto;
 
 import java.util.UUID;
 
@@ -8,6 +8,4 @@ import jakarta.validation.constraints.NotNull;
 public record RegistroDTO(
     @NotBlank(message = "Placa não pode estar vazia.") String placa,
     @NotNull(message = "ID do Estacionamento não pode estar vazio.") UUID estacionamentoId
-) {
-
-}
+) { }
