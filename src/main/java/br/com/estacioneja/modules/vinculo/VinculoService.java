@@ -43,7 +43,9 @@ public class VinculoService {
 
         Veiculo veiculo = veiculoService.findByPlaca(dto.placaVeiculo());
 
-        if (!estacionamento.getRegraEstacionamento().contains(veiculo.getTipoVeiculo())) {
+        boolean tipoPermitido = estacionamento.getRegrasCapacidade().stream().anyMatch(r -> r.getTipoVeiculo() == veiculo.getTipoVeiculo());
+        
+        if (!tipoPermitido) {
             throw new BusinessException("Esse veiculo viola a regra do estacionamento");
         }
 

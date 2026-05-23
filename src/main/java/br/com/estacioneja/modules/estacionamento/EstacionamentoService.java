@@ -1,7 +1,12 @@
 package br.com.estacioneja.modules.estacionamento;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import br.com.estacioneja.shared.enums.TipoVeiculo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +19,7 @@ import br.com.estacioneja.modules.empresa.EmpresaService;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoDTO;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoOutputDTO;
 import br.com.estacioneja.modules.estacionamento.dto.EstacionamentoUpdateDto;
+import br.com.estacioneja.modules.estacionamento.dto.RegraCapacidadeInputDTO;
 import br.com.estacioneja.modules.security.AuthorizationService;
 import br.com.estacioneja.modules.usuario.Usuario;
 
@@ -37,7 +43,10 @@ public class EstacionamentoService {
         authorizationService.requireAnyEmpresaRole(autenticado, dto.empresaId(), CARGOS_GESTAO);
 
         Empresa empresa = empresaService.findEntityById(dto.empresaId());
-        Estacionamento newEstacionamento = new Estacionamento(dto, empresa);
+        Estacionamento newEstacionamento = new Estacionamento(dto.privacidade(), dto.descricao(), empresa, dto.metodoEntrada());
+        for (RegraCapacidadeInputDTO regra : dto.regrasCapacidade()) {
+            newEstacionamento.addRegraCapacidade(regra.tipoVeiculo(), regra.capacidade());
+        }
         Estacionamento saved = estacionamentoRepository.save(newEstacionamento);
         return estacionamentoMapper.toDto(saved);
     }
@@ -50,7 +59,32 @@ public class EstacionamentoService {
         authorizationService.requireAnyEmpresaRole(autenticado, empresaIdOf(estacionamento), CARGOS_GESTAO);
 
         estacionamento.setPrivacidade(dto.privacidade());
+        estacionamento.setDescricao(dto.descricao());
+        estacionamento.setMetodoEntrada(dto.metodoEntrada());
+        mergeRegrasCapacidade(estacionamento, dto.regrasCapacidade());
+
         estacionamentoRepository.save(estacionamento);
+    }
+
+    private void mergeRegrasCapacidade(Estacionamento estacionamento, List<RegraCapacidadeInputDTO> regrasDto) {
+        Set<TipoVeiculo> tiposDesejados = regrasDto.stream()
+                .map(RegraCapacidadeInputDTO::tipoVeiculo)
+                .collect(Collectors.toSet());
+
+        List<RegraCapacidade> aRemover = estacionamento.getRegrasCapacidade().stream()
+                .filter(r -> !tiposDesejados.contains(r.getTipoVeiculo()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        for (RegraCapacidade regra : aRemover) {
+            estacionamento.removerRegra(regra);
+        }
+
+        for (RegraCapacidadeInputDTO regraDto : regrasDto) {
+            estacionamento.buscarRegra(regraDto.tipoVeiculo())
+                    .ifPresentOrElse(
+                            existente -> existente.ajustarCapacidade(regraDto.capacidade()),
+                            () -> estacionamento.addRegraCapacidade(regraDto.tipoVeiculo(), regraDto.capacidade())
+                    );
+        }
     }
 
     @Transactional

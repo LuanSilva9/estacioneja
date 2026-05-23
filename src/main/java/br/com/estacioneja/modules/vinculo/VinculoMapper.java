@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import br.com.estacioneja.modules.empresa.Empresa;
 import br.com.estacioneja.modules.endereco.Endereco;
 import br.com.estacioneja.modules.estacionamento.Estacionamento;
+import br.com.estacioneja.modules.estacionamento.EstacionamentoMapper;
 import br.com.estacioneja.modules.usuario.Usuario;
 import br.com.estacioneja.modules.veiculo.Veiculo;
 import br.com.estacioneja.modules.vinculo.dto.EstacionamentoCardUsuarioDTO;
@@ -18,7 +19,10 @@ import br.com.estacioneja.modules.vinculo.dto.VinculoConsultaGuaritaDTO;
 import br.com.estacioneja.modules.vinculo.dto.VinculoLinhaAdminDTO;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class VinculoMapper {
+
+    private final EstacionamentoMapper estacionamentoMapper;
 
     public VinculoCardUsuarioDTO toCardUsuario(Vinculo vinculo) {
         if (vinculo == null) return null;
@@ -77,10 +81,9 @@ public class VinculoMapper {
                 e.getId(),
                 e.getDescricao(),
                 empresa == null ? null : empresa.getNome(),
-                endereco == null ? null : endereco.getCidade(),
-                endereco == null ? null : endereco.getUf(),
-                e.getCapacidade(),
-                e.getCapacidadeDisponivel()
+                endereco == null ? null : endereco,
+                e.getPrivacidade(),
+                estacionamentoMapper.toRegraCapacidadeList(e.getRegrasCapacidade())
         );
     }
 

@@ -95,13 +95,13 @@ public class RegistroService {
 
     private RegistroOutputDTO registrarEntrada(Veiculo veiculo, Estacionamento estacionamento) {
         Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.ENTRADA);
-        estacionamento.entrarVeiculo();
+        estacionamento.entrarVeiculo(veiculo.getTipoVeiculo());
         return registroMapper.toDto(registroRepository.save(newRegistro));
     }
 
     private RegistroOutputDTO registrarSaida(Veiculo veiculo, Estacionamento estacionamento) {
         Registro newRegistro = new Registro(veiculo, estacionamento, TipoRegistro.SAIDA);
-        estacionamento.sairVeiculo();
+        estacionamento.sairVeiculo(veiculo.getTipoVeiculo());
         return registroMapper.toDto(registroRepository.save(newRegistro));
     }
 }
